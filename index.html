@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>NOVA Disaster Response</title>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <nav>
+    <div class="logo">🚨 NOVA</div>
+
+    <div class="nav-links">
+      <a href="#home">Home</a>
+      <a href="#report">Report</a>
+      <a href="#alerts">Alerts</a>
+      <a href="#about">About</a>
+    </div>
+  </nav>
+
+  <section class="hero" id="home">
+
+    <div class="hero-content">
+
+      <p class="tag">EMERGENCY RESPONSE PLATFORM</p>
+
+      <h1>
+        Help should reach<br>
+        when it actually matters.
+      </h1>
+
+      <p class="hero-text">
+        NOVA is a small attempt to make emergency reporting easier.
+        The idea is simple — report the situation quickly and help people
+        coordinate better during difficult times.
+      </p>
+
+      <div class="buttons">
+        <button class="sos-btn" onclick="sendSOS()">
+          🚨 Send SOS
+        </button>
+
+        <button class="report-btn">
+          Report Emergency
+        </button>
+      </div>
+
+    </div>
+
+    <div class="hero-card">
+
+      <div class="status">
+        <span class="pulse"></span>
+        System Active
+      </div>
+
+      <h3>Need help?</h3>
+
+      <p>
+        Share basic emergency details so the situation can be understood quickly.
+      </p>
+
+      <div class="stats">
+
+        <div>
+          <strong>24/7</strong>
+          <span>Emergency</span>
+        </div>
+
+        <div>
+          <strong>Fast</strong>
+          <span>Reporting</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <section class="features" id="about">
+
+    <h2>What can you do here?</h2>
+
+    <p class="subtitle">
+      Some basic features I'm planning and working on for the project.
+    </p>
+
+
+    <div class="feature-grid">
+
+      <div class="feature-card">
+        <div class="icon">🚨</div>
+        <h3>Quick SOS</h3>
+        <p>
+          In an emergency, the user can quickly send an SOS alert.
+        </p>
+      </div>
+
+
+      <div class="feature-card">
+        <div class="icon">📍</div>
+        <h3>Share Location</h3>
+        <p>
+          Location sharing can help responders understand where help is needed.
+        </p>
+      </div>
+
+
+      <div class="feature-card">
+        <div class="icon">📢</div>
+        <h3>Important Alerts</h3>
+        <p>
+          Users can get updates related to emergency or disaster situations.
+        </p>
+      </div>
+
+
+      <div class="feature-card">
+        <div class="icon">👥</div>
+        <h3>Community Help</h3>
+        <p>
+          A simple way to help volunteers and people coordinate better.
+        </p>
+      </div>
+
+    </div>
+
+  </section>
+
+  <section class="emergency-section" id="report">
+
+    <h2>Facing an emergency?</h2>
+
+    <p>
+      Don't waste time searching everywhere. Use the SOS option to report the situation.
+    </p>
+
+    <button class="big-sos" onclick="sendSOS()">
+      🚨 SEND SOS
+    </button>
+
+  </section>
+
+  <footer>
+    <p>
+      NOVA Disaster Response • Made by Aditya Raj while learning and building 🚀
+    </p>
+  </footer>
+
+  <script src="script.js"></script>
+
+</body>
+</html>
