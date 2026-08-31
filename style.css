@@ -1,3 +1,5 @@
+/* sabse pehle basic setting warna cheeze idhar udhar ho jati hain */
+
 * {
   margin: 0;
   padding: 0;
@@ -15,6 +17,7 @@ body {
 }
 
 
+/* upar wala navbar */
 
 nav {
   display: flex;
@@ -28,7 +31,6 @@ nav {
 .logo {
   font-size: 24px;
   font-weight: bold;
-  letter-spacing: 1px;
 }
 
 .nav-links {
@@ -47,6 +49,7 @@ nav {
 }
 
 
+/* main wala first section */
 
 .hero {
   min-height: 85vh;
@@ -78,10 +81,10 @@ nav {
   color: #aab7c4;
   font-size: 18px;
   line-height: 1.7;
-  max-width: 600px;
 }
 
 
+/* dono buttons ek jagah */
 
 .buttons {
   display: flex;
@@ -118,6 +121,7 @@ button {
 }
 
 
+/* right side wala card */
 
 .hero-card {
   background: #101c2e;
@@ -153,6 +157,7 @@ button {
 }
 
 
+/* reports aur 24/7 wala part */
 
 .stats {
   display: flex;
@@ -178,6 +183,7 @@ button {
 }
 
 
+/* features wala section */
 
 .features {
   padding: 80px 10%;
@@ -231,6 +237,7 @@ button {
 }
 
 
+/* emergency report wala bada section */
 
 .emergency-section {
   text-align: center;
@@ -262,6 +269,164 @@ button {
 }
 
 
+/* ab reports dashboard */
+
+.reports-section {
+  padding: 80px 10%;
+  background: #0b1626;
+  text-align: center;
+}
+
+.reports-section h2 {
+  font-size: 38px;
+  margin-bottom: 15px;
+}
+
+.reports-container {
+  max-width: 900px;
+  margin: auto;
+  text-align: left;
+}
+
+.no-report {
+  text-align: center;
+  color: #94a3b8;
+  padding: 30px;
+}
+
+
+/* individual report card */
+
+.report-card {
+  background: #101c2e;
+  border: 1px solid #24344a;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.report-card h3 {
+  margin-bottom: 10px;
+}
+
+.report-card p {
+  color: #aab7c4;
+  margin: 7px 0;
+}
+
+
+/* popup ka background */
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 10;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background: rgba(0, 0, 0, 0.75);
+}
+
+
+/* actual popup box */
+
+.modal-content {
+  background: #101c2e;
+  margin: 7% auto;
+  padding: 30px;
+  border-radius: 15px;
+  border: 1px solid #24344a;
+  width: 90%;
+  max-width: 500px;
+  position: relative;
+}
+
+.modal-content h2 {
+  margin-bottom: 10px;
+}
+
+.form-text {
+  color: #94a3b8;
+  margin-bottom: 25px;
+}
+
+
+/* cross button */
+
+.close {
+  position: absolute;
+  right: 20px;
+  top: 15px;
+  font-size: 30px;
+  cursor: pointer;
+  color: #94a3b8;
+}
+
+.close:hover {
+  color: white;
+}
+
+
+/* form ke andar wali setting */
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin: 12px 0 7px;
+}
+
+input,
+select,
+textarea {
+  padding: 13px;
+  border-radius: 7px;
+  border: 1px solid #334155;
+  background: #081120;
+  color: white;
+  font-size: 15px;
+}
+
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+
+/* location lene wala button */
+
+.location-btn {
+  margin-top: 20px;
+  background: #2563eb;
+  color: white;
+}
+
+#locationStatus {
+  font-size: 13px;
+  color: #94a3b8;
+  margin-top: 10px;
+}
+
+
+/* final submit button */
+
+.submit-btn {
+  margin-top: 20px;
+  background: #22c55e;
+  color: white;
+  font-weight: bold;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+}
+
+
+/* footer */
 
 footer {
   text-align: center;
@@ -271,7 +436,8 @@ footer {
   font-size: 14px;
 }
 
-/* mobile ke liye thoda responsive */
+
+/* tablet ya thodi choti screen */
 
 @media (max-width: 900px) {
 
@@ -297,14 +463,18 @@ footer {
     width: 100%;
     max-width: 450px;
   }
-
 }
+
+
+/* mobile pe sab theek dikhe isliye */
 
 @media (max-width: 600px) {
 
   nav {
     padding: 18px 5%;
   }
+
+  /* mobile me links hide kar diye */
 
   .nav-links {
     display: none;
@@ -319,8 +489,12 @@ footer {
   }
 
   .features h2,
-  .emergency-section h2 {
+  .emergency-section h2,
+  .reports-section h2 {
     font-size: 30px;
   }
 
+  .modal-content {
+    margin: 15% auto;
+  }
 }
