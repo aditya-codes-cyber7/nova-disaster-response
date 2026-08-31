@@ -1,27 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <title>NOVA Disaster Response</title>
 
+  <!-- styling wali file -->
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
+  <!-- upar navigation bar -->
   <nav>
     <div class="logo">🚨 NOVA</div>
 
     <div class="nav-links">
       <a href="#home">Home</a>
       <a href="#report">Report</a>
-      <a href="#alerts">Alerts</a>
+      <a href="#reports">Reports</a>
       <a href="#about">About</a>
     </div>
   </nav>
 
+
+  <!-- ye website ka main section hai -->
   <section class="hero" id="home">
 
     <div class="hero-content">
@@ -29,28 +34,34 @@
       <p class="tag">EMERGENCY RESPONSE PLATFORM</p>
 
       <h1>
-        Help should reach<br>
-        when it actually matters.
+        Emergency me help<br>
+        jaldi milni chahiye.
       </h1>
 
       <p class="hero-text">
-        NOVA is a small attempt to make emergency reporting easier.
-        The idea is simple — report the situation quickly and help people
-        coordinate better during difficult times.
+        NOVA basically ek chota sa project hai jiska idea ye hai ki
+        emergency ke time par report karna aur information share karna
+        thoda easy ho sake.
       </p>
 
       <div class="buttons">
-        <button class="sos-btn" onclick="sendSOS()">
+
+        <!-- direct SOS ke liye -->
+        <button class="sos-btn" onclick="openSOSForm()">
           🚨 Send SOS
         </button>
 
-        <button class="report-btn">
+        <!-- normal emergency report -->
+        <button class="report-btn" onclick="openReportForm()">
           Report Emergency
         </button>
+
       </div>
 
     </div>
 
+
+    <!-- right side wala info card -->
     <div class="hero-card">
 
       <div class="status">
@@ -58,22 +69,22 @@
         System Active
       </div>
 
-      <h3>Need help?</h3>
+      <h3>Koi problem hai?</h3>
 
       <p>
-        Share basic emergency details so the situation can be understood quickly.
+        Basic emergency details add karo taki situation samajhne me help ho.
       </p>
 
       <div class="stats">
 
         <div>
-          <strong>24/7</strong>
-          <span>Emergency</span>
+          <strong id="reportCount">0</strong>
+          <span>Reports</span>
         </div>
 
         <div>
-          <strong>Fast</strong>
-          <span>Reporting</span>
+          <strong>24/7</strong>
+          <span>Available</span>
         </div>
 
       </div>
@@ -83,14 +94,14 @@
   </section>
 
 
+  <!-- yaha project ke features dikhaye hain -->
   <section class="features" id="about">
 
-    <h2>What can you do here?</h2>
+    <h2>Yaha kya kya kar sakte ho?</h2>
 
     <p class="subtitle">
-      Some basic features I'm planning and working on for the project.
+      Abhi kuch basic features hain, baaki dheere dheere add karunga.
     </p>
-
 
     <div class="feature-grid">
 
@@ -98,25 +109,25 @@
         <div class="icon">🚨</div>
         <h3>Quick SOS</h3>
         <p>
-          In an emergency, the user can quickly send an SOS alert.
+          Emergency ho toh quickly SOS request bhej sakte ho.
         </p>
       </div>
 
 
       <div class="feature-card">
         <div class="icon">📍</div>
-        <h3>Share Location</h3>
+        <h3>Location</h3>
         <p>
-          Location sharing can help responders understand where help is needed.
+          Apni location lekar report ke saath save kar sakte ho.
         </p>
       </div>
 
 
       <div class="feature-card">
         <div class="icon">📢</div>
-        <h3>Important Alerts</h3>
+        <h3>Reports</h3>
         <p>
-          Users can get updates related to emergency or disaster situations.
+          Jo emergency reports submit hui hain unko dashboard me dekh sakte ho.
         </p>
       </div>
 
@@ -125,7 +136,7 @@
         <div class="icon">👥</div>
         <h3>Community Help</h3>
         <p>
-          A simple way to help volunteers and people coordinate better.
+          Aage chalke volunteers aur responders ko connect karne ka idea hai.
         </p>
       </div>
 
@@ -133,26 +144,126 @@
 
   </section>
 
+
+  <!-- yaha se user emergency report kar sakta hai -->
   <section class="emergency-section" id="report">
 
-    <h2>Facing an emergency?</h2>
+    <h2>Emergency Report Karni Hai?</h2>
 
     <p>
-      Don't waste time searching everywhere. Use the SOS option to report the situation.
+      Jo information pata hai wahi fill karo, unnecessary details ki zarurat nahi.
     </p>
 
-    <button class="big-sos" onclick="sendSOS()">
-      🚨 SEND SOS
+    <button class="big-sos" onclick="openReportForm()">
+      🚨 REPORT EMERGENCY
     </button>
 
   </section>
 
+
+  <!-- submitted reports yaha dikhenge -->
+  <section class="reports-section" id="reports">
+
+    <h2>Recent Reports</h2>
+
+    <p class="subtitle">
+      Abhi demo ke liye reports browser me save ho rahi hain.
+    </p>
+
+    <div id="reportsContainer" class="reports-container">
+
+      <p class="no-report">
+        Abhi tak koi report submit nahi hui.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- popup form yaha hai -->
+  <div class="modal" id="reportModal">
+
+    <div class="modal-content">
+
+      <!-- form band karne ke liye -->
+      <span class="close" onclick="closeReportForm()">×</span>
+
+      <h2>Emergency Details</h2>
+
+      <p class="form-text">
+        Jo pata hai wahi fill karo, tension lene ki zarurat nahi 😅
+      </p>
+
+      <form id="emergencyForm">
+
+        <label>Name</label>
+
+        <input
+          type="text"
+          id="name"
+          placeholder="Apna naam likho"
+          required
+        >
+
+
+        <label>Emergency Type</label>
+
+        <select id="emergencyType" required>
+
+          <option value="">Select karo</option>
+          <option>Fire 🔥</option>
+          <option>Medical 🚑</option>
+          <option>Flood 🌊</option>
+          <option>Accident 🚗</option>
+          <option>Earthquake 🌍</option>
+          <option>Other ⚠️</option>
+
+        </select>
+
+
+        <label>Kya hua?</label>
+
+        <textarea
+          id="description"
+          placeholder="Short me batao kya problem hui hai..."
+          required>
+        </textarea>
+
+
+        <!-- location lene ka button -->
+        <button
+          type="button"
+          class="location-btn"
+          onclick="getLocation()"
+        >
+          📍 Get My Location
+        </button>
+
+        <p id="locationStatus"></p>
+
+
+        <!-- final submit -->
+        <button type="submit" class="submit-btn">
+          Submit Report
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- bilkul niche -->
   <footer>
     <p>
-      NOVA Disaster Response • Made by Aditya Raj while learning and building 🚀
+      NOVA Disaster Response • Made by Aditya Raj while learning 🚀
     </p>
   </footer>
 
+
+  <!-- javascript wali file -->
   <script src="script.js"></script>
 
 </body>
