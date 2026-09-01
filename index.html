@@ -26,7 +26,7 @@
   </nav>
 
 
-  <!-- ye website ka main section hai -->
+  <!-- main hero section -->
   <section class="hero" id="home">
 
     <div class="hero-content">
@@ -46,12 +46,10 @@
 
       <div class="buttons">
 
-        <!-- direct SOS ke liye -->
         <button class="sos-btn" onclick="openSOSForm()">
           🚨 Send SOS
         </button>
 
-        <!-- normal emergency report -->
         <button class="report-btn" onclick="openReportForm()">
           Report Emergency
         </button>
@@ -61,7 +59,7 @@
     </div>
 
 
-    <!-- right side wala info card -->
+    <!-- right side info card -->
     <div class="hero-card">
 
       <div class="status">
@@ -94,7 +92,7 @@
   </section>
 
 
-  <!-- yaha project ke features dikhaye hain -->
+  <!-- features section -->
   <section class="features" id="about">
 
     <h2>Yaha kya kya kar sakte ho?</h2>
@@ -108,36 +106,25 @@
       <div class="feature-card">
         <div class="icon">🚨</div>
         <h3>Quick SOS</h3>
-        <p>
-          Emergency ho toh quickly SOS request bhej sakte ho.
-        </p>
+        <p>Emergency ho toh quickly SOS request bhej sakte ho.</p>
       </div>
-
 
       <div class="feature-card">
         <div class="icon">📍</div>
         <h3>Location</h3>
-        <p>
-          Apni location lekar report ke saath save kar sakte ho.
-        </p>
+        <p>Apni location lekar report ke saath save kar sakte ho.</p>
       </div>
-
 
       <div class="feature-card">
         <div class="icon">📢</div>
         <h3>Reports</h3>
-        <p>
-          Jo emergency reports submit hui hain unko dashboard me dekh sakte ho.
-        </p>
+        <p>Submitted emergency reports dashboard me dekh sakte ho.</p>
       </div>
-
 
       <div class="feature-card">
         <div class="icon">👥</div>
         <h3>Community Help</h3>
-        <p>
-          Aage chalke volunteers aur responders ko connect karne ka idea hai.
-        </p>
+        <p>Aage volunteers aur responders ko connect karne ka idea hai.</p>
       </div>
 
     </div>
@@ -145,7 +132,7 @@
   </section>
 
 
-  <!-- yaha se user emergency report kar sakta hai -->
+  <!-- emergency report section -->
   <section class="emergency-section" id="report">
 
     <h2>Emergency Report Karni Hai?</h2>
@@ -161,14 +148,91 @@
   </section>
 
 
-  <!-- submitted reports yaha dikhenge -->
+  <!-- DASHBOARD SECTION -->
+  <section class="dashboard-section">
+
+    <div class="dashboard-heading">
+      <p class="tag">LIVE DEMO DASHBOARD</p>
+      <h2>Emergency Overview</h2>
+      <p>Reports ka quick overview yaha dikhega.</p>
+    </div>
+
+
+    <!-- counters -->
+    <div class="dashboard-cards">
+
+      <div class="dashboard-card total-card">
+        <div class="dashboard-icon">🚨</div>
+        <div>
+          <span>Total Reports</span>
+          <strong id="totalReports">0</strong>
+        </div>
+      </div>
+
+
+      <div class="dashboard-card active-card">
+        <div class="dashboard-icon">🔴</div>
+        <div>
+          <span>Active Cases</span>
+          <strong id="activeReports">0</strong>
+        </div>
+      </div>
+
+
+      <div class="dashboard-card resolved-card">
+        <div class="dashboard-icon">✅</div>
+        <div>
+          <span>Resolved</span>
+          <strong id="resolvedReports">0</strong>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- submitted reports -->
   <section class="reports-section" id="reports">
 
-    <h2>Recent Reports</h2>
+    <div class="reports-header">
 
-    <p class="subtitle">
-      Abhi demo ke liye reports browser me save ho rahi hain.
-    </p>
+      <div>
+        <h2>Recent Reports</h2>
+
+        <p class="subtitle">
+          Abhi demo ke liye reports browser me save ho rahi hain.
+        </p>
+      </div>
+
+
+      <!-- clear all button -->
+      <button class="clear-btn" onclick="clearAllReports()">
+        🗑️ Clear All
+      </button>
+
+    </div>
+
+
+    <!-- filter -->
+    <div class="filter-box">
+
+      <label for="reportFilter">🔎 Filter Reports:</label>
+
+      <select id="reportFilter" onchange="filterReports()">
+
+        <option value="All">All Emergencies</option>
+        <option value="Fire 🔥">Fire 🔥</option>
+        <option value="Medical 🚑">Medical 🚑</option>
+        <option value="Flood 🌊">Flood 🌊</option>
+        <option value="Accident 🚗">Accident 🚗</option>
+        <option value="Earthquake 🌍">Earthquake 🌍</option>
+        <option value="Other ⚠️">Other ⚠️</option>
+
+      </select>
+
+    </div>
+
 
     <div id="reportsContainer" class="reports-container">
 
@@ -181,12 +245,11 @@
   </section>
 
 
-  <!-- popup form yaha hai -->
+  <!-- popup form -->
   <div class="modal" id="reportModal">
 
     <div class="modal-content">
 
-      <!-- form band karne ke liye -->
       <span class="close" onclick="closeReportForm()">×</span>
 
       <h2>Emergency Details</h2>
@@ -231,7 +294,6 @@
         </textarea>
 
 
-        <!-- location lene ka button -->
         <button
           type="button"
           class="location-btn"
@@ -243,7 +305,6 @@
         <p id="locationStatus"></p>
 
 
-        <!-- final submit -->
         <button type="submit" class="submit-btn">
           Submit Report
         </button>
@@ -255,7 +316,6 @@
   </div>
 
 
-  <!-- bilkul niche -->
   <footer>
     <p>
       NOVA Disaster Response • Made by Aditya Raj while learning 🚀
@@ -263,7 +323,6 @@
   </footer>
 
 
-  <!-- javascript wali file -->
   <script src="script.js"></script>
 
 </body>
