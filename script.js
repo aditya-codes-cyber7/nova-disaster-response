@@ -1,9 +1,31 @@
 // ========================================
-// NOVA Disaster Response - JavaScript
-// reports abhi browser ke localStorage me save ho rahi hain
+// NOVA DISASTER RESPONSE SYSTEM
+// FIREBASE + FIRESTORE VERSION
+// ========================================
+
+
+import {
+
+  db,
+  collection,
+  addDoc,
+  doc,
+  updateDoc,
+  deleteDoc,
+  onSnapshot,
+  query,
+  orderBy
+
+} from "./firebase.js";
+
+
+// ========================================
+// GLOBAL VARIABLES
 // ========================================
 
 let userLocation = "Location nahi mili";
+
+let allReports = [];
 
 
 // ========================================
@@ -21,8 +43,11 @@ function openSOSForm() {
 
   document.getElementById("reportModal").style.display = "block";
 
-  // emergency type select karne ke liye focus
-  document.getElementById("emergencyType").focus();
+  setTimeout(function () {
+
+    document.getElementById("emergencyType").focus();
+
+  }, 300);
 
 }
 
@@ -35,7 +60,7 @@ function closeReportForm() {
 
 
 // ========================================
-// LOCATION LENE KA FUNCTION
+// LOCATION
 // ========================================
 
 function getLocation() {
@@ -53,13 +78,19 @@ function getLocation() {
 
       function (position) {
 
-        let latitude = position.coords.latitude;
-        let longitude = position.coords.longitude;
+        let latitude =
+          position.coords.latitude;
+
+        let longitude =
+          position.coords.longitude;
 
 
         userLocation =
+
           latitude.toFixed(5) +
+
           ", " +
+
           longitude.toFixed(5);
 
 
@@ -78,7 +109,10 @@ function getLocation() {
 
     );
 
-  } else {
+  }
+
+
+  else {
 
     status.innerText =
       "Tumhara browser location support nahi karta.";
@@ -89,204 +123,262 @@ function getLocation() {
 
 
 // ========================================
-// NEW REPORT SUBMIT
+// SUBMIT NEW REPORT TO FIREBASE
 // ========================================
 
-document.getElementById("emergencyForm").addEventListener(
+document
+  .getElementById("emergencyForm")
+  .addEventListener(
 
-  "submit",
+    "submit",
 
-  function (event) {
+    async function (event) {
 
-    // page reload mat hone do
-    event.preventDefault();
-
-
-    // form ki values le rahe hain
-
-    let name =
-      document.getElementById("name").value;
+      event.preventDefault();
 
 
-    let type =
-      document.getElementById("emergencyType").value;
+      let name =
+        document.getElementById("name").value;
 
 
-    let description =
-      document.getElementById("description").value;
+      let type =
+        document.getElementById(
+          "emergencyType"
+        ).value;
 
 
-    // nayi report object
-
-    let report = {
-
-      id: Date.now(),
-
-      name: name,
-
-      type: type,
-
-      description: description,
-
-      location: userLocation,
-
-      time: new Date().toLocaleString(),
-
-      // har nayi report pehle Active hogi
-      status: "Active"
-
-    };
+      let description =
+        document.getElementById(
+          "description"
+        ).value;
 
 
-    // purani reports nikalo
+      // Validation
 
-    let reports = JSON.parse(
-      localStorage.getItem("novaReports")
-    ) || [];
+      if (!name || !type || !description) {
+
+        alert(
+          "Please saari details fill karo!"
+        );
+
+        return;
+
+      }
 
 
-    // new report sabse upar add karo
+      try {
 
-    reports.unshift(report);
+        // Add report to Firestore
+
+        await addDoc(
+
+          collection(db, "reports"),
+
+          {
+
+            name: name,
+
+            type: type,
+
+            description: description,
+
+            location: userLocation,
+
+            time:
+              new Date().toLocaleString(),
+
+            timestamp:
+              Date.now(),
+
+            status: "Active"
+
+          }
+
+        );
 
 
-    // browser me save
+        alert(
+          "Emergency report Firebase par successfully submit ho gayi! 🚨"
+        );
 
-    localStorage.setItem(
-      "novaReports",
-      JSON.stringify(reports)
+
+        // Reset form
+
+        document
+          .getElementById("emergencyForm")
+          .reset();
+
+
+        userLocation =
+          "Location nahi mili";
+
+
+        document
+          .getElementById(
+            "locationStatus"
+          )
+          .innerText = "";
+
+
+        closeReportForm();
+
+      }
+
+
+      catch (error) {
+
+        console.error(error);
+
+
+        alert(
+          "Report submit nahi hui. Please dobara try karo."
+        );
+
+      }
+
+    }
+
+  );
+
+
+// ========================================
+// REALTIME REPORTS LISTENER
+// ========================================
+
+function loadReports() {
+
+  const reportsRef =
+    collection(db, "reports");
+
+
+  const reportsQuery =
+    query(
+      reportsRef,
+      orderBy("timestamp", "desc")
     );
 
 
-    alert("Report submit ho gayi! 🚨");
+  onSnapshot(
+
+    reportsQuery,
 
 
-    // form reset
+    function (snapshot) {
 
-    document.getElementById(
-      "emergencyForm"
-    ).reset();
+      allReports = [];
 
 
-    userLocation = "Location nahi mili";
+      snapshot.forEach(function (documentData) {
+
+        allReports.push({
+
+          id: documentData.id,
+
+          ...documentData.data()
+
+        });
+
+      });
 
 
-    document.getElementById(
-      "locationStatus"
-    ).innerText = "";
+      showReports();
+
+    },
 
 
-    // popup band
+    function (error) {
 
-    closeReportForm();
+      console.error(
+        "Firebase Error:",
+        error
+      );
 
+    }
 
-    // reports aur dashboard update
+  );
 
-    showReports();
-
-  }
-
-);
+}
 
 
 // ========================================
-// REPORTS SCREEN PAR DIKHANA
+// SHOW REPORTS
 // ========================================
 
 function showReports() {
 
-  // browser se reports nikalo
-
-  let reports = JSON.parse(
-    localStorage.getItem("novaReports")
-  ) || [];
-
-
-  // ----------------------------------------
-  // PURANI REPORTS FIX
-  // pehle status nahi tha isliye undefined aa raha tha
-  // ----------------------------------------
-
-  reports = reports.map(function (report) {
-
-    if (!report.status) {
-
-      report.status = "Active";
-
-    }
-
-    return report;
-
-  });
-
-
-  // fixed reports dobara save
-
-  localStorage.setItem(
-    "novaReports",
-    JSON.stringify(reports)
-  );
-
 
   let container =
-    document.getElementById("reportsContainer");
+    document.getElementById(
+      "reportsContainer"
+    );
 
 
-  // ----------------------------------------
-  // HERO REPORT COUNT
-  // ----------------------------------------
+  if (!container) return;
 
-  let heroCount =
-    document.getElementById("reportCount");
 
-  if (heroCount) {
+  // =====================================
+  // REPORT COUNTS
+  // =====================================
 
-    heroCount.innerText =
-      reports.length;
+  let reportCount =
+    document.getElementById(
+      "reportCount"
+    );
+
+
+  if (reportCount) {
+
+    reportCount.innerText =
+      allReports.length;
 
   }
 
 
-  // ----------------------------------------
-  // DASHBOARD COUNTERS
-  // ----------------------------------------
-
   let totalReports =
-    document.getElementById("totalReports");
+    document.getElementById(
+      "totalReports"
+    );
+
 
   if (totalReports) {
 
     totalReports.innerText =
-      reports.length;
+      allReports.length;
 
   }
 
 
-  // active reports count
+  let activeReports =
+    allReports.filter(
 
-  let activeReports = reports.filter(
-    function (report) {
+      function (report) {
 
-      return report.status === "Active";
+        return report.status ===
+          "Active";
 
-    }
-  );
+      }
+
+    );
 
 
-  // resolved reports count
+  let resolvedReports =
+    allReports.filter(
 
-  let resolvedReports = reports.filter(
-    function (report) {
+      function (report) {
 
-      return report.status === "Resolved";
+        return report.status ===
+          "Resolved";
 
-    }
-  );
+      }
+
+    );
 
 
   let activeCounter =
-    document.getElementById("activeReports");
+    document.getElementById(
+      "activeReports"
+    );
+
 
   if (activeCounter) {
 
@@ -297,7 +389,10 @@ function showReports() {
 
 
   let resolvedCounter =
-    document.getElementById("resolvedReports");
+    document.getElementById(
+      "resolvedReports"
+    );
+
 
   if (resolvedCounter) {
 
@@ -307,15 +402,17 @@ function showReports() {
   }
 
 
-  // ----------------------------------------
-  // FILTER CHECK
-  // ----------------------------------------
+  // =====================================
+  // FILTER
+  // =====================================
 
   let selectedFilter = "All";
 
 
   let filterElement =
-    document.getElementById("reportFilter");
+    document.getElementById(
+      "reportFilter"
+    );
 
 
   if (filterElement) {
@@ -326,35 +423,46 @@ function showReports() {
   }
 
 
-  let filteredReports = reports;
+  let filteredReports =
+    allReports;
 
-
-  // All nahi hai toh type ke according filter
 
   if (selectedFilter !== "All") {
 
-    filteredReports = reports.filter(
-      function (report) {
+    filteredReports =
+      allReports.filter(
 
-        return report.type === selectedFilter;
+        function (report) {
 
-      }
-    );
+          return report.type ===
+            selectedFilter;
+
+        }
+
+      );
 
   }
 
 
-  // ----------------------------------------
-  // AGAR KOI REPORT NAHI HAI
-  // ----------------------------------------
+  // =====================================
+  // NO REPORT
+  // =====================================
 
-  if (filteredReports.length === 0) {
+  if (
+    filteredReports.length === 0
+  ) {
 
     container.innerHTML = `
 
-      <p class="no-report">
-        Abhi is category me koi report nahi hai.
-      </p>
+      <div class="no-report">
+
+        <h3>📭 No Reports Found</h3>
+
+        <p>
+          Abhi koi emergency report available nahi hai.
+        </p>
+
+      </div>
 
     `;
 
@@ -363,217 +471,237 @@ function showReports() {
   }
 
 
-  // purana content hatao
+  // =====================================
+  // CREATE REPORT CARDS
+  // =====================================
 
   container.innerHTML = "";
 
 
-  // ----------------------------------------
-  // HAR REPORT KA CARD BANAO
-  // ----------------------------------------
+  filteredReports.forEach(
 
-  filteredReports.forEach(function (report) {
-
-    let card =
-      document.createElement("div");
+    function (report) {
 
 
-    card.className =
-      "report-card";
+      let card =
+        document.createElement("div");
 
 
-    // status ke hisaab se CSS class
-
-    let statusClass = "";
-
-
-    if (report.status === "Active") {
-
-      statusClass =
-        "active-status";
-
-    } else {
-
-      statusClass =
-        "resolved-status";
-
-    }
+      card.className =
+        "report-card";
 
 
-    // status toggle button
+      // Status class
 
-    let statusButton = "";
+      let statusClass =
+
+        report.status === "Active"
+
+          ? "active-status"
+
+          : "resolved-status";
 
 
-    if (report.status === "Active") {
+      // Status button
 
-      statusButton = `
+      let statusButton = "";
 
-        <button
-          class="resolve-btn"
-          onclick="toggleStatus(${report.id})"
-        >
-          ✅ Mark Resolved
-        </button>
+
+      if (
+        report.status === "Active"
+      ) {
+
+        statusButton = `
+
+          <button
+            class="resolve-btn"
+            onclick="toggleStatus('${report.id}', '${report.status}')"
+          >
+
+            ✅ Mark Resolved
+
+          </button>
+
+        `;
+
+      }
+
+
+      else {
+
+        statusButton = `
+
+          <button
+            class="active-btn"
+            onclick="toggleStatus('${report.id}', '${report.status}')"
+          >
+
+            🔄 Mark Active
+
+          </button>
+
+        `;
+
+      }
+
+
+      card.innerHTML = `
+
+        <div class="report-top">
+
+          <h3>
+            🚨 ${report.type}
+          </h3>
+
+
+          <span
+            class="status-badge ${statusClass}"
+          >
+
+            ${report.status}
+
+          </span>
+
+        </div>
+
+
+        <p>
+
+          <strong>Name:</strong>
+
+          ${report.name}
+
+        </p>
+
+
+        <p>
+
+          <strong>Problem:</strong>
+
+          ${report.description}
+
+        </p>
+
+
+        <p>
+
+          <strong>Location:</strong>
+
+          📍 ${report.location}
+
+        </p>
+
+
+        <p>
+
+          <strong>Time:</strong>
+
+          🕒 ${report.time}
+
+        </p>
+
+
+        <div class="report-actions">
+
+
+          ${statusButton}
+
+
+          <button
+
+            class="delete-btn"
+
+            onclick="deleteReport('${report.id}')"
+
+          >
+
+            🗑️ Delete
+
+          </button>
+
+
+        </div>
 
       `;
 
-    } else {
 
-      statusButton = `
-
-        <button
-          class="active-btn"
-          onclick="toggleStatus(${report.id})"
-        >
-          🔄 Mark Active
-        </button>
-
-      `;
+      container.appendChild(card);
 
     }
 
-
-    // card ka content
-
-    card.innerHTML = `
-
-      <div class="report-top">
-
-        <h3>
-          🚨 ${report.type}
-        </h3>
-
-
-        <span class="status-badge ${statusClass}">
-          ${report.status}
-        </span>
-
-      </div>
-
-
-      <p>
-        <strong>Name:</strong>
-        ${report.name}
-      </p>
-
-
-      <p>
-        <strong>Problem:</strong>
-        ${report.description}
-      </p>
-
-
-      <p>
-        <strong>Location:</strong>
-        ${report.location}
-      </p>
-
-
-      <p>
-        <strong>Time:</strong>
-        ${report.time}
-      </p>
-
-
-      <div class="report-actions">
-
-        ${statusButton}
-
-
-        <button
-          class="delete-btn"
-          onclick="deleteReport(${report.id})"
-        >
-          🗑️ Delete
-        </button>
-
-      </div>
-
-    `;
-
-
-    // card page me add
-
-    container.appendChild(card);
-
-  });
+  );
 
 }
 
 
 // ========================================
-// STATUS CHANGE
-// Active <-> Resolved
+// CHANGE REPORT STATUS
 // ========================================
 
-function toggleStatus(id) {
+async function toggleStatus(
+  id,
+  currentStatus
+) {
 
-  let reports = JSON.parse(
-    localStorage.getItem("novaReports")
-  ) || [];
+
+  try {
 
 
-  reports = reports.map(function (report) {
+    let newStatus =
 
-    if (report.id === id) {
+      currentStatus === "Active"
 
-      // agar purani report hai aur status nahi hai
-      // pehle Active maan lo
+        ? "Resolved"
 
-      if (!report.status) {
+        : "Active";
 
-        report.status = "Active";
+
+    await updateDoc(
+
+      doc(
+        db,
+        "reports",
+        id
+      ),
+
+      {
+
+        status:
+          newStatus
 
       }
 
-
-      // status change
-
-      if (report.status === "Active") {
-
-        report.status = "Resolved";
-
-      } else {
-
-        report.status = "Active";
-
-      }
-
-    }
+    );
 
 
-    return report;
-
-  });
+  }
 
 
-  // updated reports save
+  catch (error) {
 
-  localStorage.setItem(
-    "novaReports",
-    JSON.stringify(reports)
-  );
+    console.error(error);
 
+    alert(
+      "Status update nahi ho paya."
+    );
 
-  // page update
-
-  showReports();
+  }
 
 }
 
 
 // ========================================
-// SINGLE REPORT DELETE
+// DELETE SINGLE REPORT
 // ========================================
 
-function deleteReport(id) {
+async function deleteReport(id) {
 
-  let confirmDelete = confirm(
 
-    "Pakki baat? Ye report delete ho jayegi."
+  let confirmDelete =
 
-  );
+    confirm(
+      "Pakki baat? Ye report permanently delete ho jayegi."
+    );
 
 
   if (!confirmDelete) {
@@ -583,29 +711,33 @@ function deleteReport(id) {
   }
 
 
-  let reports = JSON.parse(
-    localStorage.getItem("novaReports")
-  ) || [];
+  try {
 
 
-  // jiski id match nahi karti usko rakho
+    await deleteDoc(
 
-  reports = reports.filter(
-    function (report) {
+      doc(
+        db,
+        "reports",
+        id
+      )
 
-      return report.id !== id;
-
-    }
-  );
-
-
-  localStorage.setItem(
-    "novaReports",
-    JSON.stringify(reports)
-  );
+    );
 
 
-  showReports();
+  }
+
+
+  catch (error) {
+
+    console.error(error);
+
+
+    alert(
+      "Report delete nahi ho payi."
+    );
+
+  }
 
 }
 
@@ -614,13 +746,14 @@ function deleteReport(id) {
 // CLEAR ALL REPORTS
 // ========================================
 
-function clearAllReports() {
+async function clearAllReports() {
 
-  let confirmClear = confirm(
 
-    "Saari reports delete ho jayengi. Sure ho?"
+  let confirmClear =
 
-  );
+    confirm(
+      "Saari reports permanently delete ho jayengi. Sure ho?"
+    );
 
 
   if (!confirmClear) {
@@ -630,14 +763,44 @@ function clearAllReports() {
   }
 
 
-  // pura localStorage data remove
-
-  localStorage.removeItem(
-    "novaReports"
-  );
+  try {
 
 
-  showReports();
+    for (
+      let report of allReports
+    ) {
+
+      await deleteDoc(
+
+        doc(
+          db,
+          "reports",
+          report.id
+        )
+
+      );
+
+    }
+
+
+    alert(
+      "Saari reports delete ho gayi."
+    );
+
+
+  }
+
+
+  catch (error) {
+
+    console.error(error);
+
+
+    alert(
+      "Reports delete nahi ho payi."
+    );
+
+  }
 
 }
 
@@ -654,35 +817,66 @@ function filterReports() {
 
 
 // ========================================
-// PAGE LOAD
+// MODAL OUTSIDE CLICK
 // ========================================
 
-// page khulte hi reports dikhao
+window.onclick =
+  function (event) {
 
-showReports();
+
+    let modal =
+      document.getElementById(
+        "reportModal"
+      );
+
+
+    if (
+      event.target === modal
+    ) {
+
+      closeReportForm();
+
+    }
+
+  };
 
 
 // ========================================
-// POPUP KE BAHAR CLICK
+// MAKE FUNCTIONS GLOBAL
 // ========================================
 
-window.onclick = function (event) {
+window.openReportForm =
+  openReportForm;
 
-  let modal =
-    document.getElementById("reportModal");
+window.openSOSForm =
+  openSOSForm;
+
+window.closeReportForm =
+  closeReportForm;
+
+window.getLocation =
+  getLocation;
+
+window.toggleStatus =
+  toggleStatus;
+
+window.deleteReport =
+  deleteReport;
+
+window.clearAllReports =
+  clearAllReports;
+
+window.filterReports =
+  filterReports;
 
 
-  if (event.target === modal) {
+// ========================================
+// START APP
+// ========================================
 
-    closeReportForm();
+loadReports();
 
-  }
-
-};
-
-
-// console check
 
 console.log(
-  "NOVA Disaster Response upgraded version chal raha hai 🚀"
+  "🚀 NOVA Firebase Disaster Response System Running!"
 );
