@@ -1,96 +1,141 @@
-// ========================================
-// NOVA DISASTER RESPONSE SYSTEM
-// FIREBASE + FIRESTORE VERSION
-// ========================================
+// ==========================================
+// NOVA DISASTER RESPONSE - PHASE 2
+// FIREBASE FIRESTORE REAL-TIME INTEGRATION
+// ==========================================
 
+
+// Import Firebase
+
+import { initializeApp } from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
 import {
-
-  db,
+  getFirestore,
   collection,
   addDoc,
-  doc,
+  getDocs,
+  onSnapshot,
   updateDoc,
   deleteDoc,
-  onSnapshot,
+  doc,
   query,
   orderBy
+} from
+"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-} from "./firebase.js";
+
+// ==========================================
+// FIREBASE CONFIG
+// ==========================================
+
+const firebaseConfig = {
+
+  apiKey: "AIzaSyBcEkoZMt1KZdQ-ch6J1-7KKyQRO542ZRY",
+
+  authDomain: "nova-disaster-response.firebaseapp.com",
+
+  projectId: "nova-disaster-response",
+
+  storageBucket:
+    "nova-disaster-response.firebasestorage.app",
+
+  messagingSenderId: "275029136991",
+
+  appId:
+    "1:275029136991:web:382543b5ef90263b8364a"
+
+};
 
 
-// ========================================
+// Initialize Firebase
+
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+// ==========================================
 // GLOBAL VARIABLES
-// ========================================
+// ==========================================
 
 let userLocation = "Location nahi mili";
 
 let allReports = [];
 
 
-// ========================================
+// ==========================================
 // FORM OPEN / CLOSE
-// ========================================
+// ==========================================
 
 function openReportForm() {
 
-  document.getElementById("reportModal").style.display = "block";
+  document.getElementById(
+    "reportModal"
+  ).style.display = "block";
 
 }
 
 
 function openSOSForm() {
 
-  document.getElementById("reportModal").style.display = "block";
+  document.getElementById(
+    "reportModal"
+  ).style.display = "block";
 
-  setTimeout(function () {
 
-    document.getElementById("emergencyType").focus();
-
-  }, 300);
+  document.getElementById(
+    "emergencyType"
+  ).focus();
 
 }
 
 
 function closeReportForm() {
 
-  document.getElementById("reportModal").style.display = "none";
+  document.getElementById(
+    "reportModal"
+  ).style.display = "none";
 
 }
 
 
-// ========================================
+// Make functions available to HTML onclick
+
+window.openReportForm = openReportForm;
+window.openSOSForm = openSOSForm;
+window.closeReportForm = closeReportForm;
+
+
+// ==========================================
 // LOCATION
-// ========================================
+// ==========================================
 
 function getLocation() {
 
-  let status = document.getElementById("locationStatus");
+  let status =
+    document.getElementById("locationStatus");
 
 
   if (navigator.geolocation) {
 
     status.innerText =
-      "Location le rahe hain... thoda wait karo 📍";
+      "Location le rahe hain... 📍";
 
 
     navigator.geolocation.getCurrentPosition(
 
       function (position) {
 
-        let latitude =
+        const latitude =
           position.coords.latitude;
 
-        let longitude =
+        const longitude =
           position.coords.longitude;
 
 
         userLocation =
-
           latitude.toFixed(5) +
-
           ", " +
-
           longitude.toFixed(5);
 
 
@@ -103,7 +148,7 @@ function getLocation() {
       function () {
 
         status.innerText =
-          "Location allow nahi hui ya nahi mil payi.";
+          "Location allow nahi hui.";
 
       }
 
@@ -111,170 +156,148 @@ function getLocation() {
 
   }
 
-
   else {
 
     status.innerText =
-      "Tumhara browser location support nahi karta.";
+      "Browser location support nahi karta.";
 
   }
 
 }
 
 
-// ========================================
-// SUBMIT NEW REPORT TO FIREBASE
-// ========================================
-
-document
-  .getElementById("emergencyForm")
-  .addEventListener(
-
-    "submit",
-
-    async function (event) {
-
-      event.preventDefault();
+window.getLocation = getLocation;
 
 
-      let name =
-        document.getElementById("name").value;
+// ==========================================
+// SUBMIT REPORT TO FIRESTORE
+// ==========================================
+
+const emergencyForm =
+  document.getElementById("emergencyForm");
 
 
-      let type =
-        document.getElementById(
-          "emergencyType"
-        ).value;
+emergencyForm.addEventListener(
+
+  "submit",
+
+  async function (event) {
+
+    event.preventDefault();
 
 
-      let description =
-        document.getElementById(
-          "description"
-        ).value;
+    const name =
+      document.getElementById("name").value;
 
 
-      // Validation
-
-      if (!name || !type || !description) {
-
-        alert(
-          "Please saari details fill karo!"
-        );
-
-        return;
-
-      }
+    const type =
+      document.getElementById(
+        "emergencyType"
+      ).value;
 
 
-      try {
-
-        // Add report to Firestore
-
-        await addDoc(
-
-          collection(db, "reports"),
-
-          {
-
-            name: name,
-
-            type: type,
-
-            description: description,
-
-            location: userLocation,
-
-            time:
-              new Date().toLocaleString(),
-
-            timestamp:
-              Date.now(),
-
-            status: "Active"
-
-          }
-
-        );
+    const description =
+      document.getElementById(
+        "description"
+      ).value;
 
 
-        alert(
-          "Emergency report Firebase par successfully submit ho gayi! 🚨"
-        );
+    try {
+
+      await addDoc(
+
+        collection(db, "reports"),
+
+        {
+
+          name: name,
+
+          type: type,
+
+          description: description,
+
+          location: userLocation,
+
+          status: "Active",
+
+          timestamp: Date.now(),
+
+          time:
+            new Date().toLocaleString()
+
+        }
+
+      );
 
 
-        // Reset form
-
-        document
-          .getElementById("emergencyForm")
-          .reset();
+      alert(
+        "Emergency Report Firestore me submit ho gayi! 🚨"
+      );
 
 
-        userLocation =
-          "Location nahi mili";
+      emergencyForm.reset();
 
 
-        document
-          .getElementById(
-            "locationStatus"
-          )
-          .innerText = "";
+      userLocation =
+        "Location nahi mili";
 
 
-        closeReportForm();
-
-      }
-
-
-      catch (error) {
-
-        console.error(error);
+      document.getElementById(
+        "locationStatus"
+      ).innerText = "";
 
 
-        alert(
-          "Report submit nahi hui. Please dobara try karo."
-        );
-
-      }
+      closeReportForm();
 
     }
 
+
+    catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Report submit nahi hui. Firebase check karo."
+      );
+
+    }
+
+  }
+
+);
+
+
+// ==========================================
+// REAL-TIME REPORT LISTENER
+// ==========================================
+
+function listenToReports() {
+
+  const reportsQuery = query(
+
+    collection(db, "reports"),
+
+    orderBy("timestamp", "desc")
+
   );
-
-
-// ========================================
-// REALTIME REPORTS LISTENER
-// ========================================
-
-function loadReports() {
-
-  const reportsRef =
-    collection(db, "reports");
-
-
-  const reportsQuery =
-    query(
-      reportsRef,
-      orderBy("timestamp", "desc")
-    );
 
 
   onSnapshot(
 
     reportsQuery,
 
-
     function (snapshot) {
 
       allReports = [];
 
 
-      snapshot.forEach(function (documentData) {
+      snapshot.forEach(function (document) {
 
         allReports.push({
 
-          id: documentData.id,
+          id: document.id,
 
-          ...documentData.data()
+          ...document.data()
 
         });
 
@@ -289,7 +312,7 @@ function loadReports() {
     function (error) {
 
       console.error(
-        "Firebase Error:",
+        "Firestore error:",
         error
       );
 
@@ -300,14 +323,13 @@ function loadReports() {
 }
 
 
-// ========================================
+// ==========================================
 // SHOW REPORTS
-// ========================================
+// ==========================================
 
 function showReports() {
 
-
-  let container =
+  const container =
     document.getElementById(
       "reportsContainer"
     );
@@ -316,11 +338,9 @@ function showReports() {
   if (!container) return;
 
 
-  // =====================================
-  // REPORT COUNTS
-  // =====================================
+  // HERO COUNT
 
-  let reportCount =
+  const reportCount =
     document.getElementById(
       "reportCount"
     );
@@ -334,7 +354,9 @@ function showReports() {
   }
 
 
-  let totalReports =
+  // DASHBOARD TOTAL
+
+  const totalReports =
     document.getElementById(
       "totalReports"
     );
@@ -348,33 +370,29 @@ function showReports() {
   }
 
 
-  let activeReports =
+  // ACTIVE REPORTS
+
+  const activeReports =
     allReports.filter(
 
-      function (report) {
-
-        return report.status ===
-          "Active";
-
-      }
+      report =>
+        report.status === "Active"
 
     );
 
 
-  let resolvedReports =
+  // RESOLVED REPORTS
+
+  const resolvedReports =
     allReports.filter(
 
-      function (report) {
-
-        return report.status ===
-          "Resolved";
-
-      }
+      report =>
+        report.status === "Resolved"
 
     );
 
 
-  let activeCounter =
+  const activeCounter =
     document.getElementById(
       "activeReports"
     );
@@ -388,7 +406,7 @@ function showReports() {
   }
 
 
-  let resolvedCounter =
+  const resolvedCounter =
     document.getElementById(
       "resolvedReports"
     );
@@ -402,17 +420,15 @@ function showReports() {
   }
 
 
-  // =====================================
   // FILTER
-  // =====================================
 
-  let selectedFilter = "All";
-
-
-  let filterElement =
+  const filterElement =
     document.getElementById(
       "reportFilter"
     );
+
+
+  let selectedFilter = "All";
 
 
   if (filterElement) {
@@ -432,37 +448,23 @@ function showReports() {
     filteredReports =
       allReports.filter(
 
-        function (report) {
-
-          return report.type ===
-            selectedFilter;
-
-        }
+        report =>
+          report.type === selectedFilter
 
       );
 
   }
 
 
-  // =====================================
   // NO REPORT
-  // =====================================
 
-  if (
-    filteredReports.length === 0
-  ) {
+  if (filteredReports.length === 0) {
 
     container.innerHTML = `
 
-      <div class="no-report">
-
-        <h3>📭 No Reports Found</h3>
-
-        <p>
-          Abhi koi emergency report available nahi hai.
-        </p>
-
-      </div>
+      <p class="no-report">
+        Abhi koi report nahi hai.
+      </p>
 
     `;
 
@@ -471,27 +473,22 @@ function showReports() {
   }
 
 
-  // =====================================
-  // CREATE REPORT CARDS
-  // =====================================
-
   container.innerHTML = "";
 
+
+  // CREATE CARDS
 
   filteredReports.forEach(
 
     function (report) {
 
-
-      let card =
+      const card =
         document.createElement("div");
 
 
       card.className =
         "report-card";
 
-
-      // Status class
 
       let statusClass =
 
@@ -502,30 +499,23 @@ function showReports() {
           : "resolved-status";
 
 
-      // Status button
-
       let statusButton = "";
 
 
-      if (
-        report.status === "Active"
-      ) {
+      if (report.status === "Active") {
 
         statusButton = `
 
           <button
             class="resolve-btn"
-            onclick="toggleStatus('${report.id}', '${report.status}')"
+            onclick="toggleStatus('${report.id}')"
           >
-
             ✅ Mark Resolved
-
           </button>
 
         `;
 
       }
-
 
       else {
 
@@ -533,11 +523,9 @@ function showReports() {
 
           <button
             class="active-btn"
-            onclick="toggleStatus('${report.id}', '${report.status}')"
+            onclick="toggleStatus('${report.id}')"
           >
-
             🔄 Mark Active
-
           </button>
 
         `;
@@ -557,68 +545,47 @@ function showReports() {
           <span
             class="status-badge ${statusClass}"
           >
-
             ${report.status}
-
           </span>
 
         </div>
 
 
         <p>
-
           <strong>Name:</strong>
-
           ${report.name}
-
         </p>
 
 
         <p>
-
           <strong>Problem:</strong>
-
           ${report.description}
-
         </p>
 
 
         <p>
-
           <strong>Location:</strong>
-
-          📍 ${report.location}
-
+          ${report.location}
         </p>
 
 
         <p>
-
           <strong>Time:</strong>
-
-          🕒 ${report.time}
-
+          ${report.time}
         </p>
 
 
         <div class="report-actions">
 
-
           ${statusButton}
 
 
           <button
-
             class="delete-btn"
-
             onclick="deleteReport('${report.id}')"
-
           >
-
             🗑️ Delete
-
           </button>
-
 
         </div>
 
@@ -634,22 +601,29 @@ function showReports() {
 }
 
 
-// ========================================
-// CHANGE REPORT STATUS
-// ========================================
+// ==========================================
+// UPDATE REPORT STATUS
+// ==========================================
 
-async function toggleStatus(
-  id,
-  currentStatus
-) {
-
+async function toggleStatus(id) {
 
   try {
 
+    const report =
+      allReports.find(
 
-    let newStatus =
+        report =>
+          report.id === id
 
-      currentStatus === "Active"
+      );
+
+
+    if (!report) return;
+
+
+    const newStatus =
+
+      report.status === "Active"
 
         ? "Resolved"
 
@@ -658,22 +632,16 @@ async function toggleStatus(
 
     await updateDoc(
 
-      doc(
-        db,
-        "reports",
-        id
-      ),
+      doc(db, "reports", id),
 
       {
 
-        status:
-          newStatus
+        status: newStatus
 
       }
 
     );
 
-
   }
 
 
@@ -682,7 +650,7 @@ async function toggleStatus(
     console.error(error);
 
     alert(
-      "Status update nahi ho paya."
+      "Status update nahi hua."
     );
 
   }
@@ -690,40 +658,33 @@ async function toggleStatus(
 }
 
 
-// ========================================
-// DELETE SINGLE REPORT
-// ========================================
+window.toggleStatus =
+  toggleStatus;
+
+
+// ==========================================
+// DELETE REPORT
+// ==========================================
 
 async function deleteReport(id) {
 
+  const confirmDelete = confirm(
 
-  let confirmDelete =
+    "Pakki baat? Ye report permanently delete ho jayegi."
 
-    confirm(
-      "Pakki baat? Ye report permanently delete ho jayegi."
-    );
+  );
 
 
-  if (!confirmDelete) {
-
-    return;
-
-  }
+  if (!confirmDelete) return;
 
 
   try {
-
 
     await deleteDoc(
 
-      doc(
-        db,
-        "reports",
-        id
-      )
+      doc(db, "reports", id)
 
     );
-
 
   }
 
@@ -732,9 +693,8 @@ async function deleteReport(id) {
 
     console.error(error);
 
-
     alert(
-      "Report delete nahi ho payi."
+      "Report delete nahi hui."
     );
 
   }
@@ -742,72 +702,13 @@ async function deleteReport(id) {
 }
 
 
-// ========================================
-// CLEAR ALL REPORTS
-// ========================================
-
-async function clearAllReports() {
+window.deleteReport =
+  deleteReport;
 
 
-  let confirmClear =
-
-    confirm(
-      "Saari reports permanently delete ho jayengi. Sure ho?"
-    );
-
-
-  if (!confirmClear) {
-
-    return;
-
-  }
-
-
-  try {
-
-
-    for (
-      let report of allReports
-    ) {
-
-      await deleteDoc(
-
-        doc(
-          db,
-          "reports",
-          report.id
-        )
-
-      );
-
-    }
-
-
-    alert(
-      "Saari reports delete ho gayi."
-    );
-
-
-  }
-
-
-  catch (error) {
-
-    console.error(error);
-
-
-    alert(
-      "Reports delete nahi ho payi."
-    );
-
-  }
-
-}
-
-
-// ========================================
-// FILTER REPORTS
-// ========================================
+// ==========================================
+// FILTER
+// ==========================================
 
 function filterReports() {
 
@@ -816,67 +717,91 @@ function filterReports() {
 }
 
 
-// ========================================
-// MODAL OUTSIDE CLICK
-// ========================================
-
-window.onclick =
-  function (event) {
-
-
-    let modal =
-      document.getElementById(
-        "reportModal"
-      );
-
-
-    if (
-      event.target === modal
-    ) {
-
-      closeReportForm();
-
-    }
-
-  };
-
-
-// ========================================
-// MAKE FUNCTIONS GLOBAL
-// ========================================
-
-window.openReportForm =
-  openReportForm;
-
-window.openSOSForm =
-  openSOSForm;
-
-window.closeReportForm =
-  closeReportForm;
-
-window.getLocation =
-  getLocation;
-
-window.toggleStatus =
-  toggleStatus;
-
-window.deleteReport =
-  deleteReport;
-
-window.clearAllReports =
-  clearAllReports;
-
 window.filterReports =
   filterReports;
 
 
-// ========================================
-// START APP
-// ========================================
+// ==========================================
+// CLEAR ALL REPORTS
+// ==========================================
 
-loadReports();
+async function clearAllReports() {
+
+  const confirmClear = confirm(
+
+    "Saari reports permanently delete ho jayengi. Sure ho?"
+
+  );
+
+
+  if (!confirmClear) return;
+
+
+  try {
+
+    for (
+
+      const report of allReports
+
+    ) {
+
+      await deleteDoc(
+
+        doc(db, "reports", report.id)
+
+      );
+
+    }
+
+  }
+
+
+  catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Reports delete nahi hui."
+
+    );
+
+  }
+
+}
+
+
+window.clearAllReports =
+  clearAllReports;
+
+
+// ==========================================
+// START REAL-TIME LISTENER
+// ==========================================
+
+listenToReports();
+
+
+// ==========================================
+// MODAL OUTSIDE CLICK
+// ==========================================
+
+window.onclick = function (event) {
+
+  const modal =
+    document.getElementById(
+      "reportModal"
+    );
+
+
+  if (event.target === modal) {
+
+    closeReportForm();
+
+  }
+
+};
 
 
 console.log(
-  "🚀 NOVA Firebase Disaster Response System Running!"
+  "🚀 NOVA Phase 2 - Real-time Firestore Connected"
 );
