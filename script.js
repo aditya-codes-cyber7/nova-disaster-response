@@ -1,41 +1,53 @@
-// NOVA ka javascript
+// ========================================
+// NOVA Disaster Response - JavaScript
 // reports abhi browser ke localStorage me save ho rahi hain
+// ========================================
 
 let userLocation = "Location nahi mili";
 
 
-// ================================
+// ========================================
 // FORM OPEN / CLOSE
-// ================================
+// ========================================
 
 function openReportForm() {
+
   document.getElementById("reportModal").style.display = "block";
+
 }
 
 
 function openSOSForm() {
+
   document.getElementById("reportModal").style.display = "block";
 
+  // emergency type select karne ke liye focus
   document.getElementById("emergencyType").focus();
+
 }
 
 
 function closeReportForm() {
+
   document.getElementById("reportModal").style.display = "none";
+
 }
 
 
-// ================================
-// LOCATION
-// ================================
+// ========================================
+// LOCATION LENE KA FUNCTION
+// ========================================
 
 function getLocation() {
 
   let status = document.getElementById("locationStatus");
 
+
   if (navigator.geolocation) {
 
-    status.innerText = "Location le rahe hain... thoda wait karo 📍";
+    status.innerText =
+      "Location le rahe hain... thoda wait karo 📍";
+
 
     navigator.geolocation.getCurrentPosition(
 
@@ -44,14 +56,18 @@ function getLocation() {
         let latitude = position.coords.latitude;
         let longitude = position.coords.longitude;
 
+
         userLocation =
           latitude.toFixed(5) +
           ", " +
           longitude.toFixed(5);
 
-        status.innerText = "Location mil gayi ✅";
+
+        status.innerText =
+          "Location mil gayi ✅";
 
       },
+
 
       function () {
 
@@ -72,28 +88,35 @@ function getLocation() {
 }
 
 
-// ================================
+// ========================================
 // NEW REPORT SUBMIT
-// ================================
+// ========================================
 
 document.getElementById("emergencyForm").addEventListener(
+
   "submit",
 
   function (event) {
 
+    // page reload mat hone do
     event.preventDefault();
 
 
-    let name = document.getElementById("name").value;
+    // form ki values le rahe hain
+
+    let name =
+      document.getElementById("name").value;
+
 
     let type =
       document.getElementById("emergencyType").value;
+
 
     let description =
       document.getElementById("description").value;
 
 
-    // new report object
+    // nayi report object
 
     let report = {
 
@@ -109,19 +132,25 @@ document.getElementById("emergencyForm").addEventListener(
 
       time: new Date().toLocaleString(),
 
-      // new report by default active rahegi
+      // har nayi report pehle Active hogi
       status: "Active"
 
     };
 
+
+    // purani reports nikalo
 
     let reports = JSON.parse(
       localStorage.getItem("novaReports")
     ) || [];
 
 
+    // new report sabse upar add karo
+
     reports.unshift(report);
 
+
+    // browser me save
 
     localStorage.setItem(
       "novaReports",
@@ -132,19 +161,28 @@ document.getElementById("emergencyForm").addEventListener(
     alert("Report submit ho gayi! 🚨");
 
 
-    document.getElementById("emergencyForm").reset();
+    // form reset
+
+    document.getElementById(
+      "emergencyForm"
+    ).reset();
+
 
     userLocation = "Location nahi mili";
+
 
     document.getElementById(
       "locationStatus"
     ).innerText = "";
 
 
+    // popup band
+
     closeReportForm();
 
 
-    // sab update karo
+    // reports aur dashboard update
+
     showReports();
 
   }
@@ -152,69 +190,146 @@ document.getElementById("emergencyForm").addEventListener(
 );
 
 
-// ================================
-// REPORTS SHOW KARNA
-// ================================
+// ========================================
+// REPORTS SCREEN PAR DIKHANA
+// ========================================
 
 function showReports() {
+
+  // browser se reports nikalo
 
   let reports = JSON.parse(
     localStorage.getItem("novaReports")
   ) || [];
 
 
+  // ----------------------------------------
+  // PURANI REPORTS FIX
+  // pehle status nahi tha isliye undefined aa raha tha
+  // ----------------------------------------
+
+  reports = reports.map(function (report) {
+
+    if (!report.status) {
+
+      report.status = "Active";
+
+    }
+
+    return report;
+
+  });
+
+
+  // fixed reports dobara save
+
+  localStorage.setItem(
+    "novaReports",
+    JSON.stringify(reports)
+  );
+
+
   let container =
     document.getElementById("reportsContainer");
 
 
-  // hero wala report count
+  // ----------------------------------------
+  // HERO REPORT COUNT
+  // ----------------------------------------
 
-  document.getElementById(
-    "reportCount"
-  ).innerText = reports.length;
+  let heroCount =
+    document.getElementById("reportCount");
+
+  if (heroCount) {
+
+    heroCount.innerText =
+      reports.length;
+
+  }
 
 
-  // dashboard counters
+  // ----------------------------------------
+  // DASHBOARD COUNTERS
+  // ----------------------------------------
 
-  document.getElementById(
-    "totalReports"
-  ).innerText = reports.length;
+  let totalReports =
+    document.getElementById("totalReports");
 
+  if (totalReports) {
+
+    totalReports.innerText =
+      reports.length;
+
+  }
+
+
+  // active reports count
 
   let activeReports = reports.filter(
     function (report) {
+
       return report.status === "Active";
+
     }
   );
 
+
+  // resolved reports count
 
   let resolvedReports = reports.filter(
     function (report) {
+
       return report.status === "Resolved";
+
     }
   );
 
 
-  document.getElementById(
-    "activeReports"
-  ).innerText = activeReports.length;
+  let activeCounter =
+    document.getElementById("activeReports");
+
+  if (activeCounter) {
+
+    activeCounter.innerText =
+      activeReports.length;
+
+  }
 
 
-  document.getElementById(
-    "resolvedReports"
-  ).innerText = resolvedReports.length;
+  let resolvedCounter =
+    document.getElementById("resolvedReports");
+
+  if (resolvedCounter) {
+
+    resolvedCounter.innerText =
+      resolvedReports.length;
+
+  }
 
 
-  // filter value check
+  // ----------------------------------------
+  // FILTER CHECK
+  // ----------------------------------------
 
-  let selectedFilter =
-    document.getElementById("reportFilter").value;
+  let selectedFilter = "All";
 
 
-  // agar All select hai toh sab dikhao
+  let filterElement =
+    document.getElementById("reportFilter");
+
+
+  if (filterElement) {
+
+    selectedFilter =
+      filterElement.value;
+
+  }
+
 
   let filteredReports = reports;
 
+
+  // All nahi hai toh type ke according filter
 
   if (selectedFilter !== "All") {
 
@@ -229,7 +344,9 @@ function showReports() {
   }
 
 
-  // agar reports nahi hain
+  // ----------------------------------------
+  // AGAR KOI REPORT NAHI HAI
+  // ----------------------------------------
 
   if (filteredReports.length === 0) {
 
@@ -246,65 +363,87 @@ function showReports() {
   }
 
 
-  // container clear
+  // purana content hatao
 
   container.innerHTML = "";
 
 
-  // cards banana
+  // ----------------------------------------
+  // HAR REPORT KA CARD BANAO
+  // ----------------------------------------
 
   filteredReports.forEach(function (report) {
 
-    let card = document.createElement("div");
+    let card =
+      document.createElement("div");
 
-    card.className = "report-card";
+
+    card.className =
+      "report-card";
 
 
-    // status ke according class
+    // status ke hisaab se CSS class
 
     let statusClass = "";
 
+
     if (report.status === "Active") {
-      statusClass = "active-status";
+
+      statusClass =
+        "active-status";
+
     } else {
-      statusClass = "resolved-status";
+
+      statusClass =
+        "resolved-status";
+
     }
 
 
-    // status button text
+    // status toggle button
 
     let statusButton = "";
+
 
     if (report.status === "Active") {
 
       statusButton = `
+
         <button
           class="resolve-btn"
           onclick="toggleStatus(${report.id})"
         >
           ✅ Mark Resolved
         </button>
+
       `;
 
     } else {
 
       statusButton = `
+
         <button
           class="active-btn"
           onclick="toggleStatus(${report.id})"
         >
           🔄 Mark Active
         </button>
+
       `;
 
     }
 
 
+    // card ka content
+
     card.innerHTML = `
 
       <div class="report-top">
 
-        <h3>🚨 ${report.type}</h3>
+        <h3>
+          🚨 ${report.type}
+        </h3>
+
 
         <span class="status-badge ${statusClass}">
           ${report.status}
@@ -313,17 +452,23 @@ function showReports() {
       </div>
 
 
-      <p><strong>Name:</strong> ${report.name}</p>
+      <p>
+        <strong>Name:</strong>
+        ${report.name}
+      </p>
+
 
       <p>
         <strong>Problem:</strong>
         ${report.description}
       </p>
 
+
       <p>
         <strong>Location:</strong>
         ${report.location}
       </p>
+
 
       <p>
         <strong>Time:</strong>
@@ -334,6 +479,7 @@ function showReports() {
       <div class="report-actions">
 
         ${statusButton}
+
 
         <button
           class="delete-btn"
@@ -347,6 +493,8 @@ function showReports() {
     `;
 
 
+    // card page me add
+
     container.appendChild(card);
 
   });
@@ -354,9 +502,10 @@ function showReports() {
 }
 
 
-// ================================
+// ========================================
 // STATUS CHANGE
-// ================================
+// Active <-> Resolved
+// ========================================
 
 function toggleStatus(id) {
 
@@ -368,6 +517,18 @@ function toggleStatus(id) {
   reports = reports.map(function (report) {
 
     if (report.id === id) {
+
+      // agar purani report hai aur status nahi hai
+      // pehle Active maan lo
+
+      if (!report.status) {
+
+        report.status = "Active";
+
+      }
+
+
+      // status change
 
       if (report.status === "Active") {
 
@@ -381,10 +542,13 @@ function toggleStatus(id) {
 
     }
 
+
     return report;
 
   });
 
+
+  // updated reports save
 
   localStorage.setItem(
     "novaReports",
@@ -392,24 +556,30 @@ function toggleStatus(id) {
   );
 
 
+  // page update
+
   showReports();
 
 }
 
 
-// ================================
+// ========================================
 // SINGLE REPORT DELETE
-// ================================
+// ========================================
 
 function deleteReport(id) {
 
   let confirmDelete = confirm(
+
     "Pakki baat? Ye report delete ho jayegi."
+
   );
 
 
   if (!confirmDelete) {
+
     return;
+
   }
 
 
@@ -418,11 +588,15 @@ function deleteReport(id) {
   ) || [];
 
 
-  reports = reports.filter(function (report) {
+  // jiski id match nahi karti usko rakho
 
-    return report.id !== id;
+  reports = reports.filter(
+    function (report) {
 
-  });
+      return report.id !== id;
+
+    }
+  );
 
 
   localStorage.setItem(
@@ -436,23 +610,31 @@ function deleteReport(id) {
 }
 
 
-// ================================
+// ========================================
 // CLEAR ALL REPORTS
-// ================================
+// ========================================
 
 function clearAllReports() {
 
   let confirmClear = confirm(
+
     "Saari reports delete ho jayengi. Sure ho?"
+
   );
 
 
   if (!confirmClear) {
+
     return;
+
   }
 
 
-  localStorage.removeItem("novaReports");
+  // pura localStorage data remove
+
+  localStorage.removeItem(
+    "novaReports"
+  );
 
 
   showReports();
@@ -460,9 +642,9 @@ function clearAllReports() {
 }
 
 
-// ================================
+// ========================================
 // FILTER REPORTS
-// ================================
+// ========================================
 
 function filterReports() {
 
@@ -471,19 +653,24 @@ function filterReports() {
 }
 
 
-// ================================
+// ========================================
 // PAGE LOAD
-// ================================
+// ========================================
+
+// page khulte hi reports dikhao
 
 showReports();
 
 
-// popup ke bahar click
+// ========================================
+// POPUP KE BAHAR CLICK
+// ========================================
 
 window.onclick = function (event) {
 
   let modal =
     document.getElementById("reportModal");
+
 
   if (event.target === modal) {
 
@@ -494,6 +681,8 @@ window.onclick = function (event) {
 };
 
 
+// console check
+
 console.log(
-  "NOVA upgraded dashboard chal raha hai 🚀"
+  "NOVA Disaster Response upgraded version chal raha hai 🚀"
 );
