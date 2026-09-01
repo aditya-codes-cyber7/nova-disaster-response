@@ -1,50 +1,41 @@
-// NOVA ka simple javascript part
-// abhi reports browser ke andar save ho rahi hain
+// NOVA ka javascript
+// reports abhi browser ke localStorage me save ho rahi hain
 
 let userLocation = "Location nahi mili";
 
 
-// form open karne ke liye
+// ================================
+// FORM OPEN / CLOSE
+// ================================
 
 function openReportForm() {
-
   document.getElementById("reportModal").style.display = "block";
-
 }
 
-
-// SOS button dabane par bhi wahi form khulega
 
 function openSOSForm() {
-
   document.getElementById("reportModal").style.display = "block";
 
-  // SOS ke liye emergency type automatically select karne ka try
   document.getElementById("emergencyType").focus();
-
 }
 
-
-// popup band karne ke liye
 
 function closeReportForm() {
-
   document.getElementById("reportModal").style.display = "none";
-
 }
 
 
-// user ki location lene ka function
+// ================================
+// LOCATION
+// ================================
 
 function getLocation() {
 
   let status = document.getElementById("locationStatus");
 
-  // check kar rahe hain browser location support karta hai ya nahi
-
   if (navigator.geolocation) {
 
-    status.innerText = "Location le rahe hain... thoda wait karo";
+    status.innerText = "Location le rahe hain... thoda wait karo 📍";
 
     navigator.geolocation.getCurrentPosition(
 
@@ -53,8 +44,10 @@ function getLocation() {
         let latitude = position.coords.latitude;
         let longitude = position.coords.longitude;
 
-        // abhi coordinates save kar rahe hain
-        userLocation = latitude.toFixed(5) + ", " + longitude.toFixed(5);
+        userLocation =
+          latitude.toFixed(5) +
+          ", " +
+          longitude.toFixed(5);
 
         status.innerText = "Location mil gayi ✅";
 
@@ -62,7 +55,8 @@ function getLocation() {
 
       function () {
 
-        status.innerText = "Location allow nahi hui ya nahi mil payi.";
+        status.innerText =
+          "Location allow nahi hui ya nahi mil payi.";
 
       }
 
@@ -70,34 +64,36 @@ function getLocation() {
 
   } else {
 
-    status.innerText = "Tumhara browser location support nahi karta.";
+    status.innerText =
+      "Tumhara browser location support nahi karta.";
 
   }
 
 }
 
 
-// form submit hone ka kaam
+// ================================
+// NEW REPORT SUBMIT
+// ================================
 
 document.getElementById("emergencyForm").addEventListener(
   "submit",
 
   function (event) {
 
-    // page refresh hone se rok rahe hain
     event.preventDefault();
 
 
-    // form se values nikal rahe hain
-
     let name = document.getElementById("name").value;
 
-    let type = document.getElementById("emergencyType").value;
+    let type =
+      document.getElementById("emergencyType").value;
 
-    let description = document.getElementById("description").value;
+    let description =
+      document.getElementById("description").value;
 
 
-    // ek report object bana diya
+    // new report object
 
     let report = {
 
@@ -111,24 +107,21 @@ document.getElementById("emergencyForm").addEventListener(
 
       location: userLocation,
 
-      time: new Date().toLocaleString()
+      time: new Date().toLocaleString(),
+
+      // new report by default active rahegi
+      status: "Active"
 
     };
 
-
-    // purani reports nikal rahe hain
 
     let reports = JSON.parse(
       localStorage.getItem("novaReports")
     ) || [];
 
 
-    // new report add kar di
-
     reports.unshift(report);
 
-
-    // browser me save kar diya
 
     localStorage.setItem(
       "novaReports",
@@ -139,24 +132,19 @@ document.getElementById("emergencyForm").addEventListener(
     alert("Report submit ho gayi! 🚨");
 
 
-    // form reset
-
     document.getElementById("emergencyForm").reset();
-
 
     userLocation = "Location nahi mili";
 
+    document.getElementById(
+      "locationStatus"
+    ).innerText = "";
 
-    document.getElementById("locationStatus").innerText = "";
-
-
-    // popup band
 
     closeReportForm();
 
 
-    // dashboard update
-
+    // sab update karo
     showReports();
 
   }
@@ -164,7 +152,9 @@ document.getElementById("emergencyForm").addEventListener(
 );
 
 
-// reports screen par dikhane ka function
+// ================================
+// REPORTS SHOW KARNA
+// ================================
 
 function showReports() {
 
@@ -173,24 +163,82 @@ function showReports() {
   ) || [];
 
 
-  let container = document.getElementById("reportsContainer");
-
-  let count = document.getElementById("reportCount");
-
-
-  // total reports update
-
-  count.innerText = reports.length;
+  let container =
+    document.getElementById("reportsContainer");
 
 
-  // agar koi report nahi hai
+  // hero wala report count
 
-  if (reports.length === 0) {
+  document.getElementById(
+    "reportCount"
+  ).innerText = reports.length;
+
+
+  // dashboard counters
+
+  document.getElementById(
+    "totalReports"
+  ).innerText = reports.length;
+
+
+  let activeReports = reports.filter(
+    function (report) {
+      return report.status === "Active";
+    }
+  );
+
+
+  let resolvedReports = reports.filter(
+    function (report) {
+      return report.status === "Resolved";
+    }
+  );
+
+
+  document.getElementById(
+    "activeReports"
+  ).innerText = activeReports.length;
+
+
+  document.getElementById(
+    "resolvedReports"
+  ).innerText = resolvedReports.length;
+
+
+  // filter value check
+
+  let selectedFilter =
+    document.getElementById("reportFilter").value;
+
+
+  // agar All select hai toh sab dikhao
+
+  let filteredReports = reports;
+
+
+  if (selectedFilter !== "All") {
+
+    filteredReports = reports.filter(
+      function (report) {
+
+        return report.type === selectedFilter;
+
+      }
+    );
+
+  }
+
+
+  // agar reports nahi hain
+
+  if (filteredReports.length === 0) {
 
     container.innerHTML = `
+
       <p class="no-report">
-        Abhi tak koi report submit nahi hui.
+        Abhi is category me koi report nahi hai.
       </p>
+
     `;
 
     return;
@@ -198,31 +246,103 @@ function showReports() {
   }
 
 
-  // purana content hata rahe hain
+  // container clear
 
   container.innerHTML = "";
 
 
-  // har report ka card bana rahe hain
+  // cards banana
 
-  reports.forEach(function (report) {
+  filteredReports.forEach(function (report) {
 
     let card = document.createElement("div");
 
     card.className = "report-card";
 
 
+    // status ke according class
+
+    let statusClass = "";
+
+    if (report.status === "Active") {
+      statusClass = "active-status";
+    } else {
+      statusClass = "resolved-status";
+    }
+
+
+    // status button text
+
+    let statusButton = "";
+
+    if (report.status === "Active") {
+
+      statusButton = `
+        <button
+          class="resolve-btn"
+          onclick="toggleStatus(${report.id})"
+        >
+          ✅ Mark Resolved
+        </button>
+      `;
+
+    } else {
+
+      statusButton = `
+        <button
+          class="active-btn"
+          onclick="toggleStatus(${report.id})"
+        >
+          🔄 Mark Active
+        </button>
+      `;
+
+    }
+
+
     card.innerHTML = `
 
-      <h3>🚨 ${report.type}</h3>
+      <div class="report-top">
+
+        <h3>🚨 ${report.type}</h3>
+
+        <span class="status-badge ${statusClass}">
+          ${report.status}
+        </span>
+
+      </div>
+
 
       <p><strong>Name:</strong> ${report.name}</p>
 
-      <p><strong>Problem:</strong> ${report.description}</p>
+      <p>
+        <strong>Problem:</strong>
+        ${report.description}
+      </p>
 
-      <p><strong>Location:</strong> ${report.location}</p>
+      <p>
+        <strong>Location:</strong>
+        ${report.location}
+      </p>
 
-      <p><strong>Time:</strong> ${report.time}</p>
+      <p>
+        <strong>Time:</strong>
+        ${report.time}
+      </p>
+
+
+      <div class="report-actions">
+
+        ${statusButton}
+
+        <button
+          class="delete-btn"
+          onclick="deleteReport(${report.id})"
+        >
+          🗑️ Delete
+        </button>
+
+      </div>
 
     `;
 
@@ -234,16 +354,136 @@ function showReports() {
 }
 
 
-// page open hote hi purani reports dikhao
+// ================================
+// STATUS CHANGE
+// ================================
+
+function toggleStatus(id) {
+
+  let reports = JSON.parse(
+    localStorage.getItem("novaReports")
+  ) || [];
+
+
+  reports = reports.map(function (report) {
+
+    if (report.id === id) {
+
+      if (report.status === "Active") {
+
+        report.status = "Resolved";
+
+      } else {
+
+        report.status = "Active";
+
+      }
+
+    }
+
+    return report;
+
+  });
+
+
+  localStorage.setItem(
+    "novaReports",
+    JSON.stringify(reports)
+  );
+
+
+  showReports();
+
+}
+
+
+// ================================
+// SINGLE REPORT DELETE
+// ================================
+
+function deleteReport(id) {
+
+  let confirmDelete = confirm(
+    "Pakki baat? Ye report delete ho jayegi."
+  );
+
+
+  if (!confirmDelete) {
+    return;
+  }
+
+
+  let reports = JSON.parse(
+    localStorage.getItem("novaReports")
+  ) || [];
+
+
+  reports = reports.filter(function (report) {
+
+    return report.id !== id;
+
+  });
+
+
+  localStorage.setItem(
+    "novaReports",
+    JSON.stringify(reports)
+  );
+
+
+  showReports();
+
+}
+
+
+// ================================
+// CLEAR ALL REPORTS
+// ================================
+
+function clearAllReports() {
+
+  let confirmClear = confirm(
+    "Saari reports delete ho jayengi. Sure ho?"
+  );
+
+
+  if (!confirmClear) {
+    return;
+  }
+
+
+  localStorage.removeItem("novaReports");
+
+
+  showReports();
+
+}
+
+
+// ================================
+// FILTER REPORTS
+// ================================
+
+function filterReports() {
+
+  showReports();
+
+}
+
+
+// ================================
+// PAGE LOAD
+// ================================
 
 showReports();
 
 
-// agar popup ke bahar click kare toh band ho jaye
+// popup ke bahar click
 
 window.onclick = function (event) {
 
-  let modal = document.getElementById("reportModal");
+  let modal =
+    document.getElementById("reportModal");
 
   if (event.target === modal) {
 
@@ -254,6 +494,6 @@ window.onclick = function (event) {
 };
 
 
-// console me check karne ke liye
-
-console.log("NOVA website chal rahi hai 🚀");
+console.log(
+  "NOVA upgraded dashboard chal raha hai 🚀"
+);
