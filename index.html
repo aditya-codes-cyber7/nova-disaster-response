@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -16,7 +15,6 @@
     rel="stylesheet"
     href="style.css"
   >
-
 </head>
 
 
@@ -27,44 +25,24 @@
 
   <nav>
 
-    <!-- LOGO + EMERGENCY CONTACT -->
-
-    <div class="nav-left">
-
-      <div class="logo">
-        🚨 NOVA
-      </div>
-
-      <button
-        class="emergency-contact-btn"
-        type="button"
-        onclick="openEmergencyContacts()"
-      >
-        ☎ Emergency Contacts
-      </button>
-
+    <div class="logo">
+      🚨 NOVA
     </div>
 
 
-    <!-- NAVIGATION -->
-
     <div class="nav-links">
 
-      <a href="#home">
-        Home
-      </a>
+      <a href="#home">Home</a>
 
-      <a href="#report">
-        Report
-      </a>
+      <a href="#report">Report</a>
 
-      <a href="#reports">
-        My Reports
-      </a>
+      <a href="#reports">My Reports</a>
 
-      <a href="#about">
-        About
-      </a>
+      <a href="#contacts">Emergency Contacts</a>
+
+      <a href="#feedback">Feedback</a>
+
+      <a href="#about">About</a>
 
     </div>
 
@@ -106,7 +84,6 @@
 
       <span id="userName"></span>
 
-
       <button
         class="logout-btn"
         type="button"
@@ -118,218 +95,6 @@
     </div>
 
   </nav>
-
-
-  <!-- ================= EMERGENCY CONTACT MODAL ================= -->
-
-  <div
-    class="modal"
-    id="emergencyContactsModal"
-  >
-
-    <div class="modal-content emergency-contacts-content">
-
-      <span
-        class="close"
-        onclick="closeEmergencyContacts()"
-      >
-        ×
-      </span>
-
-
-      <h2>
-        🚨 Emergency Contacts
-      </h2>
-
-
-      <p class="form-text">
-        In case of immediate danger, contact the appropriate emergency service.
-      </p>
-
-
-      <div class="contacts-list">
-
-
-        <a href="tel:112" class="contact-card">
-
-          <span class="contact-icon">
-            🆘
-          </span>
-
-          <div>
-
-            <strong>
-              National Emergency
-            </strong>
-
-            <p>
-              112
-            </p>
-
-          </div>
-
-          <span class="call-text">
-            Call
-          </span>
-
-        </a>
-
-
-        <a href="tel:101" class="contact-card">
-
-          <span class="contact-icon">
-            🚒
-          </span>
-
-          <div>
-
-            <strong>
-              Fire Brigade
-            </strong>
-
-            <p>
-              101
-            </p>
-
-          </div>
-
-          <span class="call-text">
-            Call
-          </span>
-
-        </a>
-
-
-        <a href="tel:108" class="contact-card">
-
-          <span class="contact-icon">
-            🚑
-          </span>
-
-          <div>
-
-            <strong>
-              Ambulance
-            </strong>
-
-            <p>
-              108
-            </p>
-
-          </div>
-
-          <span class="call-text">
-            Call
-          </span>
-
-        </a>
-
-
-        <a href="tel:100" class="contact-card">
-
-          <span class="contact-icon">
-            🚓
-          </span>
-
-          <div>
-
-            <strong>
-              Police
-            </strong>
-
-            <p>
-              100 / 112
-            </p>
-
-          </div>
-
-          <span class="call-text">
-            Call
-          </span>
-
-        </a>
-
-
-        <a href="tel:1091" class="contact-card">
-
-          <span class="contact-icon">
-            👩
-          </span>
-
-          <div>
-
-            <strong>
-              Women Helpline
-            </strong>
-
-            <p>
-              1091
-            </p>
-
-          </div>
-
-          <span class="call-text">
-            Call
-          </span>
-
-        </a>
-
-
-        <a href="tel:1098" class="contact-card">
-
-          <span class="contact-icon">
-            🧒
-          </span>
-
-          <div>
-
-            <strong>
-              Child Helpline
-            </strong>
-
-            <p>
-              1098
-            </p>
-
-          </div>
-
-          <span class="call-text">
-            Call
-          </span>
-
-        </a>
-
-
-        <a href="tel:1078" class="contact-card">
-
-          <span class="contact-icon">
-            🌊
-          </span>
-
-          <div>
-
-            <strong>
-              Disaster Management
-            </strong>
-
-            <p>
-              1078
-            </p>
-
-          </div>
-
-          <span class="call-text">
-            Call
-          </span>
-
-        </a>
-
-
-      </div>
-
-    </div>
-
-  </div>
 
 
   <!-- ================= HERO ================= -->
@@ -443,6 +208,164 @@
   </section>
 
 
+  <!-- ================= EMERGENCY CONTACTS ================= -->
+
+  <section
+    class="contacts-section"
+    id="contacts"
+  >
+
+    <div class="section-heading">
+
+      <p class="tag">
+        QUICK HELP
+      </p>
+
+      <h2>
+        Emergency Contact Numbers
+      </h2>
+
+      <p>
+        In case of an emergency, contact the appropriate emergency service immediately.
+      </p>
+
+    </div>
+
+
+    <div class="contacts-grid">
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🚨
+        </div>
+
+        <h3>
+          National Emergency
+        </h3>
+
+        <a href="tel:112">
+          112
+        </a>
+
+        <span>
+          All Emergency Services
+        </span>
+
+      </div>
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🚒
+        </div>
+
+        <h3>
+          Fire Brigade
+        </h3>
+
+        <a href="tel:101">
+          101
+        </a>
+
+        <span>
+          Fire Emergency
+        </span>
+
+      </div>
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🚑
+        </div>
+
+        <h3>
+          Ambulance
+        </h3>
+
+        <a href="tel:108">
+          108
+        </a>
+
+        <span>
+          Medical Emergency
+        </span>
+
+      </div>
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          👮
+        </div>
+
+        <h3>
+          Police
+        </h3>
+
+        <a href="tel:100">
+          100
+        </a>
+
+        <span>
+          Police Emergency
+        </span>
+
+      </div>
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          👩‍🚒
+        </div>
+
+        <h3>
+          Disaster Management
+        </h3>
+
+        <a href="tel:1078">
+          1078
+        </a>
+
+        <span>
+          Disaster Assistance
+        </span>
+
+      </div>
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🆘
+        </div>
+
+        <h3>
+          Women Helpline
+        </h3>
+
+        <a href="tel:181">
+          181
+        </a>
+
+        <span>
+          Emergency Support
+        </span>
+
+      </div>
+
+
+    </div>
+
+  </section>
+
+
   <!-- ================= FEATURES ================= -->
 
   <section
@@ -505,16 +428,16 @@
       <div class="feature-card">
 
         <div class="icon">
-          💬
+          📋
         </div>
 
         <h3>
-          Case Tracking
+          Report Status
         </h3>
 
         <p>
-          Track whether your emergency case is pending,
-          in progress, or solved.
+          Track whether your emergency report is pending,
+          active or resolved.
         </p>
 
       </div>
@@ -531,8 +454,8 @@
         </h3>
 
         <p>
-          Administrators can monitor cases, update status
-          and review user feedback.
+          Administrators can monitor, manage and
+          update emergency response reports.
         </p>
 
       </div>
@@ -589,7 +512,7 @@
 
 
       <p>
-        Track your emergency reports and case progress.
+        Track your submitted emergency reports in real time.
       </p>
 
     </div>
@@ -622,13 +545,13 @@
       <div class="dashboard-card">
 
         <div class="dashboard-icon">
-          ⏳
+          🔴
         </div>
 
         <div>
 
           <span>
-            Pending / In Progress
+            Pending / Active
           </span>
 
           <strong id="activeReports">
@@ -649,7 +572,7 @@
         <div>
 
           <span>
-            Solved
+            Resolved
           </span>
 
           <strong id="resolvedReports">
@@ -684,7 +607,7 @@
 
         <p class="subtitle">
 
-          Track your emergency case status and submit feedback.
+          Track your submitted emergency reports and their current status.
 
         </p>
 
@@ -766,6 +689,67 @@
   </section>
 
 
+  <!-- ================= FEEDBACK ================= -->
+
+  <section
+    class="feedback-section"
+    id="feedback"
+  >
+
+    <div class="feedback-wrapper">
+
+      <div class="feedback-info">
+
+        <p class="tag">
+          YOUR VOICE MATTERS
+        </p>
+
+        <h2>
+          Share Your Feedback 💬
+        </h2>
+
+        <p>
+          Help us improve NOVA by sharing your experience,
+          suggestions or feedback about the platform.
+        </p>
+
+      </div>
+
+
+      <div class="feedback-form-box">
+
+        <form id="feedbackForm">
+
+
+          <label>
+            Your Feedback
+          </label>
+
+
+          <textarea
+            id="feedbackMessage"
+            placeholder="Write your feedback or suggestion..."
+            required
+          ></textarea>
+
+
+          <button
+            type="submit"
+            class="feedback-btn"
+          >
+            Send Feedback 💬
+          </button>
+
+
+        </form>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
   <!-- ================= REPORT MODAL ================= -->
 
   <div
@@ -818,16 +802,23 @@
           </option>
 
           <option>Fire 🔥</option>
+
           <option>Medical 🚑</option>
+
           <option>Flood 🌊</option>
+
           <option>Accident 🚗</option>
+
           <option>Earthquake 🌍</option>
+
           <option>Other ⚠️</option>
 
         </select>
 
 
-        <label>What happened?</label>
+        <label>
+          What happened?
+        </label>
 
         <textarea
           id="description"
@@ -853,68 +844,6 @@
           class="submit-btn"
         >
           Submit Emergency Report
-        </button>
-
-      </form>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================= FEEDBACK MODAL ================= -->
-
-  <div
-    class="modal"
-    id="feedbackModal"
-  >
-
-    <div class="modal-content feedback-content">
-
-      <span
-        class="close"
-        onclick="closeFeedbackModal()"
-      >
-        ×
-      </span>
-
-
-      <h2>
-        💬 Submit Feedback
-      </h2>
-
-
-      <p class="form-text">
-        Share your feedback regarding the emergency response.
-      </p>
-
-
-      <form id="feedbackForm">
-
-
-        <input
-          type="hidden"
-          id="feedbackReportId"
-        >
-
-
-        <label>
-          Your Feedback
-        </label>
-
-
-        <textarea
-          id="feedbackText"
-          placeholder="Write your experience or feedback..."
-          required
-        ></textarea>
-
-
-        <button
-          type="submit"
-          class="submit-btn"
-        >
-          Submit Feedback
         </button>
 
       </form>
@@ -952,6 +881,7 @@
 
 
       <form id="loginForm">
+
 
         <label>Email</label>
 
@@ -1085,7 +1015,7 @@
   <footer>
 
     <p>
-      NOVA Disaster Response • Made by Aditya Raj 🚀
+      🚨 NOVA Disaster Response • Made by Aditya Raj 🚀
     </p>
 
   </footer>
