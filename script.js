@@ -1,6 +1,7 @@
 // ==========================================
 // NOVA DISASTER RESPONSE
-// FIRESTORE + FIREBASE AUTHENTICATION
+// PHASE 2 + PHASE 3 + PHASE 4
+// FIRESTORE + AUTH + USER SPECIFIC DATA
 // ==========================================
 
 
@@ -17,12 +18,16 @@ import {
   getFirestore,
   collection,
   addDoc,
+  setDoc,
+  getDoc,
   onSnapshot,
   updateDoc,
   deleteDoc,
   doc,
   query,
-  orderBy
+  where,
+  orderBy,
+  serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 
@@ -36,6 +41,7 @@ import {
   onAuthStateChanged,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
 
 
 // ==========================================
@@ -52,6 +58,7 @@ const firebaseConfig = {
 };
 
 
+
 // ==========================================
 // INITIALIZE FIREBASE
 // ==========================================
@@ -65,6 +72,7 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 
+
 // ==========================================
 // GLOBAL VARIABLES
 // ==========================================
@@ -73,6 +81,9 @@ let userLocation = "Location nahi mili";
 
 let allReports = [];
 
+let unsubscribeReports = null;
+
+
 
 // ==========================================
 // REPORT MODAL
@@ -80,12 +91,20 @@ let allReports = [];
 
 function openReportForm() {
 
+  if (!auth.currentUser) {
+
+    alert("Emergency report submit karne ke liye pehle login karo! 🔐");
+
+    openLoginModal();
+
+    return;
+  }
+
   const modal = document.getElementById("reportModal");
 
   if (modal) {
     modal.style.display = "block";
   }
-
 }
 
 
@@ -103,7 +122,6 @@ function openSOSForm() {
     }
 
   }, 100);
-
 }
 
 
@@ -114,13 +132,13 @@ function closeReportForm() {
   if (modal) {
     modal.style.display = "none";
   }
-
 }
 
 
 window.openReportForm = openReportForm;
 window.openSOSForm = openSOSForm;
 window.closeReportForm = closeReportForm;
+
 
 
 // ==========================================
@@ -184,8 +202,10 @@ function getLocation() {
 window.getLocation = getLocation;
 
 
+
 // ==========================================
 // SUBMIT REPORT
+// USER SPECIFIC DATA
 // ==========================================
 
 const emergencyForm =
@@ -195,11 +215,28 @@ const emergencyForm =
 if (emergencyForm) {
 
   emergencyForm.addEventListener(
+
     "submit",
 
     async function (event) {
 
       event.preventDefault();
+
+
+      // CHECK LOGIN
+
+      const user = auth.currentUser;
+
+      if (!user) {
+
+        alert("Report submit karne ke liye login karo! 🔐");
+
+        closeReportForm();
+
+        openLoginModal();
+
+        return;
+      }
 
 
       const name =
@@ -217,22 +254,49 @@ if (emergencyForm) {
       try {
 
         await addDoc(
+
           collection(db, "reports"),
 
           {
+
+            // USER INFORMATION
+
+            userId: user.uid,
+
+            userEmail: user.email,
+
+            userName:
+              user.displayName ||
+              name,
+
+
+            // REPORT INFORMATION
+
             name: name,
+
             type: type,
+
             description: description,
+
             location: userLocation,
+
             status: "Active",
+
             timestamp: Date.now(),
-            time: new Date().toLocaleString()
+
+            time:
+              new Date().toLocaleString(),
+
+            createdAt:
+              serverTimestamp()
+
           }
+
         );
 
 
         alert(
-          "Emergency Report submit ho gayi! 🚨"
+          "Emergency Report successfully submit ho gayi! 🚨"
         );
 
 
@@ -269,27 +333,58 @@ if (emergencyForm) {
       }
 
     }
+
   );
 
 }
 
 
+
 // ==========================================
-// FIRESTORE REAL TIME LISTENER
+// USER SPECIFIC REAL TIME REPORTS
 // ==========================================
 
-function listenToReports() {
+function listenToReports(userId) {
+
+
+  // Previous listener stop karo
+
+  if (unsubscribeReports) {
+
+    unsubscribeReports();
+
+    unsubscribeReports = null;
+
+  }
+
+
+  // No user = no reports
+
+  if (!userId) {
+
+    allReports = [];
+
+    showReports();
+
+    return;
+
+  }
+
+
+  // ONLY CURRENT USER REPORTS
 
   const reportsQuery = query(
 
     collection(db, "reports"),
+
+    where("userId", "==", userId),
 
     orderBy("timestamp", "desc")
 
   );
 
 
-  onSnapshot(
+  unsubscribeReports = onSnapshot(
 
     reportsQuery,
 
@@ -300,14 +395,19 @@ function listenToReports() {
 
 
       snapshot.forEach(
+
         function (document) {
 
           allReports.push({
+
             id: document.id,
+
             ...document.data()
+
           });
 
         }
+
       );
 
 
@@ -328,6 +428,7 @@ function listenToReports() {
   );
 
 }
+
 
 
 // ==========================================
@@ -361,18 +462,14 @@ function showReports() {
 
 
   if (reportCount) {
-
     reportCount.innerText =
       allReports.length;
-
   }
 
 
   if (totalReports) {
-
     totalReports.innerText =
       allReports.length;
-
   }
 
 
@@ -391,18 +488,14 @@ function showReports() {
 
 
   if (activeCounter) {
-
     activeCounter.innerText =
       activeReports.length;
-
   }
 
 
   if (resolvedCounter) {
-
     resolvedCounter.innerText =
       resolvedReports.length;
-
   }
 
 
@@ -418,10 +511,8 @@ function showReports() {
 
 
   if (filterElement) {
-
     selectedFilter =
       filterElement.value;
-
   }
 
 
@@ -440,17 +531,32 @@ function showReports() {
   }
 
 
+  // NOT LOGGED IN
+
+  if (!auth.currentUser) {
+
+    container.innerHTML = `
+      <p class="no-report">
+        🔐 Apni emergency reports dekhne ke liye login karo.
+      </p>
+    `;
+
+    return;
+  }
+
+
   // NO REPORTS
 
   if (filteredReports.length === 0) {
 
     container.innerHTML = `
       <p class="no-report">
-        Abhi koi report nahi hai.
+        Abhi tak aapne koi report submit nahi ki hai.
       </p>
     `;
 
     return;
+
   }
 
 
@@ -460,6 +566,7 @@ function showReports() {
   // REPORT CARDS
 
   filteredReports.forEach(
+
     function (report) {
 
       const card =
@@ -482,12 +589,14 @@ function showReports() {
       if (report.status === "Active") {
 
         statusButton = `
+
           <button
             class="resolve-btn"
             onclick="toggleStatus('${report.id}')"
           >
             ✅ Mark Resolved
           </button>
+
         `;
 
       }
@@ -496,12 +605,14 @@ function showReports() {
       else {
 
         statusButton = `
+
           <button
             class="active-btn"
             onclick="toggleStatus('${report.id}')"
           >
             🔄 Mark Active
           </button>
+
         `;
 
       }
@@ -566,9 +677,11 @@ function showReports() {
       container.appendChild(card);
 
     }
+
   );
 
 }
+
 
 
 // ==========================================
@@ -576,6 +689,17 @@ function showReports() {
 // ==========================================
 
 async function toggleStatus(id) {
+
+  const user = auth.currentUser;
+
+  if (!user) {
+
+    alert("Please login first!");
+
+    return;
+
+  }
+
 
   try {
 
@@ -587,6 +711,17 @@ async function toggleStatus(id) {
 
 
     if (!report) return;
+
+
+    // Extra security check
+
+    if (report.userId !== user.uid) {
+
+      alert("Aap kisi aur ki report edit nahi kar sakte!");
+
+      return;
+
+    }
 
 
     const newStatus =
@@ -625,11 +760,23 @@ window.toggleStatus =
   toggleStatus;
 
 
+
 // ==========================================
 // DELETE REPORT
 // ==========================================
 
 async function deleteReport(id) {
+
+  const user = auth.currentUser;
+
+  if (!user) {
+
+    alert("Please login first!");
+
+    return;
+
+  }
+
 
   const confirmDelete = confirm(
     "Pakki baat? Ye report permanently delete ho jayegi."
@@ -640,6 +787,26 @@ async function deleteReport(id) {
 
 
   try {
+
+    const report =
+      allReports.find(
+        report => report.id === id
+      );
+
+
+    if (!report) return;
+
+
+    // Extra security check
+
+    if (report.userId !== user.uid) {
+
+      alert("Aap kisi aur ki report delete nahi kar sakte!");
+
+      return;
+
+    }
+
 
     await deleteDoc(
       doc(db, "reports", id)
@@ -665,6 +832,7 @@ window.deleteReport =
   deleteReport;
 
 
+
 // ==========================================
 // FILTER REPORTS
 // ==========================================
@@ -680,14 +848,36 @@ window.filterReports =
   filterReports;
 
 
+
 // ==========================================
-// CLEAR ALL REPORTS
+// CLEAR ALL USER REPORTS
 // ==========================================
 
 async function clearAllReports() {
 
+  const user = auth.currentUser;
+
+
+  if (!user) {
+
+    alert("Pehle login karo!");
+
+    return;
+
+  }
+
+
+  if (allReports.length === 0) {
+
+    alert("Delete karne ke liye koi report nahi hai.");
+
+    return;
+
+  }
+
+
   const confirmClear = confirm(
-    "Saari reports permanently delete ho jayengi. Sure ho?"
+    "Aapki saari reports permanently delete ho jayengi. Sure ho?"
   );
 
 
@@ -698,11 +888,18 @@ async function clearAllReports() {
 
     for (const report of allReports) {
 
-      await deleteDoc(
-        doc(db, "reports", report.id)
-      );
+      // Only current user's reports
+
+      if (report.userId === user.uid) {
+
+        await deleteDoc(
+          doc(db, "reports", report.id)
+        );
+
+      }
 
     }
+
 
   }
 
@@ -724,14 +921,12 @@ window.clearAllReports =
   clearAllReports;
 
 
+
 // ==========================================
 // LOGIN MODAL
 // ==========================================
 
 function openLoginModal() {
-
-  console.log("Opening Login Modal");
-
 
   const modal =
     document.getElementById("loginModal");
@@ -768,6 +963,7 @@ window.openLoginModal =
 
 window.closeLoginModal =
   closeLoginModal;
+
 
 
 // ==========================================
@@ -813,16 +1009,84 @@ window.closeSignupModal =
   closeSignupModal;
 
 
+
+// ==========================================
+// CREATE USER PROFILE IN FIRESTORE
+// ==========================================
+
+async function createUserProfile(user) {
+
+  try {
+
+    const userRef =
+      doc(db, "users", user.uid);
+
+
+    const userSnapshot =
+      await getDoc(userRef);
+
+
+    // Existing user ko overwrite nahi karenge
+
+    if (!userSnapshot.exists()) {
+
+      await setDoc(
+
+        userRef,
+
+        {
+
+          uid: user.uid,
+
+          name:
+            user.displayName ||
+            "NOVA User",
+
+          email:
+            user.email || "",
+
+          photoURL:
+            user.photoURL || "",
+
+          role: "user",
+
+          joinedAt:
+            serverTimestamp(),
+
+          joinedTime:
+            new Date().toLocaleString()
+
+        }
+
+      );
+
+      console.log(
+        "👤 User profile created"
+      );
+
+    }
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      "User profile error:",
+      error
+    );
+
+  }
+
+}
+
+
+
 // ==========================================
 // EMAIL SIGNUP
 // ==========================================
 
 async function signupUser() {
-
-  console.log(
-    "Create Account button clicked"
-  );
-
 
   const name =
     document.getElementById(
@@ -842,10 +1106,10 @@ async function signupUser() {
     ).value;
 
 
-  if (!email || !password) {
+  if (!name || !email || !password) {
 
     alert(
-      "Email aur password fill karo!"
+      "Name, email aur password sab fill karo!"
     );
 
     return;
@@ -876,23 +1140,23 @@ async function signupUser() {
       );
 
 
-    // SAVE USER NAME
+    // Update Firebase Auth profile
 
-    if (name) {
+    await updateProfile(
 
-      await updateProfile(
-        userCredential.user,
-        {
-          displayName: name
-        }
-      );
+      userCredential.user,
 
-    }
+      {
+        displayName: name
+      }
+
+    );
 
 
-    console.log(
-      "Account Created:",
-      userCredential.user.email
+    // Create user document in Firestore
+
+    await createUserProfile(
+      userCredential.user
     );
 
 
@@ -904,9 +1168,13 @@ async function signupUser() {
     closeSignupModal();
 
 
-    document.getElementById(
-      "signupForm"
-    ).reset();
+    const signupForm =
+      document.getElementById("signupForm");
+
+
+    if (signupForm) {
+      signupForm.reset();
+    }
 
 
   }
@@ -950,16 +1218,12 @@ window.signupUser =
   signupUser;
 
 
+
 // ==========================================
 // EMAIL LOGIN
 // ==========================================
 
 async function loginUser() {
-
-  console.log(
-    "Login button clicked!"
-  );
-
 
   const email =
     document.getElementById(
@@ -971,12 +1235,6 @@ async function loginUser() {
     document.getElementById(
       "loginPassword"
     ).value;
-
-
-  console.log(
-    "Trying login:",
-    email
-  );
 
 
   if (!email || !password) {
@@ -1002,9 +1260,10 @@ async function loginUser() {
       );
 
 
-    console.log(
-      "Login Successful:",
-      userCredential.user.email
+    // Make sure user profile exists
+
+    await createUserProfile(
+      userCredential.user
     );
 
 
@@ -1016,9 +1275,13 @@ async function loginUser() {
     closeLoginModal();
 
 
-    document.getElementById(
-      "loginForm"
-    ).reset();
+    const loginForm =
+      document.getElementById("loginForm");
+
+
+    if (loginForm) {
+      loginForm.reset();
+    }
 
 
   }
@@ -1062,35 +1325,39 @@ window.loginUser =
   loginUser;
 
 
+
 // ==========================================
 // GOOGLE LOGIN
 // ==========================================
 
 async function googleLogin() {
 
-  console.log(
-    "Google Login Started"
-  );
-
-
   try {
 
     const result =
       await signInWithPopup(
+
         auth,
         googleProvider
+
       );
 
 
-    console.log(
-      "Google Login Successful:",
-      result.user.email
+    // Create Firestore profile
+
+    await createUserProfile(
+      result.user
     );
 
 
     closeLoginModal();
 
     closeSignupModal();
+
+
+    alert(
+      "Google login successful! 🎉"
+    );
 
 
   }
@@ -1119,6 +1386,7 @@ window.googleLogin =
   googleLogin;
 
 
+
 // ==========================================
 // LOGOUT
 // ==========================================
@@ -1128,6 +1396,11 @@ async function logoutUser() {
   try {
 
     await signOut(auth);
+
+
+    allReports = [];
+
+    showReports();
 
 
     alert(
@@ -1140,7 +1413,6 @@ async function logoutUser() {
   catch (error) {
 
     console.error(error);
-
 
     alert(
       "Logout failed."
@@ -1155,6 +1427,7 @@ window.logoutUser =
   logoutUser;
 
 
+
 // ==========================================
 // AUTH STATE LISTENER
 // ==========================================
@@ -1163,7 +1436,7 @@ onAuthStateChanged(
 
   auth,
 
-  function (user) {
+  async function (user) {
 
     const authButtons =
       document.getElementById(
@@ -1183,15 +1456,6 @@ onAuthStateChanged(
       );
 
 
-    if (!authButtons ||
-        !userProfile ||
-        !userName) {
-
-      return;
-
-    }
-
-
     if (user) {
 
       console.log(
@@ -1200,20 +1464,36 @@ onAuthStateChanged(
       );
 
 
-      authButtons.style.display =
-        "none";
+      // Create user profile if missing
+
+      await createUserProfile(user);
 
 
-      userProfile.style.display =
-        "flex";
+      if (authButtons) {
+        authButtons.style.display = "none";
+      }
 
 
-      userName.innerText =
-        "👤 " +
-        (
-          user.displayName ||
-          user.email
-        );
+      if (userProfile) {
+        userProfile.style.display = "flex";
+      }
+
+
+      if (userName) {
+
+        userName.innerText =
+          "👤 " +
+          (
+            user.displayName ||
+            user.email
+          );
+
+      }
+
+
+      // LOAD ONLY THIS USER'S REPORTS
+
+      listenToReports(user.uid);
 
     }
 
@@ -1225,18 +1505,37 @@ onAuthStateChanged(
       );
 
 
-      authButtons.style.display =
-        "flex";
+      if (authButtons) {
+        authButtons.style.display = "flex";
+      }
 
 
-      userProfile.style.display =
-        "none";
+      if (userProfile) {
+        userProfile.style.display = "none";
+      }
+
+
+      // Stop report listener
+
+      if (unsubscribeReports) {
+
+        unsubscribeReports();
+
+        unsubscribeReports = null;
+
+      }
+
+
+      allReports = [];
+
+      showReports();
 
     }
 
   }
 
 );
+
 
 
 // ==========================================
@@ -1268,23 +1567,17 @@ window.addEventListener(
 
 
     if (event.target === reportModal) {
-
       closeReportForm();
-
     }
 
 
     if (event.target === loginModal) {
-
       closeLoginModal();
-
     }
 
 
     if (event.target === signupModal) {
-
       closeSignupModal();
-
     }
 
   }
@@ -1292,21 +1585,23 @@ window.addEventListener(
 );
 
 
-// ==========================================
-// START FIRESTORE
-// ==========================================
-
-listenToReports();
-
 
 // ==========================================
 // CONSOLE STATUS
 // ==========================================
 
 console.log(
-  "🚀 NOVA Firestore Connected"
+  "🚀 NOVA Phase 4 Loaded"
 );
 
 console.log(
-  "🔐 NOVA Firebase Authentication Connected"
+  "🔐 Authentication Connected"
+);
+
+console.log(
+  "👤 User Profiles Enabled"
+);
+
+console.log(
+  "🛡️ User Specific Reports Enabled"
 );
