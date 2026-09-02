@@ -12,7 +12,10 @@
 
 <body>
 
-  <!-- NAVBAR -->
+  <!-- =====================
+       NAVBAR
+  ====================== -->
+
   <nav>
 
     <div class="logo">🚨 NOVA</div>
@@ -24,7 +27,8 @@
       <a href="#about">About</a>
     </div>
 
-    <!-- LOGIN / SIGNUP -->
+
+    <!-- AUTH BUTTONS -->
     <div class="auth-buttons" id="authButtons">
 
       <button
@@ -44,14 +48,16 @@
     </div>
 
 
-    <!-- USER PROFILE -->
+    <!-- USER PROFILE AFTER LOGIN -->
     <div
       class="user-profile"
       id="userProfile"
-      style="display:none"
+      style="display: none;"
     >
 
-      <span id="userName"></span>
+      <span id="userName">
+        User
+      </span>
 
       <button
         class="logout-btn"
@@ -65,12 +71,17 @@
   </nav>
 
 
-  <!-- HERO -->
+  <!-- =====================
+       HERO SECTION
+  ====================== -->
+
   <section class="hero" id="home">
 
     <div class="hero-content">
 
-      <p class="tag">EMERGENCY RESPONSE PLATFORM</p>
+      <p class="tag">
+        EMERGENCY RESPONSE PLATFORM
+      </p>
 
       <h1>
         Emergency me help<br>
@@ -83,13 +94,21 @@
         thoda easy ho sake.
       </p>
 
+
       <div class="buttons">
 
-        <button class="sos-btn" onclick="openSOSForm()">
+        <button
+          class="sos-btn"
+          onclick="openSOSForm()"
+        >
           🚨 Send SOS
         </button>
 
-        <button class="report-btn" onclick="openReportForm()">
+
+        <button
+          class="report-btn"
+          onclick="openReportForm()"
+        >
           Report Emergency
         </button>
 
@@ -97,6 +116,8 @@
 
     </div>
 
+
+    <!-- HERO CARD -->
 
     <div class="hero-card">
 
@@ -110,6 +131,7 @@
       <p>
         Basic emergency details add karo taki situation samajhne me help ho.
       </p>
+
 
       <div class="stats">
 
@@ -130,7 +152,10 @@
   </section>
 
 
-  <!-- FEATURES -->
+  <!-- =====================
+       FEATURES
+  ====================== -->
+
   <section class="features" id="about">
 
     <h2>Yaha kya kya kar sakte ho?</h2>
@@ -139,30 +164,58 @@
       Abhi kuch basic features hain, baaki dheere dheere add karunga.
     </p>
 
+
     <div class="feature-grid">
 
       <div class="feature-card">
+
         <div class="icon">🚨</div>
+
         <h3>Quick SOS</h3>
-        <p>Emergency ho toh quickly SOS request bhej sakte ho.</p>
+
+        <p>
+          Emergency ho toh quickly SOS request bhej sakte ho.
+        </p>
+
       </div>
 
+
       <div class="feature-card">
+
         <div class="icon">📍</div>
+
         <h3>Location</h3>
-        <p>Apni location lekar report ke saath save kar sakte ho.</p>
+
+        <p>
+          Apni location lekar report ke saath save kar sakte ho.
+        </p>
+
       </div>
 
+
       <div class="feature-card">
+
         <div class="icon">📢</div>
+
         <h3>Reports</h3>
-        <p>Submitted emergency reports dashboard me dekh sakte ho.</p>
+
+        <p>
+          Submitted emergency reports dashboard me dekh sakte ho.
+        </p>
+
       </div>
 
+
       <div class="feature-card">
+
         <div class="icon">👥</div>
+
         <h3>Community Help</h3>
-        <p>Aage volunteers aur responders ko connect karne ka idea hai.</p>
+
+        <p>
+          Aage volunteers aur responders ko connect karne ka idea hai.
+        </p>
+
       </div>
 
     </div>
@@ -170,55 +223,109 @@
   </section>
 
 
-  <!-- EMERGENCY REPORT -->
-  <section class="emergency-section" id="report">
+  <!-- =====================
+       EMERGENCY SECTION
+  ====================== -->
+
+  <section
+    class="emergency-section"
+    id="report"
+  >
 
     <h2>Emergency Report Karni Hai?</h2>
 
     <p>
-      Jo information pata hai wahi fill karo, unnecessary details ki zarurat nahi.
+      Jo information pata hai wahi fill karo,
+      unnecessary details ki zarurat nahi.
     </p>
 
-    <button class="big-sos" onclick="openReportForm()">
+    <button
+      class="big-sos"
+      onclick="openReportForm()"
+    >
       🚨 REPORT EMERGENCY
     </button>
 
   </section>
 
 
-  <!-- DASHBOARD -->
+  <!-- =====================
+       DASHBOARD
+  ====================== -->
+
   <section class="dashboard-section">
 
     <div class="dashboard-heading">
-      <p class="tag">LIVE DEMO DASHBOARD</p>
+
+      <p class="tag">
+        LIVE DEMO DASHBOARD
+      </p>
+
       <h2>Emergency Overview</h2>
-      <p>Reports ka quick overview yaha dikhega.</p>
+
+      <p>
+        Reports ka quick overview yaha dikhega.
+      </p>
+
     </div>
+
 
     <div class="dashboard-cards">
 
       <div class="dashboard-card total-card">
-        <div class="dashboard-icon">🚨</div>
-        <div>
-          <span>Total Reports</span>
-          <strong id="totalReports">0</strong>
+
+        <div class="dashboard-icon">
+          🚨
         </div>
+
+        <div>
+
+          <span>Total Reports</span>
+
+          <strong id="totalReports">
+            0
+          </strong>
+
+        </div>
+
       </div>
+
 
       <div class="dashboard-card active-card">
-        <div class="dashboard-icon">🔴</div>
-        <div>
-          <span>Active Cases</span>
-          <strong id="activeReports">0</strong>
+
+        <div class="dashboard-icon">
+          🔴
         </div>
+
+        <div>
+
+          <span>Active Cases</span>
+
+          <strong id="activeReports">
+            0
+          </strong>
+
+        </div>
+
       </div>
 
+
       <div class="dashboard-card resolved-card">
-        <div class="dashboard-icon">✅</div>
-        <div>
-          <span>Resolved</span>
-          <strong id="resolvedReports">0</strong>
+
+        <div class="dashboard-icon">
+          ✅
         </div>
+
+        <div>
+
+          <span>Resolved</span>
+
+          <strong id="resolvedReports">
+            0
+          </strong>
+
+        </div>
+
       </div>
 
     </div>
@@ -226,8 +333,14 @@
   </section>
 
 
-  <!-- REPORTS -->
-  <section class="reports-section" id="reports">
+  <!-- =====================
+       REPORTS
+  ====================== -->
+
+  <section
+    class="reports-section"
+    id="reports"
+  >
 
     <div class="reports-header">
 
@@ -236,17 +349,23 @@
         <h2>Recent Reports</h2>
 
         <p class="subtitle">
-          Live emergency reports Firestore se aa rahi hain.
+          Real-time emergency reports Firestore se aa rahi hain.
         </p>
 
       </div>
 
-      <button class="clear-btn" onclick="clearAllReports()">
+
+      <button
+        class="clear-btn"
+        onclick="clearAllReports()"
+      >
         🗑️ Clear All
       </button>
 
     </div>
 
+
+    <!-- FILTER -->
 
     <div class="filter-box">
 
@@ -254,23 +373,46 @@
         🔎 Filter Reports:
       </label>
 
+
       <select
         id="reportFilter"
         onchange="filterReports()"
       >
 
-        <option value="All">All Emergencies</option>
-        <option value="Fire 🔥">Fire 🔥</option>
-        <option value="Medical 🚑">Medical 🚑</option>
-        <option value="Flood 🌊">Flood 🌊</option>
-        <option value="Accident 🚗">Accident 🚗</option>
-        <option value="Earthquake 🌍">Earthquake 🌍</option>
-        <option value="Other ⚠️">Other ⚠️</option>
+        <option value="All">
+          All Emergencies
+        </option>
+
+        <option value="Fire 🔥">
+          Fire 🔥
+        </option>
+
+        <option value="Medical 🚑">
+          Medical 🚑
+        </option>
+
+        <option value="Flood 🌊">
+          Flood 🌊
+        </option>
+
+        <option value="Accident 🚗">
+          Accident 🚗
+        </option>
+
+        <option value="Earthquake 🌍">
+          Earthquake 🌍
+        </option>
+
+        <option value="Other ⚠️">
+          Other ⚠️
+        </option>
 
       </select>
 
     </div>
 
+
+    <!-- REPORTS CONTAINER -->
 
     <div
       id="reportsContainer"
@@ -278,7 +420,7 @@
     >
 
       <p class="no-report">
-        Loading reports...
+        Abhi tak koi report submit nahi hui.
       </p>
 
     </div>
@@ -286,8 +428,14 @@
   </section>
 
 
-  <!-- REPORT MODAL -->
-  <div class="modal" id="reportModal">
+  <!-- =====================
+       EMERGENCY REPORT MODAL
+  ====================== -->
+
+  <div
+    class="modal"
+    id="reportModal"
+  >
 
     <div class="modal-content">
 
@@ -298,11 +446,13 @@
         ×
       </span>
 
+
       <h2>Emergency Details</h2>
 
       <p class="form-text">
-        Jo pata hai wahi fill karo.
+        Jo pata hai wahi fill karo, tension lene ki zarurat nahi 😅
       </p>
+
 
       <form id="emergencyForm">
 
@@ -318,9 +468,15 @@
 
         <label>Emergency Type</label>
 
-        <select id="emergencyType" required>
+        <select
+          id="emergencyType"
+          required
+        >
 
-          <option value="">Select karo</option>
+          <option value="">
+            Select karo
+          </option>
+
           <option>Fire 🔥</option>
           <option>Medical 🚑</option>
           <option>Flood 🌊</option>
@@ -348,6 +504,7 @@
           📍 Get My Location
         </button>
 
+
         <p id="locationStatus"></p>
 
 
@@ -365,8 +522,14 @@
   </div>
 
 
-  <!-- LOGIN MODAL -->
-  <div class="modal" id="loginModal">
+  <!-- =====================
+       LOGIN MODAL
+  ====================== -->
+
+  <div
+    class="modal"
+    id="loginModal"
+  >
 
     <div class="modal-content auth-modal">
 
@@ -377,45 +540,67 @@
         ×
       </span>
 
+
       <h2>Welcome Back 👋</h2>
 
       <p class="form-text">
-        Login karke NOVA use karo.
+        Login karke NOVA community ka part bano.
       </p>
 
-      <input
-        type="email"
-        id="loginEmail"
-        placeholder="Email address"
-      >
 
-      <input
-        type="password"
-        id="loginPassword"
-        placeholder="Password"
-      >
+      <form id="loginForm">
 
-      <button
-        class="submit-btn"
-        onclick="loginUser()"
-      >
-        Login
-      </button>
+        <label>Email</label>
 
-      <button
-        class="google-btn"
-        onclick="googleLogin()"
-      >
-        Continue with Google 🔵
-      </button>
+        <input
+          type="email"
+          id="loginEmail"
+          placeholder="Enter your email"
+          required
+        >
+
+
+        <label>Password</label>
+
+        <input
+          type="password"
+          id="loginPassword"
+          placeholder="Enter your password"
+          required
+        >
+
+
+        <button
+          type="submit"
+          class="submit-btn"
+        >
+          Login
+        </button>
+
+
+        <button
+          type="button"
+          class="google-btn"
+          onclick="googleLogin()"
+        >
+          🔵 Continue with Google
+        </button>
+
+      </form>
 
     </div>
 
   </div>
 
 
-  <!-- SIGNUP MODAL -->
-  <div class="modal" id="signupModal">
+  <!-- =====================
+       SIGNUP MODAL
+  ====================== -->
+
+  <div
+    class="modal"
+    id="signupModal"
+  >
 
     <div class="modal-content auth-modal">
 
@@ -426,44 +611,89 @@
         ×
       </span>
 
+
       <h2>Create Account 🚀</h2>
 
       <p class="form-text">
-        NOVA community join karo.
+        NOVA join karo aur emergency response network ka part bano.
       </p>
 
-      <input
-        type="email"
-        id="signupEmail"
-        placeholder="Email address"
-      >
 
-      <input
-        type="password"
-        id="signupPassword"
-        placeholder="Password (minimum 6 characters)"
-      >
+      <form id="signupForm">
 
-      <button
-        class="submit-btn"
-        onclick="signupUser()"
-      >
-        Create Account
-      </button>
+        <label>Name</label>
+
+        <input
+          type="text"
+          id="signupName"
+          placeholder="Apna naam likho"
+          required
+        >
+
+
+        <label>Email</label>
+
+        <input
+          type="email"
+          id="signupEmail"
+          placeholder="Enter your email"
+          required
+        >
+
+
+        <label>Password</label>
+
+        <input
+          type="password"
+          id="signupPassword"
+          placeholder="Minimum 6 characters"
+          required
+        >
+
+
+        <button
+          type="submit"
+          class="submit-btn"
+        >
+          Create Account
+        </button>
+
+
+        <button
+          type="button"
+          class="google-btn"
+          onclick="googleLogin()"
+        >
+          🔵 Sign up with Google
+        </button>
+
+      </form>
 
     </div>
 
   </div>
 
 
+  <!-- =====================
+       FOOTER
+  ====================== -->
+
   <footer>
+
     <p>
       NOVA Disaster Response • Made by Aditya Raj while learning 🚀
     </p>
+
   </footer>
 
 
-  <script type="module" src="script.js"></script>
+  <!-- JAVASCRIPT -->
+
+  <script
+    type="module"
+    src="script.js"
+  ></script>
 
 </body>
+
 </html>
