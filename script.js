@@ -1,7 +1,6 @@
 // ==========================================
-// NOVA DISASTER RESPONSE
-// FINAL PHASE 4
-// FIREBASE AUTH + FIRESTORE + USER ROLES
+// NOVA DISASTER RESPONSE - PHASE 4 FINAL
+// Firebase Auth + User Based Reports + Admin
 // ==========================================
 
 
@@ -13,7 +12,6 @@ import {
   initializeApp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
 
-
 import {
   getFirestore,
   collection,
@@ -23,12 +21,10 @@ import {
   deleteDoc,
   doc,
   query,
+  orderBy,
   where,
-  getDoc,
-  setDoc,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
-
 
 import {
   getAuth,
@@ -47,22 +43,12 @@ import {
 // ==========================================
 
 const firebaseConfig = {
-
   apiKey: "AIzaSyBcEkoZMt1KZdQ-ch6J1-7KKyQRO542ZRY",
-
   authDomain: "nova-disaster-response.firebaseapp.com",
-
   projectId: "nova-disaster-response",
-
-  storageBucket:
-    "nova-disaster-response.firebasestorage.app",
-
-  messagingSenderId:
-    "275029136991",
-
-  appId:
-    "1:275029136991:web:382543b5ef90263b8364a"
-
+  storageBucket: "nova-disaster-response.firebasestorage.app",
+  messagingSenderId: "275029136991",
+  appId: "1:275029136991:web:382543b5ef90263b8364a"
 };
 
 
@@ -76,33 +62,56 @@ const db = getFirestore(app);
 
 const auth = getAuth(app);
 
-const googleProvider =
-  new GoogleAuthProvider();
+const googleProvider = new GoogleAuthProvider();
 
 
 // ==========================================
 // ADMIN CONFIG
-// IMPORTANT: PUT YOUR ADMIN EMAIL HERE
+// IMPORTANT: CHANGE THIS EMAIL
 // ==========================================
 
-const ADMIN_EMAIL =
-  "aditya9288raj@gmail.com";
+const ADMIN_EMAIL = "aditya9288raj@gmail.com";
 
 
 // ==========================================
 // GLOBAL VARIABLES
 // ==========================================
 
-let userLocation =
-  "Location nahi mili";
+let currentUser = null;
+
+let currentUserIsAdmin = false;
+
+let userLocation = "Location not available";
 
 let allReports = [];
 
-let currentUserRole =
-  "user";
+let unsubscribeReports = null;
 
-let unsubscribeReports =
-  null;
+
+// ==========================================
+// HELPERS
+// ==========================================
+
+function isAdmin(user) {
+
+  if (!user) return false;
+
+  return user.email === ADMIN_EMAIL;
+
+}
+
+
+function getUserDisplayName(user) {
+
+  if (!user) return "User";
+
+  return (
+    user.displayName ||
+    user.email?.split("@")[0] ||
+    "User"
+  );
+
+}
 
 
 // ==========================================
@@ -111,11 +120,9 @@ let unsubscribeReports =
 
 function openReportForm() {
 
-  if (!auth.currentUser) {
+  if (!currentUser) {
 
-    alert(
-      "Emergency report submit karne ke liye pehle login karo!"
-    );
+    alert("Please login first to submit an emergency report.");
 
     openLoginModal();
 
@@ -123,18 +130,11 @@ function openReportForm() {
 
   }
 
-
   const modal =
-    document.getElementById(
-      "reportModal"
-    );
-
+    document.getElementById("reportModal");
 
   if (modal) {
-
-    modal.style.display =
-      "block";
-
+    modal.style.display = "block";
   }
 
 }
@@ -144,22 +144,16 @@ function openSOSForm() {
 
   openReportForm();
 
-
   setTimeout(() => {
 
     const emergencyType =
-      document.getElementById(
-        "emergencyType"
-      );
-
+      document.getElementById("emergencyType");
 
     if (emergencyType) {
-
       emergencyType.focus();
-
     }
 
-  }, 100);
+  }, 200);
 
 }
 
@@ -167,65 +161,44 @@ function openSOSForm() {
 function closeReportForm() {
 
   const modal =
-    document.getElementById(
-      "reportModal"
-    );
-
+    document.getElementById("reportModal");
 
   if (modal) {
-
-    modal.style.display =
-      "none";
-
+    modal.style.display = "none";
   }
 
 }
 
 
-window.openReportForm =
-  openReportForm;
-
-window.openSOSForm =
-  openSOSForm;
-
-window.closeReportForm =
-  closeReportForm;
-
+window.openReportForm = openReportForm;
+window.openSOSForm = openSOSForm;
+window.closeReportForm = closeReportForm;
 
 
 // ==========================================
-// LOCATION
+// GET LOCATION
 // ==========================================
 
 function getLocation() {
 
   const status =
-    document.getElementById(
-      "locationStatus"
-    );
-
+    document.getElementById("locationStatus");
 
   if (!navigator.geolocation) {
 
     if (status) {
-
       status.innerText =
-        "Browser location support nahi karta.";
-
+        "Browser does not support location.";
     }
 
     return;
 
   }
 
-
   if (status) {
-
     status.innerText =
-      "Location le rahe hain... 📍";
-
+      "Getting your location... 📍";
   }
-
 
   navigator.geolocation.getCurrentPosition(
 
@@ -237,30 +210,23 @@ function getLocation() {
       const longitude =
         position.coords.longitude;
 
-
       userLocation =
         latitude.toFixed(5) +
         ", " +
         longitude.toFixed(5);
 
-
       if (status) {
-
         status.innerText =
-          "Location mil gayi ✅";
-
+          "Location added successfully ✅";
       }
 
     },
 
-
     function () {
 
       if (status) {
-
         status.innerText =
-          "Location allow nahi hui.";
-
+          "Location permission denied.";
       }
 
     }
@@ -270,19 +236,15 @@ function getLocation() {
 }
 
 
-window.getLocation =
-  getLocation;
-
+window.getLocation = getLocation;
 
 
 // ==========================================
-// SUBMIT EMERGENCY REPORT
+// SUBMIT REPORT
 // ==========================================
 
 const emergencyForm =
-  document.getElementById(
-    "emergencyForm"
-  );
+  document.getElementById("emergencyForm");
 
 
 if (emergencyForm) {
@@ -296,17 +258,9 @@ if (emergencyForm) {
       event.preventDefault();
 
 
-      const currentUser =
-        auth.currentUser;
-
-
-      // USER LOGIN CHECK
-
       if (!currentUser) {
 
-        alert(
-          "Report submit karne ke liye pehle login karo!"
-        );
+        alert("Please login first.");
 
         closeReportForm();
 
@@ -317,47 +271,21 @@ if (emergencyForm) {
       }
 
 
-      const nameElement =
-        document.getElementById(
-          "name"
-        );
-
-
-      const typeElement =
-        document.getElementById(
-          "emergencyType"
-        );
-
-
-      const descriptionElement =
-        document.getElementById(
-          "description"
-        );
-
-
       const name =
-        nameElement
-          ? nameElement.value.trim()
-          : "";
+        document.getElementById("name").value.trim();
 
 
       const type =
-        typeElement
-          ? typeElement.value
-          : "";
+        document.getElementById("emergencyType").value;
 
 
       const description =
-        descriptionElement
-          ? descriptionElement.value.trim()
-          : "";
+        document.getElementById("description").value.trim();
 
 
-      if (!type || !description) {
+      if (!name || !type || !description) {
 
-        alert(
-          "Emergency details fill karo!"
-        );
+        alert("Please fill all required details.");
 
         return;
 
@@ -366,64 +294,32 @@ if (emergencyForm) {
 
       try {
 
-        // SAVE REPORT WITH USER ID
-
         await addDoc(
 
-          collection(
-            db,
-            "reports"
-          ),
+          collection(db, "reports"),
 
           {
 
-            // USER INFORMATION
+            // REPORT DETAILS
+            name: name,
+            type: type,
+            description: description,
+            location: userLocation,
 
-            userId:
-              currentUser.uid,
+            // OWNER DETAILS
+            userId: currentUser.uid,
+            userEmail: currentUser.email,
+            userName: getUserDisplayName(currentUser),
 
-            userEmail:
-              currentUser.email || "",
+            // ADMIN ONLY STATUS
+            status: "Active",
 
-            userName:
-              currentUser.displayName ||
-              name ||
-              "NOVA User",
-
-
-            // REPORT INFORMATION
-
-            name:
-              name ||
-              currentUser.displayName ||
-              "NOVA User",
-
-            type:
-              type,
-
-            description:
-              description,
-
-            location:
-              userLocation,
-
-
-            // REPORT STATUS
-
-            status:
-              "Active",
-
-
-            // TIME
-
-            timestamp:
-              Date.now(),
+            // TIMESTAMP
+            timestamp: Date.now(),
+            createdAt: serverTimestamp(),
 
             time:
-              new Date().toLocaleString(),
-
-            createdAt:
-              serverTimestamp()
+              new Date().toLocaleString()
 
           }
 
@@ -431,7 +327,7 @@ if (emergencyForm) {
 
 
         alert(
-          "Emergency Report successfully submit ho gayi! 🚨"
+          "Emergency report submitted successfully! 🚨"
         );
 
 
@@ -439,25 +335,19 @@ if (emergencyForm) {
 
 
         userLocation =
-          "Location nahi mili";
+          "Location not available";
 
 
         const locationStatus =
-          document.getElementById(
-            "locationStatus"
-          );
+          document.getElementById("locationStatus");
 
 
         if (locationStatus) {
-
-          locationStatus.innerText =
-            "";
-
+          locationStatus.innerText = "";
         }
 
 
         closeReportForm();
-
 
       }
 
@@ -471,7 +361,7 @@ if (emergencyForm) {
 
 
         alert(
-          "Report submit nahi hui: " +
+          "Report submission failed: " +
           error.message
         );
 
@@ -484,223 +374,22 @@ if (emergencyForm) {
 }
 
 
-
-// ==========================================
-// CREATE USER PROFILE IN FIRESTORE
-// ==========================================
-
-async function createUserProfile(user) {
-
-  try {
-
-    const userRef =
-      doc(
-        db,
-        "users",
-        user.uid
-      );
-
-
-    const userSnapshot =
-      await getDoc(userRef);
-
-
-    // IF USER ALREADY EXISTS
-
-    if (userSnapshot.exists()) {
-
-      const data =
-        userSnapshot.data();
-
-
-      currentUserRole =
-        data.role || "user";
-
-
-      return;
-
-    }
-
-
-    // CHECK ADMIN EMAIL
-
-    const role =
-      user.email === ADMIN_EMAIL
-        ? "admin"
-        : "user";
-
-
-    // CREATE USER PROFILE
-
-    await setDoc(
-
-      userRef,
-
-      {
-
-        uid:
-          user.uid,
-
-        name:
-          user.displayName ||
-          "NOVA User",
-
-        email:
-          user.email || "",
-
-        role:
-          role,
-
-        createdAt:
-          serverTimestamp()
-
-      }
-
-    );
-
-
-    currentUserRole =
-      role;
-
-
-    console.log(
-      "User profile created:",
-      role
-    );
-
-  }
-
-
-  catch (error) {
-
-    console.error(
-      "User Profile Error:",
-      error
-    );
-
-  }
-
-}
-
-
-
-// ==========================================
-// GET USER ROLE
-// ==========================================
-
-async function getUserRole(user) {
-
-  try {
-
-    const userRef =
-      doc(
-        db,
-        "users",
-        user.uid
-      );
-
-
-    const userSnapshot =
-      await getDoc(userRef);
-
-
-    if (userSnapshot.exists()) {
-
-      const userData =
-        userSnapshot.data();
-
-
-      currentUserRole =
-        userData.role || "user";
-
-
-    }
-
-    else {
-
-      await createUserProfile(
-        user
-      );
-
-    }
-
-
-    // EXTRA ADMIN EMAIL CHECK
-
-    if (
-      user.email === ADMIN_EMAIL
-    ) {
-
-      currentUserRole =
-        "admin";
-
-
-      await setDoc(
-
-        userRef,
-
-        {
-          role: "admin"
-        },
-
-        {
-          merge: true
-        }
-
-      );
-
-    }
-
-
-    console.log(
-      "Current User Role:",
-      currentUserRole
-    );
-
-
-  }
-
-
-  catch (error) {
-
-    console.error(
-      "Role Error:",
-      error
-    );
-
-
-    currentUserRole =
-      "user";
-
-  }
-
-}
-
-
-
 // ==========================================
 // FIRESTORE REPORT LISTENER
 // ==========================================
 
 function listenToReports() {
 
-  const currentUser =
-    auth.currentUser;
-
-
-  // STOP OLD LISTENER
+  // Stop previous listener
 
   if (unsubscribeReports) {
 
     unsubscribeReports();
 
-    unsubscribeReports =
-      null;
+    unsubscribeReports = null;
 
   }
 
-
-  // NO USER
 
   if (!currentUser) {
 
@@ -716,179 +405,109 @@ function listenToReports() {
   let reportsQuery;
 
 
-  // ==========================================
-  // ADMIN CAN SEE ALL REPORTS
-  // ==========================================
+  // ADMIN SEES ALL REPORTS
 
-  if (
-    currentUserRole === "admin"
-  ) {
+  if (currentUserIsAdmin) {
 
-    console.log(
-      "👑 Admin: Loading all reports"
+    reportsQuery = query(
+
+      collection(db, "reports"),
+
+      orderBy("timestamp", "desc")
+
     );
-
-
-    reportsQuery =
-      query(
-        collection(
-          db,
-          "reports"
-        )
-      );
 
   }
 
 
-  // ==========================================
-  // NORMAL USER CAN SEE ONLY OWN REPORTS
-  // ==========================================
+  // NORMAL USER SEES ONLY OWN REPORTS
 
   else {
 
-    console.log(
-      "👤 User: Loading only personal reports"
+    reportsQuery = query(
+
+      collection(db, "reports"),
+
+      where(
+        "userId",
+        "==",
+        currentUser.uid
+      ),
+
+      orderBy("timestamp", "desc")
+
     );
-
-
-    reportsQuery =
-      query(
-
-        collection(
-          db,
-          "reports"
-        ),
-
-        where(
-          "userId",
-          "==",
-          currentUser.uid
-        )
-
-      );
 
   }
 
 
-  // REAL TIME LISTENER
+  unsubscribeReports = onSnapshot(
 
-  unsubscribeReports =
-    onSnapshot(
-
-      reportsQuery,
+    reportsQuery,
 
 
-      function (snapshot) {
+    function (snapshot) {
 
-        allReports = [];
-
-
-        snapshot.forEach(
-
-          function (document) {
-
-            allReports.push({
-
-              id:
-                document.id,
-
-              ...document.data()
-
-            });
-
-          }
-
-        );
+      allReports = [];
 
 
-        // SORT LATEST FIRST
+      snapshot.forEach(
 
-        allReports.sort(
+        function (document) {
 
-          function (a, b) {
+          allReports.push({
 
-            return (
-              (b.timestamp || 0) -
-              (a.timestamp || 0)
-            );
+            id: document.id,
 
-          }
+            ...document.data()
 
-        );
+          });
 
+        }
 
-        showReports();
+      );
 
 
-        console.log(
-          "Reports loaded:",
-          allReports.length
-        );
+      showReports();
 
-      },
+    },
 
 
-      function (error) {
+    function (error) {
 
-        console.error(
-          "Firestore Listener Error:",
-          error
-        );
+      console.error(
+        "Firestore Listener Error:",
+        error
+      );
 
-      }
+    }
 
-    );
+  );
 
 }
 
 
-
 // ==========================================
-// SHOW REPORTS
+// UPDATE DASHBOARD
 // ==========================================
 
-function showReports() {
-
-  const container =
-    document.getElementById(
-      "reportsContainer"
-    );
-
-
-  if (!container) {
-
-    return;
-
-  }
-
-
-  // ==========================================
-  // COUNTERS
-  // ==========================================
+function updateDashboardCounters() {
 
   const reportCount =
-    document.getElementById(
-      "reportCount"
-    );
-
+    document.getElementById("reportCount");
 
   const totalReports =
-    document.getElementById(
-      "totalReports"
-    );
-
+    document.getElementById("totalReports");
 
   const activeCounter =
-    document.getElementById(
-      "activeReports"
-    );
-
+    document.getElementById("activeReports");
 
   const resolvedCounter =
-    document.getElementById(
-      "resolvedReports"
-    );
+    document.getElementById("resolvedReports");
 
+
+  // USER TOTAL = OWN REPORTS
+  // ADMIN TOTAL = ALL REPORTS
 
   if (reportCount) {
 
@@ -906,21 +525,34 @@ function showReports() {
   }
 
 
+  // Only admin should see status data
+
+  if (!currentUserIsAdmin) {
+
+    if (activeCounter) {
+      activeCounter.innerText = "-";
+    }
+
+    if (resolvedCounter) {
+      resolvedCounter.innerText = "-";
+    }
+
+    return;
+
+  }
+
+
   const activeReports =
     allReports.filter(
-
       report =>
         report.status === "Active"
-
     );
 
 
   const resolvedReports =
     allReports.filter(
-
       report =>
         report.status === "Resolved"
-
     );
 
 
@@ -939,19 +571,47 @@ function showReports() {
 
   }
 
+}
 
-  // ==========================================
+
+// ==========================================
+// SHOW REPORTS
+// ==========================================
+
+function showReports() {
+
+  const container =
+    document.getElementById("reportsContainer");
+
+
+  if (!container) return;
+
+
+  updateDashboardCounters();
+
+
+  // NOT LOGGED IN
+
+  if (!currentUser) {
+
+    container.innerHTML = `
+      <p class="no-report">
+        🔐 Login to view your emergency reports.
+      </p>
+    `;
+
+    return;
+
+  }
+
+
   // FILTER
-  // ==========================================
 
   const filterElement =
-    document.getElementById(
-      "reportFilter"
-    );
+    document.getElementById("reportFilter");
 
 
-  let selectedFilter =
-    "All";
+  let selectedFilter = "All";
 
 
   if (filterElement) {
@@ -966,136 +626,124 @@ function showReports() {
     allReports;
 
 
-  if (
-    selectedFilter !== "All" &&
-    selectedFilter !== "All Emergencies"
-  ) {
+  if (selectedFilter !== "All") {
 
     filteredReports =
       allReports.filter(
 
         report =>
-          report.type ===
-          selectedFilter
+          report.type === selectedFilter
 
       );
 
   }
 
 
-  // ==========================================
   // NO REPORTS
-  // ==========================================
 
-  if (
-    filteredReports.length === 0
-  ) {
+  if (filteredReports.length === 0) {
 
     container.innerHTML = `
-
-      <div class="no-report">
-
-        <h3>📭 No Reports Found</h3>
-
-        <p>
-          ${auth.currentUser
-            ? "Abhi koi emergency report nahi hai."
-            : "Reports dekhne ke liye login karo."
-          }
-        </p>
-
-      </div>
-
+      <p class="no-report">
+        ${currentUserIsAdmin
+          ? "No emergency reports found."
+          : "You have not submitted any emergency reports yet."
+        }
+      </p>
     `;
-
 
     return;
 
   }
 
 
-  container.innerHTML =
-    "";
+  container.innerHTML = "";
 
-
-  // ==========================================
-  // CREATE REPORT CARDS
-  // ==========================================
 
   filteredReports.forEach(
 
     function (report) {
 
       const card =
-        document.createElement(
-          "div"
-        );
+        document.createElement("div");
 
 
       card.className =
         "report-card";
 
 
-      const statusClass =
+      // ======================================
+      // ADMIN VIEW
+      // ======================================
 
-        report.status === "Active"
+      if (currentUserIsAdmin) {
 
-          ? "active-status"
-
-          : "resolved-status";
-
-
-      // ========================================
-      // ADMIN ONLY ACTIONS
-      // ========================================
-
-      let adminActions =
-        "";
-
-
-      if (
-        currentUserRole === "admin"
-      ) {
-
-        let statusButton =
-          "";
-
-
-        if (
+        const statusClass =
           report.status === "Active"
-        ) {
-
-          statusButton = `
-
-            <button
-              class="resolve-btn"
-              onclick="toggleStatus('${report.id}')"
-            >
-              ✅ Mark Resolved
-            </button>
-
-          `;
-
-        }
+            ? "active-status"
+            : "resolved-status";
 
 
-        else {
+        const statusButton =
+          report.status === "Active"
 
-          statusButton = `
+            ? `
+              <button
+                class="resolve-btn"
+                onclick="toggleStatus('${report.id}')"
+              >
+                ✅ Mark Resolved
+              </button>
+            `
 
-            <button
-              class="active-btn"
-              onclick="toggleStatus('${report.id}')"
-            >
-              🔄 Mark Active
-            </button>
-
-          `;
-
-        }
+            : `
+              <button
+                class="active-btn"
+                onclick="toggleStatus('${report.id}')"
+              >
+                🔄 Mark Active
+              </button>
+            `;
 
 
-        adminActions = `
+        card.innerHTML = `
+
+          <div class="report-top">
+
+            <h3>
+              🚨 ${report.type}
+            </h3>
+
+            <span class="status-badge ${statusClass}">
+              ${report.status}
+            </span>
+
+          </div>
+
+          <p>
+            <strong>Reported By:</strong>
+            ${report.name}
+          </p>
+
+          <p>
+            <strong>User Email:</strong>
+            ${report.userEmail || "Not available"}
+          </p>
+
+          <p>
+            <strong>Problem:</strong>
+            ${report.description}
+          </p>
+
+          <p>
+            <strong>Location:</strong>
+            ${report.location}
+          </p>
+
+          <p>
+            <strong>Time:</strong>
+            ${report.time}
+          </p>
 
           <div class="report-actions">
 
@@ -1115,28 +763,49 @@ function showReports() {
       }
 
 
-      // ========================================
-      // ADMIN USER INFORMATION
-      // ========================================
+      // ======================================
+      // NORMAL USER VIEW
+      // ======================================
 
-      let userInfo =
-        "";
+      else {
 
+        card.innerHTML = `
 
-      if (
-        currentUserRole === "admin"
-      ) {
+          <div class="report-top">
 
-        userInfo = `
+            <h3>
+              🚨 ${report.type}
+            </h3>
+
+            <span class="my-report-badge">
+              Your Report
+            </span>
+
+          </div>
 
           <p>
-            <strong>👤 Reported By:</strong>
-            ${report.userName || report.name || "Unknown"}
+            <strong>Name:</strong>
+            ${report.name}
           </p>
 
           <p>
-            <strong>📧 Email:</strong>
-            ${report.userEmail || "Not available"}
+            <strong>Problem:</strong>
+            ${report.description}
+          </p>
+
+          <p>
+            <strong>Location:</strong>
+            ${report.location}
+          </p>
+
+          <p>
+            <strong>Submitted:</strong>
+            ${report.time}
+          </p>
+
+          <p class="report-info">
+            ℹ️ Your emergency request has been securely submitted.
+            Response status is managed by the emergency administration.
           </p>
 
         `;
@@ -1144,103 +813,13 @@ function showReports() {
       }
 
 
-      // ========================================
-      // REPORT CARD HTML
-      // ========================================
-
-      card.innerHTML = `
-
-        <div class="report-top">
-
-          <h3>
-            🚨 ${report.type || "Emergency"}
-          </h3>
-
-
-          <span
-            class="status-badge ${statusClass}"
-          >
-            ${report.status || "Active"}
-          </span>
-
-        </div>
-
-
-        ${userInfo}
-
-
-        <p>
-          <strong>Problem:</strong>
-          ${report.description || "No description"}
-        </p>
-
-
-        <p>
-          <strong>📍 Location:</strong>
-          ${report.location || "Location unavailable"}
-        </p>
-
-
-        <p>
-          <strong>🕒 Time:</strong>
-          ${report.time || "Unknown"}
-        </p>
-
-
-        ${adminActions}
-
-      `;
-
-
-      container.appendChild(
-        card
-      );
+      container.appendChild(card);
 
     }
 
   );
 
-
-  updateAdminControls();
-
 }
-
-
-
-// ==========================================
-// ADMIN CONTROL VISIBILITY
-// ==========================================
-
-function updateAdminControls() {
-
-  const clearButton =
-    document.getElementById(
-      "clearAllBtn"
-    );
-
-
-  if (clearButton) {
-
-    if (
-      currentUserRole === "admin"
-    ) {
-
-      clearButton.style.display =
-        "block";
-
-    }
-
-    else {
-
-      clearButton.style.display =
-        "none";
-
-    }
-
-  }
-
-}
-
 
 
 // ==========================================
@@ -1250,14 +829,10 @@ function updateAdminControls() {
 
 async function toggleStatus(id) {
 
-  // SECURITY CHECK
-
-  if (
-    currentUserRole !== "admin"
-  ) {
+  if (!currentUserIsAdmin) {
 
     alert(
-      "❌ Sirf Admin report status change kar sakta hai!"
+      "Only admin can change report status."
     );
 
     return;
@@ -1269,53 +844,28 @@ async function toggleStatus(id) {
 
     const report =
       allReports.find(
-
         report =>
           report.id === id
-
       );
 
 
-    if (!report) {
-
-      return;
-
-    }
+    if (!report) return;
 
 
     const newStatus =
-
       report.status === "Active"
-
         ? "Resolved"
-
         : "Active";
 
 
     await updateDoc(
 
-      doc(
-        db,
-        "reports",
-        id
-      ),
+      doc(db, "reports", id),
 
       {
-
-        status:
-          newStatus,
-
-        updatedAt:
-          Date.now()
-
+        status: newStatus
       }
 
-    );
-
-
-    console.log(
-      "Status Updated:",
-      newStatus
     );
 
   }
@@ -1323,14 +873,10 @@ async function toggleStatus(id) {
 
   catch (error) {
 
-    console.error(
-      "Status Error:",
-      error
-    );
-
+    console.error(error);
 
     alert(
-      "Status update nahi hua."
+      "Status update failed."
     );
 
   }
@@ -1342,7 +888,6 @@ window.toggleStatus =
   toggleStatus;
 
 
-
 // ==========================================
 // DELETE REPORT
 // ADMIN ONLY
@@ -1350,12 +895,10 @@ window.toggleStatus =
 
 async function deleteReport(id) {
 
-  if (
-    currentUserRole !== "admin"
-  ) {
+  if (!currentUserIsAdmin) {
 
     alert(
-      "❌ Sirf Admin reports delete kar sakta hai!"
+      "Only admin can delete reports."
     );
 
     return;
@@ -1363,36 +906,18 @@ async function deleteReport(id) {
   }
 
 
-  const confirmDelete =
-    confirm(
-
-      "Pakki baat? Ye report permanently delete ho jayegi."
-
-    );
+  const confirmDelete = confirm(
+    "Are you sure? This report will be permanently deleted."
+  );
 
 
-  if (!confirmDelete) {
-
-    return;
-
-  }
+  if (!confirmDelete) return;
 
 
   try {
 
     await deleteDoc(
-
-      doc(
-        db,
-        "reports",
-        id
-      )
-
-    );
-
-
-    console.log(
-      "Report deleted"
+      doc(db, "reports", id)
     );
 
   }
@@ -1400,14 +925,10 @@ async function deleteReport(id) {
 
   catch (error) {
 
-    console.error(
-      "Delete Error:",
-      error
-    );
-
+    console.error(error);
 
     alert(
-      "Report delete nahi hui."
+      "Report deletion failed."
     );
 
   }
@@ -1417,7 +938,6 @@ async function deleteReport(id) {
 
 window.deleteReport =
   deleteReport;
-
 
 
 // ==========================================
@@ -1435,7 +955,6 @@ window.filterReports =
   filterReports;
 
 
-
 // ==========================================
 // CLEAR ALL REPORTS
 // ADMIN ONLY
@@ -1443,12 +962,10 @@ window.filterReports =
 
 async function clearAllReports() {
 
-  if (
-    currentUserRole !== "admin"
-  ) {
+  if (!currentUserIsAdmin) {
 
     alert(
-      "❌ Sirf Admin saari reports delete kar sakta hai!"
+      "Only admin can clear reports."
     );
 
     return;
@@ -1456,42 +973,27 @@ async function clearAllReports() {
   }
 
 
-  const confirmClear =
-    confirm(
-
-      "⚠️ Saari reports permanently delete ho jayengi. Sure ho?"
-
-    );
+  const confirmClear = confirm(
+    "Delete ALL emergency reports permanently?"
+  );
 
 
-  if (!confirmClear) {
-
-    return;
-
-  }
+  if (!confirmClear) return;
 
 
   try {
 
-    for (
-      const report of allReports
-    ) {
+    for (const report of allReports) {
 
       await deleteDoc(
-
-        doc(
-          db,
-          "reports",
-          report.id
-        )
-
+        doc(db, "reports", report.id)
       );
 
     }
 
 
     alert(
-      "All reports deleted!"
+      "All reports cleared."
     );
 
   }
@@ -1499,14 +1001,10 @@ async function clearAllReports() {
 
   catch (error) {
 
-    console.error(
-      "Clear All Error:",
-      error
-    );
-
+    console.error(error);
 
     alert(
-      "Reports delete nahi hui."
+      "Reports could not be cleared."
     );
 
   }
@@ -1518,7 +1016,6 @@ window.clearAllReports =
   clearAllReports;
 
 
-
 // ==========================================
 // LOGIN MODAL
 // ==========================================
@@ -1526,15 +1023,12 @@ window.clearAllReports =
 function openLoginModal() {
 
   const modal =
-    document.getElementById(
-      "loginModal"
-    );
+    document.getElementById("loginModal");
 
 
   if (modal) {
 
-    modal.style.display =
-      "block";
+    modal.style.display = "block";
 
   }
 
@@ -1544,15 +1038,12 @@ function openLoginModal() {
 function closeLoginModal() {
 
   const modal =
-    document.getElementById(
-      "loginModal"
-    );
+    document.getElementById("loginModal");
 
 
   if (modal) {
 
-    modal.style.display =
-      "none";
+    modal.style.display = "none";
 
   }
 
@@ -1566,7 +1057,6 @@ window.closeLoginModal =
   closeLoginModal;
 
 
-
 // ==========================================
 // SIGNUP MODAL
 // ==========================================
@@ -1574,15 +1064,12 @@ window.closeLoginModal =
 function openSignupModal() {
 
   const modal =
-    document.getElementById(
-      "signupModal"
-    );
+    document.getElementById("signupModal");
 
 
   if (modal) {
 
-    modal.style.display =
-      "block";
+    modal.style.display = "block";
 
   }
 
@@ -1592,15 +1079,12 @@ function openSignupModal() {
 function closeSignupModal() {
 
   const modal =
-    document.getElementById(
-      "signupModal"
-    );
+    document.getElementById("signupModal");
 
 
   if (modal) {
 
-    modal.style.display =
-      "none";
+    modal.style.display = "none";
 
   }
 
@@ -1614,56 +1098,26 @@ window.closeSignupModal =
   closeSignupModal;
 
 
-
 // ==========================================
 // EMAIL SIGNUP
 // ==========================================
 
 async function signupUser() {
 
-  const nameInput =
-    document.getElementById(
-      "signupName"
-    );
-
-
-  const emailInput =
-    document.getElementById(
-      "signupEmail"
-    );
-
-
-  const passwordInput =
-    document.getElementById(
-      "signupPassword"
-    );
-
-
   const name =
-    nameInput
-      ? nameInput.value.trim()
-      : "";
-
+    document.getElementById("signupName").value.trim();
 
   const email =
-    emailInput
-      ? emailInput.value.trim()
-      : "";
-
+    document.getElementById("signupEmail").value.trim();
 
   const password =
-    passwordInput
-      ? passwordInput.value
-      : "";
+    document.getElementById("signupPassword").value;
 
 
-  if (
-    !email ||
-    !password
-  ) {
+  if (!email || !password) {
 
     alert(
-      "Email aur password fill karo!"
+      "Please fill email and password."
     );
 
     return;
@@ -1671,12 +1125,10 @@ async function signupUser() {
   }
 
 
-  if (
-    password.length < 6
-  ) {
+  if (password.length < 6) {
 
     alert(
-      "Password minimum 6 characters ka hona chahiye!"
+      "Password must contain at least 6 characters."
     );
 
     return;
@@ -1687,7 +1139,6 @@ async function signupUser() {
   try {
 
     const userCredential =
-
       await createUserWithEmailAndPassword(
 
         auth,
@@ -1697,23 +1148,14 @@ async function signupUser() {
       );
 
 
-    const user =
-      userCredential.user;
-
-
-    // UPDATE DISPLAY NAME
-
     if (name) {
 
       await updateProfile(
 
-        user,
+        userCredential.user,
 
         {
-
-          displayName:
-            name
-
+          displayName: name
         }
 
       );
@@ -1721,15 +1163,8 @@ async function signupUser() {
     }
 
 
-    // CREATE USER PROFILE
-
-    await createUserProfile(
-      user
-    );
-
-
     alert(
-      "Account successfully create ho gaya! 🎉"
+      "Account created successfully! 🎉"
     );
 
 
@@ -1737,9 +1172,7 @@ async function signupUser() {
 
 
     const signupForm =
-      document.getElementById(
-        "signupForm"
-      );
+      document.getElementById("signupForm");
 
 
     if (signupForm) {
@@ -1748,7 +1181,6 @@ async function signupUser() {
 
     }
 
-
   }
 
 
@@ -1756,8 +1188,7 @@ async function signupUser() {
 
     console.error(
       "Signup Error:",
-      error.code,
-      error.message
+      error
     );
 
 
@@ -1767,7 +1198,7 @@ async function signupUser() {
     ) {
 
       alert(
-        "Is email se account already bana hua hai. Login karo!"
+        "This email already has an account. Please login."
       );
 
     }
@@ -1791,44 +1222,23 @@ window.signupUser =
   signupUser;
 
 
-
 // ==========================================
 // EMAIL LOGIN
 // ==========================================
 
 async function loginUser() {
 
-  const emailInput =
-    document.getElementById(
-      "loginEmail"
-    );
-
-
-  const passwordInput =
-    document.getElementById(
-      "loginPassword"
-    );
-
-
   const email =
-    emailInput
-      ? emailInput.value.trim()
-      : "";
-
+    document.getElementById("loginEmail").value.trim();
 
   const password =
-    passwordInput
-      ? passwordInput.value
-      : "";
+    document.getElementById("loginPassword").value;
 
 
-  if (
-    !email ||
-    !password
-  ) {
+  if (!email || !password) {
 
     alert(
-      "Email aur password fill karo!"
+      "Please fill email and password."
     );
 
     return;
@@ -1856,9 +1266,7 @@ async function loginUser() {
 
 
     const loginForm =
-      document.getElementById(
-        "loginForm"
-      );
+      document.getElementById("loginForm");
 
 
     if (loginForm) {
@@ -1874,7 +1282,7 @@ async function loginUser() {
 
     console.error(
       "Login Error:",
-      error.code
+      error
     );
 
 
@@ -1884,7 +1292,7 @@ async function loginUser() {
     ) {
 
       alert(
-        "Email ya password galat hai!"
+        "Incorrect email or password."
       );
 
     }
@@ -1908,33 +1316,19 @@ window.loginUser =
   loginUser;
 
 
-
 // ==========================================
-// GOOGLE LOGIN / SIGNUP
+// GOOGLE LOGIN
 // ==========================================
 
 async function googleLogin() {
 
   try {
 
-    const result =
+    await signInWithPopup(
 
-      await signInWithPopup(
+      auth,
+      googleProvider
 
-        auth,
-        googleProvider
-
-      );
-
-
-    const user =
-      result.user;
-
-
-    // CREATE PROFILE IF NEW USER
-
-    await createUserProfile(
-      user
     );
 
 
@@ -1943,9 +1337,8 @@ async function googleLogin() {
     closeSignupModal();
 
 
-    console.log(
-      "Google Login Successful:",
-      user.email
+    alert(
+      "Google login successful! 🎉"
     );
 
   }
@@ -1955,8 +1348,7 @@ async function googleLogin() {
 
     console.error(
       "Google Login Error:",
-      error.code,
-      error.message
+      error
     );
 
 
@@ -1974,7 +1366,6 @@ window.googleLogin =
   googleLogin;
 
 
-
 // ==========================================
 // LOGOUT
 // ==========================================
@@ -1983,30 +1374,7 @@ async function logoutUser() {
 
   try {
 
-    await signOut(
-      auth
-    );
-
-
-    currentUserRole =
-      "user";
-
-
-    allReports =
-      [];
-
-
-    if (unsubscribeReports) {
-
-      unsubscribeReports();
-
-      unsubscribeReports =
-        null;
-
-    }
-
-
-    showReports();
+    await signOut(auth);
 
 
     alert(
@@ -2018,11 +1386,7 @@ async function logoutUser() {
 
   catch (error) {
 
-    console.error(
-      "Logout Error:",
-      error
-    );
-
+    console.error(error);
 
     alert(
       "Logout failed."
@@ -2037,6 +1401,53 @@ window.logoutUser =
   logoutUser;
 
 
+// ==========================================
+// UPDATE UI BY ROLE
+// ==========================================
+
+function updateRoleUI() {
+
+  const clearButton =
+    document.querySelector(".clear-btn");
+
+
+  const dashboardHeading =
+    document.querySelector(
+      ".dashboard-heading p:not(.tag)"
+    );
+
+
+  if (currentUserIsAdmin) {
+
+    if (clearButton) {
+      clearButton.style.display = "block";
+    }
+
+
+    if (dashboardHeading) {
+      dashboardHeading.innerText =
+        "Admin dashboard - monitoring all emergency reports.";
+    }
+
+  }
+
+
+  else {
+
+    if (clearButton) {
+      clearButton.style.display = "none";
+    }
+
+
+    if (dashboardHeading) {
+      dashboardHeading.innerText =
+        "Your personal emergency report overview.";
+    }
+
+  }
+
+}
+
 
 // ==========================================
 // AUTH STATE LISTENER
@@ -2046,150 +1457,122 @@ onAuthStateChanged(
 
   auth,
 
-  async function (user) {
+  function (user) {
 
     const authButtons =
-      document.getElementById(
-        "authButtons"
-      );
-
+      document.getElementById("authButtons");
 
     const userProfile =
-      document.getElementById(
-        "userProfile"
-      );
-
+      document.getElementById("userProfile");
 
     const userName =
-      document.getElementById(
-        "userName"
-      );
+      document.getElementById("userName");
 
 
-    // ========================================
+    currentUser = user;
+
+    currentUserIsAdmin =
+      isAdmin(user);
+
+
+    // ======================================
     // USER LOGGED IN
-    // ========================================
+    // ======================================
 
     if (user) {
 
       console.log(
-        "🔐 User logged in:",
+        "User logged in:",
         user.email
       );
 
 
-      // GET ROLE
-
-      await getUserRole(
-        user
+      console.log(
+        "Is Admin:",
+        currentUserIsAdmin
       );
 
 
-      // UPDATE NAVBAR
-
       if (authButtons) {
 
-        authButtons.style.display =
-          "none";
+        authButtons.style.display = "none";
 
       }
 
 
       if (userProfile) {
 
-        userProfile.style.display =
-          "flex";
+        userProfile.style.display = "flex";
 
       }
 
 
       if (userName) {
 
-        const roleBadge =
-
-          currentUserRole === "admin"
-
-            ? "👑 Admin: "
-
-            : "👤 ";
+        const roleText =
+          currentUserIsAdmin
+            ? "ADMIN"
+            : "USER";
 
 
         userName.innerText =
-
-          roleBadge +
-
-          (
-            user.displayName ||
-            user.email
-          );
+          `👤 ${getUserDisplayName(user)} (${roleText})`;
 
       }
 
 
-      // LOAD REPORTS BASED ON ROLE
+      updateRoleUI();
+
 
       listenToReports();
-
-
-      // CLOSE MODALS
-
-      closeLoginModal();
-
-      closeSignupModal();
-
 
     }
 
 
-    // ========================================
+    // ======================================
     // USER LOGGED OUT
-    // ========================================
+    // ======================================
 
     else {
 
       console.log(
-        "🔓 No user logged in"
+        "No user logged in"
       );
-
-
-      currentUserRole =
-        "user";
 
 
       if (authButtons) {
 
-        authButtons.style.display =
-          "flex";
+        authButtons.style.display = "flex";
 
       }
 
 
       if (userProfile) {
 
-        userProfile.style.display =
-          "none";
+        userProfile.style.display = "none";
 
       }
+
+
+      currentUserIsAdmin = false;
+
+
+      updateRoleUI();
 
 
       if (unsubscribeReports) {
 
         unsubscribeReports();
 
-        unsubscribeReports =
-          null;
+        unsubscribeReports = null;
 
       }
 
 
-      allReports =
-        [];
+      allReports = [];
 
 
       showReports();
-
-
-      updateAdminControls();
 
     }
 
@@ -2198,9 +1581,8 @@ onAuthStateChanged(
 );
 
 
-
 // ==========================================
-// CLOSE MODALS WHEN CLICKING OUTSIDE
+// OUTSIDE MODAL CLICK
 // ==========================================
 
 window.addEventListener(
@@ -2210,47 +1592,30 @@ window.addEventListener(
   function (event) {
 
     const reportModal =
-      document.getElementById(
-        "reportModal"
-      );
-
+      document.getElementById("reportModal");
 
     const loginModal =
-      document.getElementById(
-        "loginModal"
-      );
-
+      document.getElementById("loginModal");
 
     const signupModal =
-      document.getElementById(
-        "signupModal"
-      );
+      document.getElementById("signupModal");
 
 
-    if (
-      event.target ===
-      reportModal
-    ) {
+    if (event.target === reportModal) {
 
       closeReportForm();
 
     }
 
 
-    if (
-      event.target ===
-      loginModal
-    ) {
+    if (event.target === loginModal) {
 
       closeLoginModal();
 
     }
 
 
-    if (
-      event.target ===
-      signupModal
-    ) {
+    if (event.target === signupModal) {
 
       closeSignupModal();
 
@@ -2261,37 +1626,22 @@ window.addEventListener(
 );
 
 
-
 // ==========================================
-// INITIAL UI
-// ==========================================
-
-updateAdminControls();
-
-showReports();
-
-
-
-// ==========================================
-// CONSOLE STATUS
+// START
 // ==========================================
 
 console.log(
-  "🚀 NOVA Phase 4 Loaded"
+  "🚨 NOVA Disaster Response - Phase 4 Ready"
 );
 
 console.log(
-  "🔐 Firebase Authentication Active"
+  "🔐 Authentication Enabled"
 );
 
 console.log(
-  "🔥 Firestore Real-time Database Active"
+  "👤 User Based Reports Enabled"
 );
 
 console.log(
-  "👤 User Specific Reports Active"
-);
-
-console.log(
-  "👑 Role Based Access System Active"
+  "🛡️ Admin Role System Enabled"
 );
