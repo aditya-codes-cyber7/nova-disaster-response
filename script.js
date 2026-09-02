@@ -8,8 +8,10 @@
 // FIREBASE IMPORTS
 // ==========================================
 
-import { initializeApp } from
-  "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+import {
+  initializeApp
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
 
 import {
   getFirestore,
@@ -21,8 +23,8 @@ import {
   doc,
   query,
   orderBy
-} from
-  "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
 
 import {
   getAuth,
@@ -31,9 +33,9 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
-  onAuthStateChanged
-} from
-  "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+  onAuthStateChanged,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 
 // ==========================================
@@ -55,8 +57,11 @@ const firebaseConfig = {
 // ==========================================
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
+
 const auth = getAuth(app);
+
 const googleProvider = new GoogleAuthProvider();
 
 
@@ -65,6 +70,7 @@ const googleProvider = new GoogleAuthProvider();
 // ==========================================
 
 let userLocation = "Location nahi mili";
+
 let allReports = [];
 
 
@@ -73,20 +79,44 @@ let allReports = [];
 // ==========================================
 
 function openReportForm() {
-  document.getElementById("reportModal").style.display = "block";
+
+  const modal = document.getElementById("reportModal");
+
+  if (modal) {
+    modal.style.display = "block";
+  }
+
 }
 
+
 function openSOSForm() {
+
   openReportForm();
 
   setTimeout(() => {
-    document.getElementById("emergencyType")?.focus();
+
+    const emergencyType =
+      document.getElementById("emergencyType");
+
+    if (emergencyType) {
+      emergencyType.focus();
+    }
+
   }, 100);
+
 }
 
+
 function closeReportForm() {
-  document.getElementById("reportModal").style.display = "none";
+
+  const modal = document.getElementById("reportModal");
+
+  if (modal) {
+    modal.style.display = "none";
+  }
+
 }
+
 
 window.openReportForm = openReportForm;
 window.openSOSForm = openSOSForm;
@@ -94,39 +124,62 @@ window.closeReportForm = closeReportForm;
 
 
 // ==========================================
-// GET LOCATION
+// LOCATION
 // ==========================================
 
 function getLocation() {
 
-  const status = document.getElementById("locationStatus");
+  const status =
+    document.getElementById("locationStatus");
+
 
   if (!navigator.geolocation) {
-    status.innerText = "Browser location support nahi karta.";
+
+    status.innerText =
+      "Browser location support nahi karta.";
+
     return;
   }
 
-  status.innerText = "Location le rahe hain... 📍";
+
+  status.innerText =
+    "Location le rahe hain... 📍";
+
 
   navigator.geolocation.getCurrentPosition(
 
     function (position) {
 
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
+      const latitude =
+        position.coords.latitude;
+
+      const longitude =
+        position.coords.longitude;
+
 
       userLocation =
-        latitude.toFixed(5) + ", " +
+        latitude.toFixed(5) +
+        ", " +
         longitude.toFixed(5);
 
-      status.innerText = "Location mil gayi ✅";
+
+      status.innerText =
+        "Location mil gayi ✅";
+
     },
 
+
     function () {
-      status.innerText = "Location allow nahi hui.";
+
+      status.innerText =
+        "Location allow nahi hui.";
+
     }
+
   );
+
 }
+
 
 window.getLocation = getLocation;
 
@@ -135,86 +188,143 @@ window.getLocation = getLocation;
 // SUBMIT REPORT
 // ==========================================
 
-const emergencyForm = document.getElementById("emergencyForm");
+const emergencyForm =
+  document.getElementById("emergencyForm");
+
 
 if (emergencyForm) {
 
-  emergencyForm.addEventListener("submit", async function (event) {
+  emergencyForm.addEventListener(
+    "submit",
 
-    event.preventDefault();
+    async function (event) {
 
-    const name = document.getElementById("name").value;
-    const type = document.getElementById("emergencyType").value;
-    const description = document.getElementById("description").value;
+      event.preventDefault();
 
-    try {
 
-      await addDoc(collection(db, "reports"), {
-        name: name,
-        type: type,
-        description: description,
-        location: userLocation,
-        status: "Active",
-        timestamp: Date.now(),
-        time: new Date().toLocaleString()
-      });
+      const name =
+        document.getElementById("name").value;
 
-      alert("Emergency Report submit ho gayi! 🚨");
 
-      emergencyForm.reset();
+      const type =
+        document.getElementById("emergencyType").value;
 
-      userLocation = "Location nahi mili";
 
-      document.getElementById("locationStatus").innerText = "";
+      const description =
+        document.getElementById("description").value;
 
-      closeReportForm();
 
-    } catch (error) {
+      try {
 
-      console.error(error);
+        await addDoc(
+          collection(db, "reports"),
 
-      alert("Report submit nahi hui. Firebase check karo.");
+          {
+            name: name,
+            type: type,
+            description: description,
+            location: userLocation,
+            status: "Active",
+            timestamp: Date.now(),
+            time: new Date().toLocaleString()
+          }
+        );
+
+
+        alert(
+          "Emergency Report submit ho gayi! 🚨"
+        );
+
+
+        emergencyForm.reset();
+
+
+        userLocation =
+          "Location nahi mili";
+
+
+        document.getElementById(
+          "locationStatus"
+        ).innerText = "";
+
+
+        closeReportForm();
+
+      }
+
+
+      catch (error) {
+
+        console.error(
+          "Report Error:",
+          error
+        );
+
+
+        alert(
+          "Report submit nahi hui: " +
+          error.message
+        );
+
+      }
+
     }
-
-  });
+  );
 
 }
 
 
 // ==========================================
-// FIRESTORE LISTENER
+// FIRESTORE REAL TIME LISTENER
 // ==========================================
 
 function listenToReports() {
 
   const reportsQuery = query(
+
     collection(db, "reports"),
+
     orderBy("timestamp", "desc")
+
   );
 
+
   onSnapshot(
+
     reportsQuery,
+
 
     function (snapshot) {
 
       allReports = [];
 
-      snapshot.forEach(function (document) {
 
-        allReports.push({
-          id: document.id,
-          ...document.data()
-        });
+      snapshot.forEach(
+        function (document) {
 
-      });
+          allReports.push({
+            id: document.id,
+            ...document.data()
+          });
+
+        }
+      );
+
 
       showReports();
 
     },
 
+
     function (error) {
-      console.error("Firestore error:", error);
+
+      console.error(
+        "Firestore Error:",
+        error
+      );
+
     }
+
   );
 
 }
@@ -227,7 +337,10 @@ function listenToReports() {
 function showReports() {
 
   const container =
-    document.getElementById("reportsContainer");
+    document.getElementById(
+      "reportsContainer"
+    );
+
 
   if (!container) return;
 
@@ -248,51 +361,81 @@ function showReports() {
 
 
   if (reportCount) {
-    reportCount.innerText = allReports.length;
+
+    reportCount.innerText =
+      allReports.length;
+
   }
+
 
   if (totalReports) {
-    totalReports.innerText = allReports.length;
+
+    totalReports.innerText =
+      allReports.length;
+
   }
 
 
-  const activeReports = allReports.filter(
-    report => report.status === "Active"
-  );
+  const activeReports =
+    allReports.filter(
+      report =>
+        report.status === "Active"
+    );
 
-  const resolvedReports = allReports.filter(
-    report => report.status === "Resolved"
-  );
+
+  const resolvedReports =
+    allReports.filter(
+      report =>
+        report.status === "Resolved"
+    );
 
 
   if (activeCounter) {
-    activeCounter.innerText = activeReports.length;
+
+    activeCounter.innerText =
+      activeReports.length;
+
   }
 
+
   if (resolvedCounter) {
-    resolvedCounter.innerText = resolvedReports.length;
+
+    resolvedCounter.innerText =
+      resolvedReports.length;
+
   }
 
 
   // FILTER
 
   const filterElement =
-    document.getElementById("reportFilter");
+    document.getElementById(
+      "reportFilter"
+    );
+
 
   let selectedFilter = "All";
 
+
   if (filterElement) {
-    selectedFilter = filterElement.value;
+
+    selectedFilter =
+      filterElement.value;
+
   }
 
 
-  let filteredReports = allReports;
+  let filteredReports =
+    allReports;
+
 
   if (selectedFilter !== "All") {
 
-    filteredReports = allReports.filter(
-      report => report.type === selectedFilter
-    );
+    filteredReports =
+      allReports.filter(
+        report =>
+          report.type === selectedFilter
+      );
 
   }
 
@@ -314,102 +457,122 @@ function showReports() {
   container.innerHTML = "";
 
 
-  filteredReports.forEach(function (report) {
+  // REPORT CARDS
 
-    const card = document.createElement("div");
+  filteredReports.forEach(
+    function (report) {
 
-    card.className = "report-card";
-
-
-    const statusClass =
-      report.status === "Active"
-        ? "active-status"
-        : "resolved-status";
+      const card =
+        document.createElement("div");
 
 
-    let statusButton = "";
+      card.className =
+        "report-card";
 
 
-    if (report.status === "Active") {
+      const statusClass =
+        report.status === "Active"
+          ? "active-status"
+          : "resolved-status";
 
-      statusButton = `
-        <button
-          class="resolve-btn"
-          onclick="toggleStatus('${report.id}')"
-        >
-          ✅ Mark Resolved
-        </button>
+
+      let statusButton = "";
+
+
+      if (report.status === "Active") {
+
+        statusButton = `
+          <button
+            class="resolve-btn"
+            onclick="toggleStatus('${report.id}')"
+          >
+            ✅ Mark Resolved
+          </button>
+        `;
+
+      }
+
+
+      else {
+
+        statusButton = `
+          <button
+            class="active-btn"
+            onclick="toggleStatus('${report.id}')"
+          >
+            🔄 Mark Active
+          </button>
+        `;
+
+      }
+
+
+      card.innerHTML = `
+
+        <div class="report-top">
+
+          <h3>
+            🚨 ${report.type}
+          </h3>
+
+          <span class="status-badge ${statusClass}">
+            ${report.status}
+          </span>
+
+        </div>
+
+
+        <p>
+          <strong>Name:</strong>
+          ${report.name}
+        </p>
+
+
+        <p>
+          <strong>Problem:</strong>
+          ${report.description}
+        </p>
+
+
+        <p>
+          <strong>Location:</strong>
+          ${report.location}
+        </p>
+
+
+        <p>
+          <strong>Time:</strong>
+          ${report.time}
+        </p>
+
+
+        <div class="report-actions">
+
+          ${statusButton}
+
+
+          <button
+            class="delete-btn"
+            onclick="deleteReport('${report.id}')"
+          >
+            🗑️ Delete
+          </button>
+
+        </div>
+
       `;
 
-    } else {
 
-      statusButton = `
-        <button
-          class="active-btn"
-          onclick="toggleStatus('${report.id}')"
-        >
-          🔄 Mark Active
-        </button>
-      `;
+      container.appendChild(card);
 
     }
-
-
-    card.innerHTML = `
-
-      <div class="report-top">
-
-        <h3>🚨 ${report.type}</h3>
-
-        <span class="status-badge ${statusClass}">
-          ${report.status}
-        </span>
-
-      </div>
-
-      <p>
-        <strong>Name:</strong>
-        ${report.name}
-      </p>
-
-      <p>
-        <strong>Problem:</strong>
-        ${report.description}
-      </p>
-
-      <p>
-        <strong>Location:</strong>
-        ${report.location}
-      </p>
-
-      <p>
-        <strong>Time:</strong>
-        ${report.time}
-      </p>
-
-      <div class="report-actions">
-
-        ${statusButton}
-
-        <button
-          class="delete-btn"
-          onclick="deleteReport('${report.id}')"
-        >
-          🗑️ Delete
-        </button>
-
-      </div>
-    `;
-
-    container.appendChild(card);
-
-  });
+  );
 
 }
 
 
 // ==========================================
-// UPDATE STATUS
+// TOGGLE STATUS
 // ==========================================
 
 async function toggleStatus(id) {
@@ -417,32 +580,49 @@ async function toggleStatus(id) {
   try {
 
     const report =
-      allReports.find(report => report.id === id);
+      allReports.find(
+        report =>
+          report.id === id
+      );
+
 
     if (!report) return;
+
 
     const newStatus =
       report.status === "Active"
         ? "Resolved"
         : "Active";
 
+
     await updateDoc(
+
       doc(db, "reports", id),
+
       {
         status: newStatus
       }
+
     );
 
-  } catch (error) {
+  }
+
+
+  catch (error) {
 
     console.error(error);
-    alert("Status update nahi hua.");
+
+    alert(
+      "Status update nahi hua."
+    );
 
   }
 
 }
 
-window.toggleStatus = toggleStatus;
+
+window.toggleStatus =
+  toggleStatus;
 
 
 // ==========================================
@@ -455,7 +635,9 @@ async function deleteReport(id) {
     "Pakki baat? Ye report permanently delete ho jayegi."
   );
 
+
   if (!confirmDelete) return;
+
 
   try {
 
@@ -463,31 +645,43 @@ async function deleteReport(id) {
       doc(db, "reports", id)
     );
 
-  } catch (error) {
+  }
+
+
+  catch (error) {
 
     console.error(error);
-    alert("Report delete nahi hui.");
+
+    alert(
+      "Report delete nahi hui."
+    );
 
   }
 
 }
 
-window.deleteReport = deleteReport;
+
+window.deleteReport =
+  deleteReport;
 
 
 // ==========================================
-// FILTER
+// FILTER REPORTS
 // ==========================================
 
 function filterReports() {
+
   showReports();
+
 }
 
-window.filterReports = filterReports;
+
+window.filterReports =
+  filterReports;
 
 
 // ==========================================
-// CLEAR ALL
+// CLEAR ALL REPORTS
 // ==========================================
 
 async function clearAllReports() {
@@ -496,7 +690,9 @@ async function clearAllReports() {
     "Saari reports permanently delete ho jayengi. Sure ho?"
   );
 
+
   if (!confirmClear) return;
+
 
   try {
 
@@ -508,16 +704,24 @@ async function clearAllReports() {
 
     }
 
-  } catch (error) {
+  }
+
+
+  catch (error) {
 
     console.error(error);
-    alert("Reports delete nahi hui.");
+
+    alert(
+      "Reports delete nahi hui."
+    );
 
   }
 
 }
 
-window.clearAllReports = clearAllReports;
+
+window.clearAllReports =
+  clearAllReports;
 
 
 // ==========================================
@@ -526,28 +730,44 @@ window.clearAllReports = clearAllReports;
 
 function openLoginModal() {
 
+  console.log("Opening Login Modal");
+
+
   const modal =
     document.getElementById("loginModal");
 
+
   if (modal) {
-    modal.style.display = "block";
+
+    modal.style.display =
+      "block";
+
   }
 
 }
+
 
 function closeLoginModal() {
 
   const modal =
     document.getElementById("loginModal");
 
+
   if (modal) {
-    modal.style.display = "none";
+
+    modal.style.display =
+      "none";
+
   }
 
 }
 
-window.openLoginModal = openLoginModal;
-window.closeLoginModal = closeLoginModal;
+
+window.openLoginModal =
+  openLoginModal;
+
+window.closeLoginModal =
+  closeLoginModal;
 
 
 // ==========================================
@@ -559,25 +779,38 @@ function openSignupModal() {
   const modal =
     document.getElementById("signupModal");
 
+
   if (modal) {
-    modal.style.display = "block";
+
+    modal.style.display =
+      "block";
+
   }
 
 }
+
 
 function closeSignupModal() {
 
   const modal =
     document.getElementById("signupModal");
 
+
   if (modal) {
-    modal.style.display = "none";
+
+    modal.style.display =
+      "none";
+
   }
 
 }
 
-window.openSignupModal = openSignupModal;
-window.closeSignupModal = closeSignupModal;
+
+window.openSignupModal =
+  openSignupModal;
+
+window.closeSignupModal =
+  closeSignupModal;
 
 
 // ==========================================
@@ -586,19 +819,35 @@ window.closeSignupModal = closeSignupModal;
 
 async function signupUser() {
 
+  console.log(
+    "Create Account button clicked"
+  );
+
+
   const name =
-    document.getElementById("signupName")?.value.trim() || "";
+    document.getElementById(
+      "signupName"
+    ).value.trim();
+
 
   const email =
-    document.getElementById("signupEmail").value.trim();
+    document.getElementById(
+      "signupEmail"
+    ).value.trim();
+
 
   const password =
-    document.getElementById("signupPassword").value;
+    document.getElementById(
+      "signupPassword"
+    ).value;
 
 
   if (!email || !password) {
 
-    alert("Email aur password fill karo!");
+    alert(
+      "Email aur password fill karo!"
+    );
+
     return;
 
   }
@@ -606,7 +855,10 @@ async function signupUser() {
 
   if (password.length < 6) {
 
-    alert("Password minimum 6 characters ka hona chahiye!");
+    alert(
+      "Password minimum 6 characters ka hona chahiye!"
+    );
+
     return;
 
   }
@@ -614,27 +866,88 @@ async function signupUser() {
 
   try {
 
-    await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
+    const userCredential =
+      await createUserWithEmailAndPassword(
+
+        auth,
+        email,
+        password
+
+      );
+
+
+    // SAVE USER NAME
+
+    if (name) {
+
+      await updateProfile(
+        userCredential.user,
+        {
+          displayName: name
+        }
+      );
+
+    }
+
+
+    console.log(
+      "Account Created:",
+      userCredential.user.email
     );
 
-    alert("Account successfully create ho gaya! 🎉");
+
+    alert(
+      "Account successfully create ho gaya! 🎉"
+    );
+
 
     closeSignupModal();
 
-  } catch (error) {
 
-    console.error("Signup Error:", error);
+    document.getElementById(
+      "signupForm"
+    ).reset();
 
-    alert("Signup failed: " + error.message);
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      "Signup Error:",
+      error.code,
+      error.message
+    );
+
+
+    if (
+      error.code === "auth/email-already-in-use"
+    ) {
+
+      alert(
+        "Is email se account already bana hua hai. Login karo!"
+      );
+
+    }
+
+
+    else {
+
+      alert(
+        "Signup failed: " +
+        error.message
+      );
+
+    }
 
   }
 
 }
 
-window.signupUser = signupUser;
+
+window.signupUser =
+  signupUser;
 
 
 // ==========================================
@@ -643,16 +956,35 @@ window.signupUser = signupUser;
 
 async function loginUser() {
 
+  console.log(
+    "Login button clicked!"
+  );
+
+
   const email =
-    document.getElementById("loginEmail").value.trim();
+    document.getElementById(
+      "loginEmail"
+    ).value.trim();
+
 
   const password =
-    document.getElementById("loginPassword").value;
+    document.getElementById(
+      "loginPassword"
+    ).value;
+
+
+  console.log(
+    "Trying login:",
+    email
+  );
 
 
   if (!email || !password) {
 
-    alert("Email aur password fill karo!");
+    alert(
+      "Email aur password fill karo!"
+    );
+
     return;
 
   }
@@ -660,27 +992,74 @@ async function loginUser() {
 
   try {
 
-    await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
+    const userCredential =
+      await signInWithEmailAndPassword(
+
+        auth,
+        email,
+        password
+
+      );
+
+
+    console.log(
+      "Login Successful:",
+      userCredential.user.email
     );
 
-    alert("Login successful! 🚀");
+
+    alert(
+      "Login successful! 🚀"
+    );
+
 
     closeLoginModal();
 
-  } catch (error) {
 
-    console.error("Login Error:", error);
+    document.getElementById(
+      "loginForm"
+    ).reset();
 
-    alert("Login failed: " + error.message);
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      "LOGIN ERROR:",
+      error.code,
+      error.message
+    );
+
+
+    if (
+      error.code === "auth/invalid-credential"
+    ) {
+
+      alert(
+        "Email ya password galat hai!"
+      );
+
+    }
+
+
+    else {
+
+      alert(
+        "Login failed: " +
+        error.message
+      );
+
+    }
 
   }
 
 }
 
-window.loginUser = loginUser;
+
+window.loginUser =
+  loginUser;
 
 
 // ==========================================
@@ -689,29 +1068,55 @@ window.loginUser = loginUser;
 
 async function googleLogin() {
 
+  console.log(
+    "Google Login Started"
+  );
+
+
   try {
 
-    await signInWithPopup(
-      auth,
-      googleProvider
+    const result =
+      await signInWithPopup(
+        auth,
+        googleProvider
+      );
+
+
+    console.log(
+      "Google Login Successful:",
+      result.user.email
     );
 
-    alert("Google login successful! 🎉");
 
     closeLoginModal();
+
     closeSignupModal();
 
-  } catch (error) {
 
-    console.error("Google Login Error:", error);
+  }
 
-    alert("Google login failed: " + error.message);
+
+  catch (error) {
+
+    console.error(
+      "Google Login Error:",
+      error.code,
+      error.message
+    );
+
+
+    alert(
+      "Google login failed: " +
+      error.message
+    );
 
   }
 
 }
 
-window.googleLogin = googleLogin;
+
+window.googleLogin =
+  googleLogin;
 
 
 // ==========================================
@@ -724,66 +1129,167 @@ async function logoutUser() {
 
     await signOut(auth);
 
-    alert("Logout successful! 👋");
 
-  } catch (error) {
+    alert(
+      "Logout successful! 👋"
+    );
+
+  }
+
+
+  catch (error) {
 
     console.error(error);
 
-    alert("Logout failed.");
+
+    alert(
+      "Logout failed."
+    );
 
   }
 
 }
 
-window.logoutUser = logoutUser;
+
+window.logoutUser =
+  logoutUser;
 
 
 // ==========================================
 // AUTH STATE LISTENER
 // ==========================================
 
-onAuthStateChanged(auth, function (user) {
+onAuthStateChanged(
 
-  const authButtons =
-    document.getElementById("authButtons");
+  auth,
 
-  const userProfile =
-    document.getElementById("userProfile");
+  function (user) {
 
-  const userName =
-    document.getElementById("userName");
-
-
-  if (!authButtons || !userProfile || !userName) {
-    return;
-  }
+    const authButtons =
+      document.getElementById(
+        "authButtons"
+      );
 
 
-  if (user) {
+    const userProfile =
+      document.getElementById(
+        "userProfile"
+      );
 
-    console.log("🔐 User logged in:", user.email);
 
-    authButtons.style.display = "none";
-    userProfile.style.display = "flex";
+    const userName =
+      document.getElementById(
+        "userName"
+      );
 
-    userName.innerText =
-      "👤 " +
-      (
-        user.displayName ||
+
+    if (!authButtons ||
+        !userProfile ||
+        !userName) {
+
+      return;
+
+    }
+
+
+    if (user) {
+
+      console.log(
+        "🔐 User logged in:",
         user.email
       );
 
-  } else {
 
-    console.log("🔓 No user logged in");
+      authButtons.style.display =
+        "none";
 
-    authButtons.style.display = "flex";
-    userProfile.style.display = "none";
+
+      userProfile.style.display =
+        "flex";
+
+
+      userName.innerText =
+        "👤 " +
+        (
+          user.displayName ||
+          user.email
+        );
+
+    }
+
+
+    else {
+
+      console.log(
+        "🔓 No user logged in"
+      );
+
+
+      authButtons.style.display =
+        "flex";
+
+
+      userProfile.style.display =
+        "none";
+
+    }
 
   }
 
-});
+);
+
+
+// ==========================================
+// OUTSIDE MODAL CLICK
+// ==========================================
+
+window.addEventListener(
+
+  "click",
+
+  function (event) {
+
+    const reportModal =
+      document.getElementById(
+        "reportModal"
+      );
+
+
+    const loginModal =
+      document.getElementById(
+        "loginModal"
+      );
+
+
+    const signupModal =
+      document.getElementById(
+        "signupModal"
+      );
+
+
+    if (event.target === reportModal) {
+
+      closeReportForm();
+
+    }
+
+
+    if (event.target === loginModal) {
+
+      closeLoginModal();
+
+    }
+
+
+    if (event.target === signupModal) {
+
+      closeSignupModal();
+
+    }
+
+  }
+
+);
 
 
 // ==========================================
@@ -794,39 +1300,13 @@ listenToReports();
 
 
 // ==========================================
-// OUTSIDE MODAL CLICK
+// CONSOLE STATUS
 // ==========================================
 
-window.addEventListener("click", function (event) {
+console.log(
+  "🚀 NOVA Firestore Connected"
+);
 
-  const reportModal =
-    document.getElementById("reportModal");
-
-  const loginModal =
-    document.getElementById("loginModal");
-
-  const signupModal =
-    document.getElementById("signupModal");
-
-
-  if (event.target === reportModal) {
-    closeReportForm();
-  }
-
-  if (event.target === loginModal) {
-    closeLoginModal();
-  }
-
-  if (event.target === signupModal) {
-    closeSignupModal();
-  }
-
-});
-
-
-// ==========================================
-// CONSOLE
-// ==========================================
-
-console.log("🚀 NOVA Firestore Connected");
-console.log("🔐 NOVA Firebase Authentication Connected");
+console.log(
+  "🔐 NOVA Firebase Authentication Connected"
+);
