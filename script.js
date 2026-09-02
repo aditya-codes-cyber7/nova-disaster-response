@@ -1,6 +1,5 @@
 // ==========================================
 // NOVA DISASTER RESPONSE
-// PHASE 2 + PHASE 3
 // FIRESTORE + FIREBASE AUTHENTICATION
 // ==========================================
 
@@ -11,7 +10,6 @@
 
 import { initializeApp } from
   "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-
 
 import {
   getFirestore,
@@ -26,7 +24,6 @@ import {
 } from
   "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -34,11 +31,9 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
-  onAuthStateChanged,
-  updateProfile
+  onAuthStateChanged
 } from
   "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-
 
 
 // ==========================================
@@ -46,23 +41,13 @@ import {
 // ==========================================
 
 const firebaseConfig = {
-
   apiKey: "AIzaSyBcEkoZMt1KZdQ-ch6J1-7KKyQRO542ZRY",
-
   authDomain: "nova-disaster-response.firebaseapp.com",
-
   projectId: "nova-disaster-response",
-
-  storageBucket:
-    "nova-disaster-response.firebasestorage.app",
-
+  storageBucket: "nova-disaster-response.firebasestorage.app",
   messagingSenderId: "275029136991",
-
-  appId:
-    "1:275029136991:web:382543b5ef90263b8364a"
-
+  appId: "1:275029136991:web:382543b5ef90263b8364a"
 };
-
 
 
 // ==========================================
@@ -70,13 +55,9 @@ const firebaseConfig = {
 // ==========================================
 
 const app = initializeApp(firebaseConfig);
-
 const db = getFirestore(app);
-
 const auth = getAuth(app);
-
 const googleProvider = new GoogleAuthProvider();
-
 
 
 // ==========================================
@@ -84,66 +65,32 @@ const googleProvider = new GoogleAuthProvider();
 // ==========================================
 
 let userLocation = "Location nahi mili";
-
 let allReports = [];
 
 
-
 // ==========================================
-// REPORT FORM OPEN / CLOSE
+// REPORT MODAL
 // ==========================================
 
 function openReportForm() {
-
-  const modal =
-    document.getElementById("reportModal");
-
-  if (modal) {
-
-    modal.style.display = "block";
-
-  }
-
+  document.getElementById("reportModal").style.display = "block";
 }
-
-
 
 function openSOSForm() {
-
   openReportForm();
 
-  const emergencyType =
-    document.getElementById("emergencyType");
-
-  if (emergencyType) {
-
-    emergencyType.focus();
-
-  }
-
+  setTimeout(() => {
+    document.getElementById("emergencyType")?.focus();
+  }, 100);
 }
-
-
 
 function closeReportForm() {
-
-  const modal =
-    document.getElementById("reportModal");
-
-  if (modal) {
-
-    modal.style.display = "none";
-
-  }
-
+  document.getElementById("reportModal").style.display = "none";
 }
-
-
 
 window.openReportForm = openReportForm;
 window.openSOSForm = openSOSForm;
 window.closeReportForm = closeReportForm;
-
 
 
 // ==========================================
@@ -152,229 +99,125 @@ window.closeReportForm = closeReportForm;
 
 function getLocation() {
 
-  const status =
-    document.getElementById("locationStatus");
+  const status = document.getElementById("locationStatus");
 
-
-  if (!status) return;
-
-
-  if (navigator.geolocation) {
-
-    status.innerText =
-      "Location le rahe hain... 📍";
-
-
-    navigator.geolocation.getCurrentPosition(
-
-      function (position) {
-
-        const latitude =
-          position.coords.latitude;
-
-        const longitude =
-          position.coords.longitude;
-
-
-        userLocation =
-          latitude.toFixed(5) +
-          ", " +
-          longitude.toFixed(5);
-
-
-        status.innerText =
-          "Location mil gayi ✅";
-
-      },
-
-
-      function () {
-
-        status.innerText =
-          "Location allow nahi hui.";
-
-      }
-
-    );
-
+  if (!navigator.geolocation) {
+    status.innerText = "Browser location support nahi karta.";
+    return;
   }
 
-  else {
+  status.innerText = "Location le rahe hain... 📍";
 
-    status.innerText =
-      "Browser location support nahi karta.";
+  navigator.geolocation.getCurrentPosition(
 
-  }
+    function (position) {
 
+      const latitude = position.coords.latitude;
+      const longitude = position.coords.longitude;
+
+      userLocation =
+        latitude.toFixed(5) + ", " +
+        longitude.toFixed(5);
+
+      status.innerText = "Location mil gayi ✅";
+    },
+
+    function () {
+      status.innerText = "Location allow nahi hui.";
+    }
+  );
 }
-
 
 window.getLocation = getLocation;
 
 
-
 // ==========================================
-// SUBMIT REPORT TO FIRESTORE
+// SUBMIT REPORT
 // ==========================================
 
-const emergencyForm =
-  document.getElementById("emergencyForm");
-
+const emergencyForm = document.getElementById("emergencyForm");
 
 if (emergencyForm) {
 
-  emergencyForm.addEventListener(
+  emergencyForm.addEventListener("submit", async function (event) {
 
-    "submit",
+    event.preventDefault();
 
-    async function (event) {
+    const name = document.getElementById("name").value;
+    const type = document.getElementById("emergencyType").value;
+    const description = document.getElementById("description").value;
 
-      event.preventDefault();
+    try {
 
+      await addDoc(collection(db, "reports"), {
+        name: name,
+        type: type,
+        description: description,
+        location: userLocation,
+        status: "Active",
+        timestamp: Date.now(),
+        time: new Date().toLocaleString()
+      });
 
-      const name =
-        document.getElementById("name").value;
+      alert("Emergency Report submit ho gayi! 🚨");
 
+      emergencyForm.reset();
 
-      const type =
-        document.getElementById("emergencyType").value;
+      userLocation = "Location nahi mili";
 
+      document.getElementById("locationStatus").innerText = "";
 
-      const description =
-        document.getElementById("description").value;
+      closeReportForm();
 
+    } catch (error) {
 
-      try {
+      console.error(error);
 
-        await addDoc(
-
-          collection(db, "reports"),
-
-          {
-
-            name: name,
-
-            type: type,
-
-            description: description,
-
-            location: userLocation,
-
-            status: "Active",
-
-            timestamp: Date.now(),
-
-            time:
-              new Date().toLocaleString()
-
-          }
-
-        );
-
-
-        alert(
-          "Emergency Report submit ho gayi! 🚨"
-        );
-
-
-        emergencyForm.reset();
-
-
-        userLocation =
-          "Location nahi mili";
-
-
-        document.getElementById(
-          "locationStatus"
-        ).innerText = "";
-
-
-        closeReportForm();
-
-      }
-
-
-      catch (error) {
-
-        console.error(error);
-
-
-        alert(
-          "Report submit nahi hui. Firebase check karo."
-        );
-
-      }
-
+      alert("Report submit nahi hui. Firebase check karo.");
     }
 
-  );
+  });
 
 }
 
 
-
 // ==========================================
-// REAL-TIME FIRESTORE LISTENER
+// FIRESTORE LISTENER
 // ==========================================
 
 function listenToReports() {
 
   const reportsQuery = query(
-
     collection(db, "reports"),
-
-    orderBy(
-      "timestamp",
-      "desc"
-    )
-
+    orderBy("timestamp", "desc")
   );
 
-
   onSnapshot(
-
     reportsQuery,
 
     function (snapshot) {
 
       allReports = [];
 
+      snapshot.forEach(function (document) {
 
-      snapshot.forEach(
+        allReports.push({
+          id: document.id,
+          ...document.data()
+        });
 
-        function (document) {
-
-          allReports.push({
-
-            id: document.id,
-
-            ...document.data()
-
-          });
-
-        }
-
-      );
-
+      });
 
       showReports();
 
     },
 
-
     function (error) {
-
-      console.error(
-        "Firestore error:",
-        error
-      );
-
+      console.error("Firestore error:", error);
     }
-
   );
 
 }
-
 
 
 // ==========================================
@@ -384,141 +227,77 @@ function listenToReports() {
 function showReports() {
 
   const container =
-    document.getElementById(
-      "reportsContainer"
-    );
-
+    document.getElementById("reportsContainer");
 
   if (!container) return;
 
 
-
-  // HERO COUNT
+  // COUNTERS
 
   const reportCount =
-    document.getElementById(
-      "reportCount"
-    );
+    document.getElementById("reportCount");
+
+  const totalReports =
+    document.getElementById("totalReports");
+
+  const activeCounter =
+    document.getElementById("activeReports");
+
+  const resolvedCounter =
+    document.getElementById("resolvedReports");
 
 
   if (reportCount) {
-
-    reportCount.innerText =
-      allReports.length;
-
+    reportCount.innerText = allReports.length;
   }
-
-
-
-  // TOTAL REPORTS
-
-  const totalReports =
-    document.getElementById(
-      "totalReports"
-    );
-
 
   if (totalReports) {
-
-    totalReports.innerText =
-      allReports.length;
-
+    totalReports.innerText = allReports.length;
   }
 
 
+  const activeReports = allReports.filter(
+    report => report.status === "Active"
+  );
 
-  // ACTIVE REPORTS
-
-  const activeReports =
-    allReports.filter(
-
-      report =>
-        report.status === "Active"
-
-    );
-
-
-
-  // RESOLVED REPORTS
-
-  const resolvedReports =
-    allReports.filter(
-
-      report =>
-        report.status === "Resolved"
-
-    );
-
-
-
-  const activeCounter =
-    document.getElementById(
-      "activeReports"
-    );
+  const resolvedReports = allReports.filter(
+    report => report.status === "Resolved"
+  );
 
 
   if (activeCounter) {
-
-    activeCounter.innerText =
-      activeReports.length;
-
+    activeCounter.innerText = activeReports.length;
   }
-
-
-
-  const resolvedCounter =
-    document.getElementById(
-      "resolvedReports"
-    );
-
 
   if (resolvedCounter) {
-
-    resolvedCounter.innerText =
-      resolvedReports.length;
-
+    resolvedCounter.innerText = resolvedReports.length;
   }
-
 
 
   // FILTER
 
   const filterElement =
-    document.getElementById(
-      "reportFilter"
-    );
-
+    document.getElementById("reportFilter");
 
   let selectedFilter = "All";
 
-
   if (filterElement) {
-
-    selectedFilter =
-      filterElement.value;
-
+    selectedFilter = filterElement.value;
   }
 
 
-  let filteredReports =
-    allReports;
-
+  let filteredReports = allReports;
 
   if (selectedFilter !== "All") {
 
-    filteredReports =
-      allReports.filter(
-
-        report =>
-          report.type === selectedFilter
-
-      );
+    filteredReports = allReports.filter(
+      report => report.type === selectedFilter
+    );
 
   }
 
 
-
-  // NO REPORT
+  // NO REPORTS
 
   if (filteredReports.length === 0) {
 
@@ -529,141 +308,108 @@ function showReports() {
     `;
 
     return;
-
   }
 
 
   container.innerHTML = "";
 
 
+  filteredReports.forEach(function (report) {
 
-  // CREATE REPORT CARDS
+    const card = document.createElement("div");
 
-  filteredReports.forEach(
-
-    function (report) {
-
-      const card =
-        document.createElement("div");
+    card.className = "report-card";
 
 
-      card.className =
-        "report-card";
+    const statusClass =
+      report.status === "Active"
+        ? "active-status"
+        : "resolved-status";
 
 
-      const statusClass =
-
-        report.status === "Active"
-
-          ? "active-status"
-
-          : "resolved-status";
+    let statusButton = "";
 
 
-      let statusButton = "";
+    if (report.status === "Active") {
 
-
-      if (report.status === "Active") {
-
-        statusButton = `
-
-          <button
-            class="resolve-btn"
-            onclick="toggleStatus('${report.id}')"
-          >
-            ✅ Mark Resolved
-          </button>
-
-        `;
-
-      }
-
-      else {
-
-        statusButton = `
-
-          <button
-            class="active-btn"
-            onclick="toggleStatus('${report.id}')"
-          >
-            🔄 Mark Active
-          </button>
-
-        `;
-
-      }
-
-
-      card.innerHTML = `
-
-        <div class="report-top">
-
-          <h3>
-            🚨 ${report.type}
-          </h3>
-
-          <span
-            class="status-badge ${statusClass}"
-          >
-            ${report.status}
-          </span>
-
-        </div>
-
-
-        <p>
-          <strong>Name:</strong>
-          ${report.name}
-        </p>
-
-
-        <p>
-          <strong>Problem:</strong>
-          ${report.description}
-        </p>
-
-
-        <p>
-          <strong>Location:</strong>
-          ${report.location}
-        </p>
-
-
-        <p>
-          <strong>Time:</strong>
-          ${report.time}
-        </p>
-
-
-        <div class="report-actions">
-
-          ${statusButton}
-
-
-          <button
-            class="delete-btn"
-            onclick="deleteReport('${report.id}')"
-          >
-            🗑️ Delete
-          </button>
-
-        </div>
-
+      statusButton = `
+        <button
+          class="resolve-btn"
+          onclick="toggleStatus('${report.id}')"
+        >
+          ✅ Mark Resolved
+        </button>
       `;
 
+    } else {
 
-      container.appendChild(card);
+      statusButton = `
+        <button
+          class="active-btn"
+          onclick="toggleStatus('${report.id}')"
+        >
+          🔄 Mark Active
+        </button>
+      `;
 
     }
 
-  );
+
+    card.innerHTML = `
+
+      <div class="report-top">
+
+        <h3>🚨 ${report.type}</h3>
+
+        <span class="status-badge ${statusClass}">
+          ${report.status}
+        </span>
+
+      </div>
+
+      <p>
+        <strong>Name:</strong>
+        ${report.name}
+      </p>
+
+      <p>
+        <strong>Problem:</strong>
+        ${report.description}
+      </p>
+
+      <p>
+        <strong>Location:</strong>
+        ${report.location}
+      </p>
+
+      <p>
+        <strong>Time:</strong>
+        ${report.time}
+      </p>
+
+      <div class="report-actions">
+
+        ${statusButton}
+
+        <button
+          class="delete-btn"
+          onclick="deleteReport('${report.id}')"
+        >
+          🗑️ Delete
+        </button>
+
+      </div>
+    `;
+
+    container.appendChild(card);
+
+  });
 
 }
 
 
-
 // ==========================================
-// UPDATE REPORT STATUS
+// UPDATE STATUS
 // ==========================================
 
 async function toggleStatus(id) {
@@ -671,61 +417,32 @@ async function toggleStatus(id) {
   try {
 
     const report =
-      allReports.find(
-
-        report =>
-          report.id === id
-
-      );
-
+      allReports.find(report => report.id === id);
 
     if (!report) return;
 
-
     const newStatus =
-
       report.status === "Active"
-
         ? "Resolved"
-
         : "Active";
 
-
     await updateDoc(
-
-      doc(
-        db,
-        "reports",
-        id
-      ),
-
+      doc(db, "reports", id),
       {
-
         status: newStatus
-
       }
-
     );
 
-  }
-
-
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
-
-    alert(
-      "Status update nahi hua."
-    );
+    alert("Status update nahi hua.");
 
   }
 
 }
 
-
-window.toggleStatus =
-  toggleStatus;
-
+window.toggleStatus = toggleStatus;
 
 
 // ==========================================
@@ -735,120 +452,72 @@ window.toggleStatus =
 async function deleteReport(id) {
 
   const confirmDelete = confirm(
-
     "Pakki baat? Ye report permanently delete ho jayegi."
-
   );
 
-
   if (!confirmDelete) return;
-
 
   try {
 
     await deleteDoc(
-
-      doc(
-        db,
-        "reports",
-        id
-      )
-
+      doc(db, "reports", id)
     );
 
-  }
-
-
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
-
-    alert(
-      "Report delete nahi hui."
-    );
+    alert("Report delete nahi hui.");
 
   }
 
 }
 
-
-window.deleteReport =
-  deleteReport;
-
+window.deleteReport = deleteReport;
 
 
 // ==========================================
-// FILTER REPORTS
+// FILTER
 // ==========================================
 
 function filterReports() {
-
   showReports();
-
 }
 
-
-window.filterReports =
-  filterReports;
-
+window.filterReports = filterReports;
 
 
 // ==========================================
-// CLEAR ALL REPORTS
+// CLEAR ALL
 // ==========================================
 
 async function clearAllReports() {
 
   const confirmClear = confirm(
-
     "Saari reports permanently delete ho jayengi. Sure ho?"
-
   );
 
-
   if (!confirmClear) return;
-
 
   try {
 
     for (const report of allReports) {
 
       await deleteDoc(
-
-        doc(
-          db,
-          "reports",
-          report.id
-        )
-
+        doc(db, "reports", report.id)
       );
 
     }
 
-  }
-
-
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
-
-    alert(
-      "Reports delete nahi hui."
-    );
+    alert("Reports delete nahi hui.");
 
   }
 
 }
 
-
-window.clearAllReports =
-  clearAllReports;
-
-
-
-// ==========================================
-// PHASE 3 - AUTHENTICATION
-// ==========================================
+window.clearAllReports = clearAllReports;
 
 
 // ==========================================
@@ -861,13 +530,10 @@ function openLoginModal() {
     document.getElementById("loginModal");
 
   if (modal) {
-
     modal.style.display = "block";
-
   }
 
 }
-
 
 function closeLoginModal() {
 
@@ -875,20 +541,13 @@ function closeLoginModal() {
     document.getElementById("loginModal");
 
   if (modal) {
-
     modal.style.display = "none";
-
   }
 
 }
 
-
-window.openLoginModal =
-  openLoginModal;
-
-window.closeLoginModal =
-  closeLoginModal;
-
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
 
 
 // ==========================================
@@ -901,13 +560,10 @@ function openSignupModal() {
     document.getElementById("signupModal");
 
   if (modal) {
-
     modal.style.display = "block";
-
   }
 
 }
-
 
 function closeSignupModal() {
 
@@ -915,52 +571,34 @@ function closeSignupModal() {
     document.getElementById("signupModal");
 
   if (modal) {
-
     modal.style.display = "none";
-
   }
 
 }
 
-
-window.openSignupModal =
-  openSignupModal;
-
-window.closeSignupModal =
-  closeSignupModal;
-
+window.openSignupModal = openSignupModal;
+window.closeSignupModal = closeSignupModal;
 
 
 // ==========================================
-// EMAIL / PASSWORD SIGNUP
+// EMAIL SIGNUP
 // ==========================================
 
 async function signupUser() {
 
   const name =
-    document.getElementById(
-      "signupName"
-    ).value.trim();
-
+    document.getElementById("signupName")?.value.trim() || "";
 
   const email =
-    document.getElementById(
-      "signupEmail"
-    ).value.trim();
-
+    document.getElementById("signupEmail").value.trim();
 
   const password =
-    document.getElementById(
-      "signupPassword"
-    ).value;
+    document.getElementById("signupPassword").value;
 
 
-  if (!name || !email || !password) {
+  if (!email || !password) {
 
-    alert(
-      "Saari details fill karo!"
-    );
-
+    alert("Email aur password fill karo!");
     return;
 
   }
@@ -968,10 +606,7 @@ async function signupUser() {
 
   if (password.length < 6) {
 
-    alert(
-      "Password minimum 6 characters ka hona chahiye!"
-    );
-
+    alert("Password minimum 6 characters ka hona chahiye!");
     return;
 
   }
@@ -979,114 +614,45 @@ async function signupUser() {
 
   try {
 
-    // CREATE USER
-
-    const userCredential =
-      await createUserWithEmailAndPassword(
-
-        auth,
-        email,
-        password
-
-      );
-
-
-    const user =
-      userCredential.user;
-
-
-    // SAVE NAME IN FIREBASE PROFILE
-
-    await updateProfile(
-
-      user,
-
-      {
-        displayName: name
-      }
-
+    await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
     );
 
-
-    // UPDATE UI IMMEDIATELY
-
-    updateUserInterface(user);
-
-
-    alert(
-      "Account successfully create ho gaya! 🎉"
-    );
-
-
-    // CLEAR FORM
-
-    document.getElementById(
-      "signupName"
-    ).value = "";
-
-
-    document.getElementById(
-      "signupEmail"
-    ).value = "";
-
-
-    document.getElementById(
-      "signupPassword"
-    ).value = "";
-
-
-    // CLOSE MODAL
+    alert("Account successfully create ho gaya! 🎉");
 
     closeSignupModal();
 
+  } catch (error) {
 
-  }
+    console.error("Signup Error:", error);
 
-
-  catch (error) {
-
-    console.error(error);
-
-
-    alert(
-      "Signup failed: " +
-      error.message
-    );
+    alert("Signup failed: " + error.message);
 
   }
 
 }
 
-
-window.signupUser =
-  signupUser;
-
+window.signupUser = signupUser;
 
 
 // ==========================================
-// EMAIL / PASSWORD LOGIN
+// EMAIL LOGIN
 // ==========================================
 
 async function loginUser() {
 
   const email =
-    document.getElementById(
-      "loginEmail"
-    ).value.trim();
-
+    document.getElementById("loginEmail").value.trim();
 
   const password =
-    document.getElementById(
-      "loginPassword"
-    ).value;
+    document.getElementById("loginPassword").value;
 
 
   if (!email || !password) {
 
-    alert(
-      "Email aur password fill karo!"
-    );
-
+    alert("Email aur password fill karo!");
     return;
 
   }
@@ -1094,115 +660,58 @@ async function loginUser() {
 
   try {
 
-    const userCredential =
-      await signInWithEmailAndPassword(
-
-        auth,
-        email,
-        password
-
-      );
-
-
-    updateUserInterface(
-      userCredential.user
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
     );
 
-
-    alert(
-      "Login successful! 🚀"
-    );
-
-
-    document.getElementById(
-      "loginEmail"
-    ).value = "";
-
-
-    document.getElementById(
-      "loginPassword"
-    ).value = "";
-
+    alert("Login successful! 🚀");
 
     closeLoginModal();
 
+  } catch (error) {
 
-  }
+    console.error("Login Error:", error);
 
-
-  catch (error) {
-
-    console.error(error);
-
-
-    alert(
-      "Login failed: " +
-      error.message
-    );
+    alert("Login failed: " + error.message);
 
   }
 
 }
 
-
-window.loginUser =
-  loginUser;
-
+window.loginUser = loginUser;
 
 
 // ==========================================
-// GOOGLE LOGIN / SIGNUP
+// GOOGLE LOGIN
 // ==========================================
 
 async function googleLogin() {
 
   try {
 
-    const result =
-      await signInWithPopup(
-
-        auth,
-        googleProvider
-
-      );
-
-
-    updateUserInterface(
-      result.user
+    await signInWithPopup(
+      auth,
+      googleProvider
     );
 
-
-    alert(
-      "Google login successful! 🎉"
-    );
-
+    alert("Google login successful! 🎉");
 
     closeLoginModal();
-
     closeSignupModal();
 
+  } catch (error) {
 
-  }
+    console.error("Google Login Error:", error);
 
-
-  catch (error) {
-
-    console.error(error);
-
-
-    alert(
-      "Google login failed: " +
-      error.message
-    );
+    alert("Google login failed: " + error.message);
 
   }
 
 }
 
-
-window.googleLogin =
-  googleLogin;
-
+window.googleLogin = googleLogin;
 
 
 // ==========================================
@@ -1215,150 +724,66 @@ async function logoutUser() {
 
     await signOut(auth);
 
+    alert("Logout successful! 👋");
 
-    alert(
-      "Logout successful! 👋"
-    );
-
-  }
-
-
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
 
-    alert(
-      "Logout failed."
-    );
+    alert("Logout failed.");
 
   }
 
 }
 
-
-window.logoutUser =
-  logoutUser;
-
-
-
-// ==========================================
-// UPDATE USER INTERFACE
-// ==========================================
-
-function updateUserInterface(user) {
-
-  const authButtons =
-    document.getElementById(
-      "authButtons"
-    );
-
-
-  const userProfile =
-    document.getElementById(
-      "userProfile"
-    );
-
-
-  const userName =
-    document.getElementById(
-      "userName"
-    );
-
-
-  if (user) {
-
-    if (authButtons) {
-
-      authButtons.style.display =
-        "none";
-
-    }
-
-
-    if (userProfile) {
-
-      userProfile.style.display =
-        "flex";
-
-    }
-
-
-    if (userName) {
-
-      const displayName =
-
-        user.displayName ||
-
-        user.email.split("@")[0];
-
-
-      userName.innerText =
-        "👤 " + displayName;
-
-    }
-
-  }
-
-
-  else {
-
-    if (authButtons) {
-
-      authButtons.style.display =
-        "flex";
-
-    }
-
-
-    if (userProfile) {
-
-      userProfile.style.display =
-        "none";
-
-    }
-
-  }
-
-}
-
+window.logoutUser = logoutUser;
 
 
 // ==========================================
 // AUTH STATE LISTENER
 // ==========================================
 
-onAuthStateChanged(
+onAuthStateChanged(auth, function (user) {
 
-  auth,
+  const authButtons =
+    document.getElementById("authButtons");
 
-  function (user) {
+  const userProfile =
+    document.getElementById("userProfile");
 
-    if (user) {
+  const userName =
+    document.getElementById("userName");
 
-      console.log(
-        "🔐 User logged in:",
+
+  if (!authButtons || !userProfile || !userName) {
+    return;
+  }
+
+
+  if (user) {
+
+    console.log("🔐 User logged in:", user.email);
+
+    authButtons.style.display = "none";
+    userProfile.style.display = "flex";
+
+    userName.innerText =
+      "👤 " +
+      (
+        user.displayName ||
         user.email
       );
 
-      updateUserInterface(user);
+  } else {
 
-    }
+    console.log("🔓 No user logged in");
 
-
-    else {
-
-      console.log(
-        "🔓 No user logged in"
-      );
-
-      updateUserInterface(null);
-
-    }
+    authButtons.style.display = "flex";
+    userProfile.style.display = "none";
 
   }
 
-);
-
+});
 
 
 // ==========================================
@@ -1368,75 +793,40 @@ onAuthStateChanged(
 listenToReports();
 
 
-
 // ==========================================
-// CLOSE MODALS ON OUTSIDE CLICK
+// OUTSIDE MODAL CLICK
 // ==========================================
 
-window.addEventListener(
+window.addEventListener("click", function (event) {
 
-  "click",
+  const reportModal =
+    document.getElementById("reportModal");
 
-  function (event) {
+  const loginModal =
+    document.getElementById("loginModal");
 
-    const reportModal =
-      document.getElementById(
-        "reportModal"
-      );
-
-
-    const loginModal =
-      document.getElementById(
-        "loginModal"
-      );
+  const signupModal =
+    document.getElementById("signupModal");
 
 
-    const signupModal =
-      document.getElementById(
-        "signupModal"
-      );
-
-
-    if (
-      event.target === reportModal
-    ) {
-
-      closeReportForm();
-
-    }
-
-
-    if (
-      event.target === loginModal
-    ) {
-
-      closeLoginModal();
-
-    }
-
-
-    if (
-      event.target === signupModal
-    ) {
-
-      closeSignupModal();
-
-    }
-
+  if (event.target === reportModal) {
+    closeReportForm();
   }
 
-);
+  if (event.target === loginModal) {
+    closeLoginModal();
+  }
 
+  if (event.target === signupModal) {
+    closeSignupModal();
+  }
+
+});
 
 
 // ==========================================
-// CONSOLE STATUS
+// CONSOLE
 // ==========================================
 
-console.log(
-  "🚀 NOVA Phase 2 - Firestore Connected"
-);
-
-console.log(
-  "🔐 NOVA Phase 3 - Firebase Authentication Connected"
-);
+console.log("🚀 NOVA Firestore Connected");
+console.log("🔐 NOVA Firebase Authentication Connected");
