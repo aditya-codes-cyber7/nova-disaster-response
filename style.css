@@ -1,7 +1,7 @@
 /* ===================================
    NOVA DISASTER RESPONSE
-   FINAL STYLE.CSS
-   =================================== */
+   PHASE 4 FINAL STYLE
+=================================== */
 
 * {
   margin: 0;
@@ -92,7 +92,7 @@ nav {
 
 
 /* ===================================
-   AUTHENTICATION
+   AUTH BUTTONS
 =================================== */
 
 .auth-buttons {
@@ -101,32 +101,31 @@ nav {
   gap: 10px;
 }
 
-.login-btn {
+.login-nav-btn {
   background: transparent;
   color: white;
-
   border: 1px solid #334155;
-
   padding: 10px 18px;
 }
 
-.login-btn:hover {
+.login-nav-btn:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
-.signup-btn {
+.signup-nav-btn {
   background: #2563eb;
   color: white;
-
   padding: 10px 18px;
 }
 
-.signup-btn:hover {
+.signup-nav-btn:hover {
   background: #1d4ed8;
 }
 
 
-/* Logged in user */
+/* ===================================
+   USER PROFILE
+=================================== */
 
 .user-profile {
   display: flex;
@@ -142,11 +141,8 @@ nav {
 
 .logout-btn {
   background: rgba(239, 68, 68, 0.15);
-
   border: 1px solid rgba(239, 68, 68, 0.35);
-
   color: #f87171;
-
   padding: 9px 15px;
   font-size: 14px;
 }
@@ -174,32 +170,25 @@ nav {
 
 .hero-content {
   max-width: 650px;
-
   animation: slideLeft 0.8s ease;
 }
 
 .tag {
   color: #4ade80;
-
   font-size: 13px;
-
   letter-spacing: 2px;
-
   margin-bottom: 20px;
 }
 
 .hero h1 {
   font-size: 58px;
   line-height: 1.1;
-
   margin-bottom: 25px;
 }
 
 .hero-text {
   color: #aab7c4;
-
   font-size: 18px;
-
   line-height: 1.7;
 }
 
@@ -211,21 +200,15 @@ nav {
 .buttons {
   display: flex;
   gap: 15px;
-
   margin-top: 30px;
 }
 
 button {
   border: none;
-
   padding: 14px 25px;
-
   border-radius: 9px;
-
   cursor: pointer;
-
   font-size: 15px;
-
   transition: all 0.25s ease;
 }
 
@@ -236,15 +219,12 @@ button:hover {
 .sos-btn {
   background: #ef4444;
   color: white;
-
   animation: sosPulse 2s infinite;
 }
 
 .report-btn {
   background: rgba(255, 255, 255, 0.05);
-
   border: 1px solid #334155;
-
   color: white;
 }
 
@@ -255,66 +235,48 @@ button:hover {
 
 .hero-card {
   padding: 30px;
-
   border-radius: 18px;
-
   width: 340px;
-
   animation: slideRight 0.8s ease;
 }
 
 .status {
   color: #4ade80;
-
   font-size: 14px;
-
   margin-bottom: 30px;
 }
 
 .pulse {
   display: inline-block;
-
   width: 9px;
   height: 9px;
-
   background: #4ade80;
-
   border-radius: 50%;
-
   margin-right: 8px;
-
   animation: greenPulse 1.5s infinite;
 }
 
 .hero-card h3 {
   font-size: 25px;
-
   margin-bottom: 15px;
 }
 
 .hero-card p {
   color: #9aa9b8;
-
   line-height: 1.6;
 }
 
 .stats {
   display: flex;
-
   justify-content: space-between;
-
   margin-top: 30px;
-
   padding-top: 20px;
-
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stats div {
   display: flex;
-
   flex-direction: column;
-
   gap: 5px;
 }
 
@@ -324,7 +286,6 @@ button:hover {
 
 .stats span {
   color: #8b9aaa;
-
   font-size: 13px;
 }
 
@@ -335,9 +296,7 @@ button:hover {
 
 .features {
   padding: 90px 10%;
-
   text-align: center;
-
   background: rgba(11, 22, 38, 0.5);
 }
 
@@ -346,43 +305,34 @@ button:hover {
 .reports-section h2,
 .dashboard-section h2 {
   font-size: 38px;
-
   margin-bottom: 15px;
 }
 
 .subtitle {
   color: #94a3b8;
-
   margin-bottom: 40px;
 }
 
 .feature-grid {
   display: grid;
-
   grid-template-columns: repeat(4, 1fr);
-
   gap: 20px;
 }
 
 .feature-card {
   border-radius: 16px;
-
   padding: 30px 20px;
-
   text-align: left;
-
   transition: all 0.3s ease;
 }
 
 .feature-card:hover {
   transform: translateY(-8px);
-
   border-color: rgba(74, 222, 128, 0.4);
 }
 
 .icon {
   font-size: 30px;
-
   margin-bottom: 20px;
 }
 
@@ -392,9 +342,7 @@ button:hover {
 
 .feature-card p {
   color: #94a3b8;
-
   font-size: 14px;
-
   line-height: 1.6;
 }
 
@@ -405,31 +353,22 @@ button:hover {
 
 .emergency-section {
   text-align: center;
-
   padding: 100px 20px;
 }
 
 .emergency-section p {
   color: #94a3b8;
-
   max-width: 600px;
-
   margin: auto;
-
   line-height: 1.6;
 }
 
 .big-sos {
   margin-top: 30px;
-
   background: #ef4444;
-
   color: white;
-
   font-weight: bold;
-
   padding: 17px 35px;
-
   animation: sosPulse 2s infinite;
 }
 
@@ -444,7 +383,6 @@ button:hover {
 
 .dashboard-heading {
   text-align: center;
-
   margin-bottom: 40px;
 }
 
@@ -454,27 +392,18 @@ button:hover {
 
 .dashboard-cards {
   display: grid;
-
   grid-template-columns: repeat(3, 1fr);
-
   gap: 20px;
-
   max-width: 1000px;
-
   margin: auto;
 }
 
 .dashboard-card {
   border-radius: 16px;
-
   padding: 25px;
-
   display: flex;
-
   align-items: center;
-
   gap: 18px;
-
   transition: 0.3s;
 }
 
@@ -488,71 +417,58 @@ button:hover {
 
 .dashboard-card div:last-child {
   display: flex;
-
   flex-direction: column;
 }
 
 .dashboard-card span {
   color: #94a3b8;
-
   font-size: 14px;
 }
 
 .dashboard-card strong {
   font-size: 32px;
-
   margin-top: 5px;
 }
 
 
 /* ===================================
-   REPORTS SECTION
+   REPORTS
 =================================== */
 
 .reports-section {
   padding: 80px 10%;
-
   background: rgba(11, 22, 38, 0.55);
 }
 
 .reports-header {
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
   max-width: 900px;
-
   margin: auto;
 }
 
 .clear-btn {
   background: rgba(239, 68, 68, 0.12);
-
   border: 1px solid rgba(239, 68, 68, 0.4);
-
   color: #f87171;
 }
 
 .clear-btn:hover {
   background: #ef4444;
-
   color: white;
 }
 
 
-/* FILTER */
+/* ===================================
+   FILTER
+=================================== */
 
 .filter-box {
   max-width: 900px;
-
   margin: 25px auto;
-
   display: flex;
-
   gap: 12px;
-
   align-items: center;
 }
 
@@ -562,30 +478,25 @@ button:hover {
 
 .filter-box select {
   padding: 11px 15px;
-
   background: #101c2e;
-
   color: white;
-
   border: 1px solid #334155;
-
   border-radius: 8px;
 }
 
 
-/* REPORT CONTAINER */
+/* ===================================
+   REPORT CONTAINER
+=================================== */
 
 .reports-container {
   max-width: 900px;
-
   margin: auto;
 }
 
 .no-report {
   text-align: center;
-
   color: #94a3b8;
-
   padding: 40px;
 }
 
@@ -596,59 +507,63 @@ button:hover {
 
 .report-card {
   border-radius: 15px;
-
   padding: 22px;
-
   margin-bottom: 16px;
-
   animation: reportAppear 0.4s ease;
 }
 
 .report-card p {
   color: #aab7c4;
-
   margin: 8px 0;
-
   line-height: 1.5;
 }
 
 .report-top {
   display: flex;
-
   justify-content: space-between;
-
   align-items: center;
-
   margin-bottom: 15px;
 }
 
 
 /* STATUS BADGES */
 
-.status-badge {
+.status-badge,
+.my-report-badge {
   padding: 7px 13px;
-
   border-radius: 20px;
-
   font-size: 13px;
-
   font-weight: bold;
 }
 
 .active-status {
   color: #f87171;
-
   background: rgba(239, 68, 68, 0.12);
-
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
 .resolved-status {
   color: #4ade80;
-
   background: rgba(34, 197, 94, 0.12);
-
   border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.my-report-badge {
+  color: #60a5fa;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(37, 99, 235, 0.3);
+}
+
+
+/* USER INFO */
+
+.report-info {
+  margin-top: 18px !important;
+  padding: 12px;
+  border-radius: 8px;
+  background: rgba(37, 99, 235, 0.1);
+  border-left: 3px solid #2563eb;
+  font-size: 13px;
 }
 
 
@@ -656,29 +571,23 @@ button:hover {
 
 .report-actions {
   display: flex;
-
   gap: 12px;
-
   margin-top: 18px;
 }
 
 .resolve-btn {
   background: #22c55e;
-
   color: white;
 }
 
 .active-btn {
   background: #f59e0b;
-
   color: white;
 }
 
 .delete-btn {
   background: rgba(239, 68, 68, 0.15);
-
   color: #f87171;
-
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
@@ -689,9 +598,7 @@ button:hover {
 
 .modal {
   display: none;
-
   position: fixed;
-
   z-index: 100;
 
   left: 0;
@@ -710,16 +617,11 @@ button:hover {
 
 .modal-content {
   margin: 7% auto;
-
   padding: 30px;
-
   border-radius: 18px;
-
   width: 90%;
   max-width: 500px;
-
   position: relative;
-
   animation: modalOpen 0.35s ease;
 }
 
@@ -729,20 +631,15 @@ button:hover {
 
 .form-text {
   color: #94a3b8;
-
   margin-bottom: 25px;
 }
 
 .close {
   position: absolute;
-
   right: 20px;
   top: 15px;
-
   font-size: 30px;
-
   cursor: pointer;
-
   color: #94a3b8;
 }
 
@@ -752,47 +649,11 @@ button:hover {
 
 
 /* ===================================
-   AUTH MODAL
-=================================== */
-
-.auth-modal {
-  max-width: 420px;
-}
-
-.auth-modal input {
-  width: 100%;
-
-  margin-bottom: 14px;
-}
-
-.auth-modal .submit-btn {
-  width: 100%;
-}
-
-.google-btn {
-  width: 100%;
-
-  margin-top: 12px;
-
-  background: white;
-
-  color: #111827;
-
-  font-weight: bold;
-}
-
-.google-btn:hover {
-  background: #e5e7eb;
-}
-
-
-/* ===================================
-   FORM
+   FORMS
 =================================== */
 
 form {
   display: flex;
-
   flex-direction: column;
 }
 
@@ -804,17 +665,11 @@ input,
 select,
 textarea {
   padding: 13px;
-
   border-radius: 8px;
-
   border: 1px solid #334155;
-
   background: rgba(8, 17, 32, 0.8);
-
   color: white;
-
   font-size: 15px;
-
   outline: none;
 }
 
@@ -826,34 +681,38 @@ textarea:focus {
 
 textarea {
   min-height: 100px;
-
   resize: vertical;
 }
 
 .location-btn {
   margin-top: 20px;
-
   background: #2563eb;
-
   color: white;
 }
 
 #locationStatus {
   font-size: 13px;
-
   color: #94a3b8;
-
   margin-top: 10px;
 }
 
 .submit-btn {
   margin-top: 20px;
-
   background: #22c55e;
-
   color: white;
-
   font-weight: bold;
+}
+
+.google-btn {
+  width: 100%;
+  margin-top: 12px;
+  background: white;
+  color: #111827;
+  font-weight: bold;
+}
+
+.google-btn:hover {
+  background: #e5e7eb;
 }
 
 
@@ -863,13 +722,9 @@ textarea {
 
 footer {
   text-align: center;
-
   padding: 25px;
-
   border-top: 1px solid rgba(255, 255, 255, 0.08);
-
   color: #718096;
-
   font-size: 14px;
 }
 
@@ -892,6 +747,7 @@ footer {
 
 }
 
+
 @keyframes slideRight {
 
   from {
@@ -905,6 +761,7 @@ footer {
   }
 
 }
+
 
 @keyframes sosPulse {
 
@@ -922,6 +779,7 @@ footer {
 
 }
 
+
 @keyframes greenPulse {
 
   0% {
@@ -938,6 +796,7 @@ footer {
 
 }
 
+
 @keyframes reportAppear {
 
   from {
@@ -951,6 +810,7 @@ footer {
   }
 
 }
+
 
 @keyframes modalOpen {
 
@@ -975,9 +835,7 @@ footer {
 
   .hero {
     flex-direction: column;
-
     text-align: center;
-
     padding: 70px 8%;
   }
 
@@ -995,7 +853,6 @@ footer {
 
   .hero-card {
     width: 100%;
-
     max-width: 450px;
   }
 
@@ -1010,7 +867,6 @@ footer {
 
   nav {
     padding: 15px 5%;
-
     gap: 10px;
   }
 
@@ -1026,8 +882,8 @@ footer {
     gap: 6px;
   }
 
-  .login-btn,
-  .signup-btn {
+  .login-nav-btn,
+  .signup-nav-btn {
     padding: 8px 10px;
     font-size: 12px;
   }
@@ -1058,15 +914,12 @@ footer {
 
   .reports-header {
     flex-direction: column;
-
     align-items: flex-start;
-
     gap: 20px;
   }
 
   .filter-box {
     flex-direction: column;
-
     align-items: flex-start;
   }
 
