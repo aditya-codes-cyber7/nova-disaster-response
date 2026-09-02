@@ -1,19 +1,22 @@
 // ==========================================
-// NOVA DISASTER RESPONSE - PHASE 2
-// FIREBASE FIRESTORE REAL-TIME INTEGRATION
+// NOVA DISASTER RESPONSE
+// PHASE 2 + PHASE 3
+// FIRESTORE + FIREBASE AUTHENTICATION
 // ==========================================
 
 
-// Import Firebase
+// ==========================================
+// FIREBASE IMPORTS
+// ==========================================
 
 import { initializeApp } from
-"https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+  "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
+
 
 import {
   getFirestore,
   collection,
   addDoc,
-  getDocs,
   onSnapshot,
   updateDoc,
   deleteDoc,
@@ -21,7 +24,19 @@ import {
   query,
   orderBy
 } from
-"https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+  "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged
+} from
+  "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
 
 
 // ==========================================
@@ -47,11 +62,17 @@ const firebaseConfig = {
 };
 
 
-// Initialize Firebase
+// ==========================================
+// INITIALIZE FIREBASE
+// ==========================================
 
 const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
+
+const auth = getAuth(app);
+
+const googleProvider = new GoogleAuthProvider();
 
 
 // ==========================================
@@ -64,7 +85,7 @@ let allReports = [];
 
 
 // ==========================================
-// FORM OPEN / CLOSE
+// REPORT FORM OPEN / CLOSE
 // ==========================================
 
 function openReportForm() {
@@ -82,7 +103,6 @@ function openSOSForm() {
     "reportModal"
   ).style.display = "block";
 
-
   document.getElementById(
     "emergencyType"
   ).focus();
@@ -99,21 +119,23 @@ function closeReportForm() {
 }
 
 
-// Make functions available to HTML onclick
-
 window.openReportForm = openReportForm;
+
 window.openSOSForm = openSOSForm;
+
 window.closeReportForm = closeReportForm;
 
 
 // ==========================================
-// LOCATION
+// GET LOCATION
 // ==========================================
 
 function getLocation() {
 
-  let status =
-    document.getElementById("locationStatus");
+  const status =
+    document.getElementById(
+      "locationStatus"
+    );
 
 
   if (navigator.geolocation) {
@@ -174,7 +196,9 @@ window.getLocation = getLocation;
 // ==========================================
 
 const emergencyForm =
-  document.getElementById("emergencyForm");
+  document.getElementById(
+    "emergencyForm"
+  );
 
 
 emergencyForm.addEventListener(
@@ -187,7 +211,9 @@ emergencyForm.addEventListener(
 
 
     const name =
-      document.getElementById("name").value;
+      document.getElementById(
+        "name"
+      ).value;
 
 
     const type =
@@ -231,7 +257,7 @@ emergencyForm.addEventListener(
 
 
       alert(
-        "Emergency Report Firestore me submit ho gayi! 🚨"
+        "Emergency Report submit ho gayi! 🚨"
       );
 
 
@@ -256,6 +282,7 @@ emergencyForm.addEventListener(
 
       console.error(error);
 
+
       alert(
         "Report submit nahi hui. Firebase check karo."
       );
@@ -268,7 +295,7 @@ emergencyForm.addEventListener(
 
 
 // ==========================================
-// REAL-TIME REPORT LISTENER
+// REAL-TIME FIRESTORE LISTENER
 // ==========================================
 
 function listenToReports() {
@@ -277,7 +304,10 @@ function listenToReports() {
 
     collection(db, "reports"),
 
-    orderBy("timestamp", "desc")
+    orderBy(
+      "timestamp",
+      "desc"
+    )
 
   );
 
@@ -291,17 +321,21 @@ function listenToReports() {
       allReports = [];
 
 
-      snapshot.forEach(function (document) {
+      snapshot.forEach(
 
-        allReports.push({
+        function (document) {
 
-          id: document.id,
+          allReports.push({
 
-          ...document.data()
+            id: document.id,
 
-        });
+            ...document.data()
 
-      });
+          });
+
+        }
+
+      );
 
 
       showReports();
@@ -354,7 +388,7 @@ function showReports() {
   }
 
 
-  // DASHBOARD TOTAL
+  // TOTAL REPORTS
 
   const totalReports =
     document.getElementById(
@@ -461,11 +495,9 @@ function showReports() {
   if (filteredReports.length === 0) {
 
     container.innerHTML = `
-
       <p class="no-report">
         Abhi koi report nahi hai.
       </p>
-
     `;
 
     return;
@@ -476,7 +508,7 @@ function showReports() {
   container.innerHTML = "";
 
 
-  // CREATE CARDS
+  // CREATE REPORT CARDS
 
   filteredReports.forEach(
 
@@ -490,7 +522,7 @@ function showReports() {
         "report-card";
 
 
-      let statusClass =
+      const statusClass =
 
         report.status === "Active"
 
@@ -540,7 +572,6 @@ function showReports() {
           <h3>
             🚨 ${report.type}
           </h3>
-
 
           <span
             class="status-badge ${statusClass}"
@@ -632,11 +663,16 @@ async function toggleStatus(id) {
 
     await updateDoc(
 
-      doc(db, "reports", id),
+      doc(
+        db,
+        "reports",
+        id
+      ),
 
       {
 
-        status: newStatus
+        status:
+          newStatus
 
       }
 
@@ -648,6 +684,7 @@ async function toggleStatus(id) {
   catch (error) {
 
     console.error(error);
+
 
     alert(
       "Status update nahi hua."
@@ -682,7 +719,11 @@ async function deleteReport(id) {
 
     await deleteDoc(
 
-      doc(db, "reports", id)
+      doc(
+        db,
+        "reports",
+        id
+      )
 
     );
 
@@ -692,6 +733,7 @@ async function deleteReport(id) {
   catch (error) {
 
     console.error(error);
+
 
     alert(
       "Report delete nahi hui."
@@ -707,7 +749,7 @@ window.deleteReport =
 
 
 // ==========================================
-// FILTER
+// FILTER REPORTS
 // ==========================================
 
 function filterReports() {
@@ -747,7 +789,11 @@ async function clearAllReports() {
 
       await deleteDoc(
 
-        doc(db, "reports", report.id)
+        doc(
+          db,
+          "reports",
+          report.id
+        )
 
       );
 
@@ -760,9 +806,9 @@ async function clearAllReports() {
 
     console.error(error);
 
+
     alert(
       "Reports delete nahi hui."
-
     );
 
   }
@@ -775,7 +821,416 @@ window.clearAllReports =
 
 
 // ==========================================
-// START REAL-TIME LISTENER
+// PHASE 3
+// FIREBASE AUTHENTICATION
+// ==========================================
+
+
+// OPEN LOGIN MODAL
+
+function openLoginModal() {
+
+  document.getElementById(
+    "loginModal"
+  ).style.display = "block";
+
+}
+
+
+function closeLoginModal() {
+
+  document.getElementById(
+    "loginModal"
+  ).style.display = "none";
+
+}
+
+
+window.openLoginModal =
+  openLoginModal;
+
+window.closeLoginModal =
+  closeLoginModal;
+
+
+// ==========================================
+// OPEN SIGNUP MODAL
+// ==========================================
+
+function openSignupModal() {
+
+  document.getElementById(
+    "signupModal"
+  ).style.display = "block";
+
+}
+
+
+function closeSignupModal() {
+
+  document.getElementById(
+    "signupModal"
+  ).style.display = "none";
+
+}
+
+
+window.openSignupModal =
+  openSignupModal;
+
+window.closeSignupModal =
+  closeSignupModal;
+
+
+// ==========================================
+// EMAIL SIGNUP
+// ==========================================
+
+async function signupUser() {
+
+  const email =
+    document.getElementById(
+      "signupEmail"
+    ).value.trim();
+
+
+  const password =
+    document.getElementById(
+      "signupPassword"
+    ).value;
+
+
+  if (!email || !password) {
+
+    alert(
+      "Email aur password fill karo!"
+    );
+
+    return;
+
+  }
+
+
+  if (password.length < 6) {
+
+    alert(
+      "Password minimum 6 characters ka hona chahiye!"
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    await createUserWithEmailAndPassword(
+
+      auth,
+
+      email,
+
+      password
+
+    );
+
+
+    alert(
+      "Account successfully create ho gaya! 🎉"
+    );
+
+
+    document.getElementById(
+      "signupEmail"
+    ).value = "";
+
+
+    document.getElementById(
+      "signupPassword"
+    ).value = "";
+
+
+    closeSignupModal();
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Signup failed: " +
+      error.message
+    );
+
+  }
+
+}
+
+
+window.signupUser =
+  signupUser;
+
+
+// ==========================================
+// EMAIL LOGIN
+// ==========================================
+
+async function loginUser() {
+
+  const email =
+    document.getElementById(
+      "loginEmail"
+    ).value.trim();
+
+
+  const password =
+    document.getElementById(
+      "loginPassword"
+    ).value;
+
+
+  if (!email || !password) {
+
+    alert(
+      "Email aur password fill karo!"
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    await signInWithEmailAndPassword(
+
+      auth,
+
+      email,
+
+      password
+
+    );
+
+
+    alert(
+      "Login successful! 🚀"
+    );
+
+
+    document.getElementById(
+      "loginEmail"
+    ).value = "";
+
+
+    document.getElementById(
+      "loginPassword"
+    ).value = "";
+
+
+    closeLoginModal();
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Login failed: " +
+      error.message
+    );
+
+  }
+
+}
+
+
+window.loginUser =
+  loginUser;
+
+
+// ==========================================
+// GOOGLE LOGIN
+// ==========================================
+
+async function googleLogin() {
+
+  try {
+
+    await signInWithPopup(
+
+      auth,
+
+      googleProvider
+
+    );
+
+
+    alert(
+      "Google login successful! 🎉"
+    );
+
+
+    closeLoginModal();
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Google login failed: " +
+      error.message
+    );
+
+  }
+
+}
+
+
+window.googleLogin =
+  googleLogin;
+
+
+// ==========================================
+// LOGOUT USER
+// ==========================================
+
+async function logoutUser() {
+
+  try {
+
+    await signOut(auth);
+
+
+    alert(
+      "Logout successful! 👋"
+    );
+
+  }
+
+
+  catch (error) {
+
+    console.error(
+      error
+    );
+
+
+    alert(
+      "Logout failed."
+    );
+
+  }
+
+}
+
+
+window.logoutUser =
+  logoutUser;
+
+
+// ==========================================
+// AUTH STATE LISTENER
+// ==========================================
+
+onAuthStateChanged(
+
+  auth,
+
+  function (user) {
+
+    const authButtons =
+      document.getElementById(
+        "authButtons"
+      );
+
+
+    const userProfile =
+      document.getElementById(
+        "userProfile"
+      );
+
+
+    const userName =
+      document.getElementById(
+        "userName"
+      );
+
+
+    if (!authButtons ||
+        !userProfile ||
+        !userName) {
+
+      return;
+
+    }
+
+
+    if (user) {
+
+      console.log(
+        "🔐 User logged in:",
+        user.email
+      );
+
+
+      authButtons.style.display =
+        "none";
+
+
+      userProfile.style.display =
+        "flex";
+
+
+      userName.innerText =
+        "👤 " +
+        (
+          user.displayName ||
+          user.email
+        );
+
+    }
+
+
+    else {
+
+      console.log(
+        "🔓 No user logged in"
+      );
+
+
+      authButtons.style.display =
+        "flex";
+
+
+      userProfile.style.display =
+        "none";
+
+    }
+
+  }
+
+);
+
+
+// ==========================================
+// START FIRESTORE LISTENER
 // ==========================================
 
 listenToReports();
@@ -785,23 +1240,69 @@ listenToReports();
 // MODAL OUTSIDE CLICK
 // ==========================================
 
-window.onclick = function (event) {
+window.addEventListener(
 
-  const modal =
-    document.getElementById(
-      "reportModal"
-    );
+  "click",
+
+  function (event) {
+
+    const reportModal =
+      document.getElementById(
+        "reportModal"
+      );
 
 
-  if (event.target === modal) {
+    const loginModal =
+      document.getElementById(
+        "loginModal"
+      );
 
-    closeReportForm();
+
+    const signupModal =
+      document.getElementById(
+        "signupModal"
+      );
+
+
+    if (
+      event.target === reportModal
+    ) {
+
+      closeReportForm();
+
+    }
+
+
+    if (
+      event.target === loginModal
+    ) {
+
+      closeLoginModal();
+
+    }
+
+
+    if (
+      event.target === signupModal
+    ) {
+
+      closeSignupModal();
+
+    }
 
   }
 
-};
+);
 
+
+// ==========================================
+// CONSOLE STATUS
+// ==========================================
 
 console.log(
   "🚀 NOVA Phase 2 - Real-time Firestore Connected"
+);
+
+console.log(
+  "🔐 NOVA Phase 3 - Firebase Authentication Connected"
 );
