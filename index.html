@@ -12,9 +12,7 @@
 
 <body>
 
-  <!-- =====================
-       NAVBAR
-  ====================== -->
+  <!-- ================= NAVBAR ================= -->
 
   <nav>
 
@@ -28,18 +26,21 @@
     </div>
 
 
-    <!-- AUTH BUTTONS -->
+    <!-- LOGIN / SIGNUP BUTTONS -->
+
     <div class="auth-buttons" id="authButtons">
 
       <button
-        class="login-btn"
+        class="login-nav-btn"
+        type="button"
         onclick="openLoginModal()"
       >
         Login
       </button>
 
       <button
-        class="signup-btn"
+        class="signup-nav-btn"
+        type="button"
         onclick="openSignupModal()"
       >
         Sign Up
@@ -49,18 +50,18 @@
 
 
     <!-- USER PROFILE AFTER LOGIN -->
+
     <div
       class="user-profile"
       id="userProfile"
       style="display: none;"
     >
 
-      <span id="userName">
-        User
-      </span>
+      <span id="userName"></span>
 
       <button
         class="logout-btn"
+        type="button"
         onclick="logoutUser()"
       >
         Logout
@@ -71,9 +72,7 @@
   </nav>
 
 
-  <!-- =====================
-       HERO SECTION
-  ====================== -->
+  <!-- ================= HERO ================= -->
 
   <section class="hero" id="home">
 
@@ -99,6 +98,7 @@
 
         <button
           class="sos-btn"
+          type="button"
           onclick="openSOSForm()"
         >
           🚨 Send SOS
@@ -107,6 +107,7 @@
 
         <button
           class="report-btn"
+          type="button"
           onclick="openReportForm()"
         >
           Report Emergency
@@ -152,9 +153,7 @@
   </section>
 
 
-  <!-- =====================
-       FEATURES
-  ====================== -->
+  <!-- ================= FEATURES ================= -->
 
   <section class="features" id="about">
 
@@ -168,54 +167,30 @@
     <div class="feature-grid">
 
       <div class="feature-card">
-
         <div class="icon">🚨</div>
-
         <h3>Quick SOS</h3>
-
-        <p>
-          Emergency ho toh quickly SOS request bhej sakte ho.
-        </p>
-
+        <p>Emergency ho toh quickly SOS request bhej sakte ho.</p>
       </div>
 
 
       <div class="feature-card">
-
         <div class="icon">📍</div>
-
         <h3>Location</h3>
-
-        <p>
-          Apni location lekar report ke saath save kar sakte ho.
-        </p>
-
+        <p>Apni location lekar report ke saath save kar sakte ho.</p>
       </div>
 
 
       <div class="feature-card">
-
         <div class="icon">📢</div>
-
         <h3>Reports</h3>
-
-        <p>
-          Submitted emergency reports dashboard me dekh sakte ho.
-        </p>
-
+        <p>Submitted emergency reports dashboard me dekh sakte ho.</p>
       </div>
 
 
       <div class="feature-card">
-
         <div class="icon">👥</div>
-
         <h3>Community Help</h3>
-
-        <p>
-          Aage volunteers aur responders ko connect karne ka idea hai.
-        </p>
-
+        <p>Aage volunteers aur responders ko connect karne ka idea hai.</p>
       </div>
 
     </div>
@@ -223,14 +198,9 @@
   </section>
 
 
-  <!-- =====================
-       EMERGENCY SECTION
-  ====================== -->
+  <!-- ================= EMERGENCY ================= -->
 
-  <section
-    class="emergency-section"
-    id="report"
-  >
+  <section class="emergency-section" id="report">
 
     <h2>Emergency Report Karni Hai?</h2>
 
@@ -241,6 +211,7 @@
 
     <button
       class="big-sos"
+      type="button"
       onclick="openReportForm()"
     >
       🚨 REPORT EMERGENCY
@@ -249,23 +220,17 @@
   </section>
 
 
-  <!-- =====================
-       DASHBOARD
-  ====================== -->
+  <!-- ================= DASHBOARD ================= -->
 
   <section class="dashboard-section">
 
     <div class="dashboard-heading">
 
-      <p class="tag">
-        LIVE DEMO DASHBOARD
-      </p>
+      <p class="tag">LIVE DEMO DASHBOARD</p>
 
       <h2>Emergency Overview</h2>
 
-      <p>
-        Reports ka quick overview yaha dikhega.
-      </p>
+      <p>Reports ka quick overview yaha dikhega.</p>
 
     </div>
 
@@ -274,18 +239,11 @@
 
       <div class="dashboard-card total-card">
 
-        <div class="dashboard-icon">
-          🚨
-        </div>
+        <div class="dashboard-icon">🚨</div>
 
         <div>
-
           <span>Total Reports</span>
-
-          <strong id="totalReports">
-            0
-          </strong>
-
+          <strong id="totalReports">0</strong>
         </div>
 
       </div>
@@ -293,18 +251,11 @@
 
       <div class="dashboard-card active-card">
 
-        <div class="dashboard-icon">
-          🔴
-        </div>
+        <div class="dashboard-icon">🔴</div>
 
         <div>
-
           <span>Active Cases</span>
-
-          <strong id="activeReports">
-            0
-          </strong>
-
+          <strong id="activeReports">0</strong>
         </div>
 
       </div>
@@ -312,18 +263,11 @@
 
       <div class="dashboard-card resolved-card">
 
-        <div class="dashboard-icon">
-          ✅
-        </div>
+        <div class="dashboard-icon">✅</div>
 
         <div>
-
           <span>Resolved</span>
-
-          <strong id="resolvedReports">
-            0
-          </strong>
-
+          <strong id="resolvedReports">0</strong>
         </div>
 
       </div>
@@ -333,14 +277,9 @@
   </section>
 
 
-  <!-- =====================
-       REPORTS
-  ====================== -->
+  <!-- ================= REPORTS ================= -->
 
-  <section
-    class="reports-section"
-    id="reports"
-  >
+  <section class="reports-section" id="reports">
 
     <div class="reports-header">
 
@@ -349,7 +288,7 @@
         <h2>Recent Reports</h2>
 
         <p class="subtitle">
-          Real-time emergency reports Firestore se aa rahi hain.
+          Reports Firebase Firestore me save ho rahi hain.
         </p>
 
       </div>
@@ -357,6 +296,7 @@
 
       <button
         class="clear-btn"
+        type="button"
         onclick="clearAllReports()"
       >
         🗑️ Clear All
@@ -373,46 +313,23 @@
         🔎 Filter Reports:
       </label>
 
-
       <select
         id="reportFilter"
         onchange="filterReports()"
       >
 
-        <option value="All">
-          All Emergencies
-        </option>
-
-        <option value="Fire 🔥">
-          Fire 🔥
-        </option>
-
-        <option value="Medical 🚑">
-          Medical 🚑
-        </option>
-
-        <option value="Flood 🌊">
-          Flood 🌊
-        </option>
-
-        <option value="Accident 🚗">
-          Accident 🚗
-        </option>
-
-        <option value="Earthquake 🌍">
-          Earthquake 🌍
-        </option>
-
-        <option value="Other ⚠️">
-          Other ⚠️
-        </option>
+        <option value="All">All Emergencies</option>
+        <option value="Fire 🔥">Fire 🔥</option>
+        <option value="Medical 🚑">Medical 🚑</option>
+        <option value="Flood 🌊">Flood 🌊</option>
+        <option value="Accident 🚗">Accident 🚗</option>
+        <option value="Earthquake 🌍">Earthquake 🌍</option>
+        <option value="Other ⚠️">Other ⚠️</option>
 
       </select>
 
     </div>
 
-
-    <!-- REPORTS CONTAINER -->
 
     <div
       id="reportsContainer"
@@ -428,14 +345,9 @@
   </section>
 
 
-  <!-- =====================
-       EMERGENCY REPORT MODAL
-  ====================== -->
+  <!-- ================= REPORT MODAL ================= -->
 
-  <div
-    class="modal"
-    id="reportModal"
-  >
+  <div class="modal" id="reportModal">
 
     <div class="modal-content">
 
@@ -446,11 +358,10 @@
         ×
       </span>
 
-
       <h2>Emergency Details</h2>
 
       <p class="form-text">
-        Jo pata hai wahi fill karo, tension lene ki zarurat nahi 😅
+        Jo pata hai wahi fill karo.
       </p>
 
 
@@ -468,15 +379,9 @@
 
         <label>Emergency Type</label>
 
-        <select
-          id="emergencyType"
-          required
-        >
+        <select id="emergencyType" required>
 
-          <option value="">
-            Select karo
-          </option>
-
+          <option value="">Select karo</option>
           <option>Fire 🔥</option>
           <option>Medical 🚑</option>
           <option>Flood 🌊</option>
@@ -522,16 +427,11 @@
   </div>
 
 
-  <!-- =====================
-       LOGIN MODAL
-  ====================== -->
+  <!-- ================= LOGIN MODAL ================= -->
 
-  <div
-    class="modal"
-    id="loginModal"
-  >
+  <div class="modal" id="loginModal">
 
-    <div class="modal-content auth-modal">
+    <div class="modal-content auth-content">
 
       <span
         class="close"
@@ -571,8 +471,9 @@
 
 
         <button
-          type="submit"
+          type="button"
           class="submit-btn"
+          onclick="loginUser()"
         >
           Login
         </button>
@@ -593,16 +494,11 @@
   </div>
 
 
-  <!-- =====================
-       SIGNUP MODAL
-  ====================== -->
+  <!-- ================= SIGNUP MODAL ================= -->
 
-  <div
-    class="modal"
-    id="signupModal"
-  >
+  <div class="modal" id="signupModal">
 
-    <div class="modal-content auth-modal">
+    <div class="modal-content auth-content">
 
       <span
         class="close"
@@ -627,7 +523,6 @@
           type="text"
           id="signupName"
           placeholder="Apna naam likho"
-          required
         >
 
 
@@ -652,8 +547,9 @@
 
 
         <button
-          type="submit"
+          type="button"
           class="submit-btn"
+          onclick="signupUser()"
         >
           Create Account
         </button>
@@ -674,9 +570,7 @@
   </div>
 
 
-  <!-- =====================
-       FOOTER
-  ====================== -->
+  <!-- ================= FOOTER ================= -->
 
   <footer>
 
@@ -687,12 +581,7 @@
   </footer>
 
 
-  <!-- JAVASCRIPT -->
-
-  <script
-    type="module"
-    src="script.js"
-  ></script>
+  <script type="module" src="script.js"></script>
 
 </body>
 
