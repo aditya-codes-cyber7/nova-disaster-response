@@ -1,6 +1,6 @@
 // ==========================================
-// NOVA DISASTER RESPONSE - PHASE 4 FINAL
-// Firebase Auth + User Based Reports + Admin
+// NOVA DISASTER RESPONSE
+// FINAL SCRIPT.JS
 // ==========================================
 
 
@@ -8,23 +8,8 @@
 // FIREBASE IMPORTS
 // ==========================================
 
-import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  onSnapshot,
-  updateDoc,
-  deleteDoc,
-  doc,
-  query,
-  orderBy,
-  where,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
   getAuth,
@@ -35,12 +20,81 @@ import {
   signOut,
   onAuthStateChanged,
   updateProfile
-} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+} from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  doc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp
+} from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 // ==========================================
-// FIREBASE CONFIG
+// 🔥 FIREBASE CONFIG
 // ==========================================
+
+// IMPORTANT:
+// Yaha apna Firebase Console wala EXACT config paste karo.
+
+const firebaseConfig = {
+
+  // ==========================================
+// NOVA DISASTER RESPONSE
+// FINAL SCRIPT.JS
+// ==========================================
+
+
+// ==========================================
+// FIREBASE IMPORTS
+// ==========================================
+
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
+  onAuthStateChanged,
+  updateProfile
+} from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  orderBy,
+  doc,
+  updateDoc,
+  deleteDoc,
+  serverTimestamp
+} from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// ==========================================
+// 🔥 FIREBASE CONFIG
+// ==========================================
+
+// IMPORTANT:
+// Yaha apna Firebase Console wala EXACT config paste karo.
 
 const firebaseConfig = {
   apiKey: "AIzaSyBcEkoZMt1KZdQ-ch6J1-7KKyQRO542ZRY",
@@ -58,17 +112,19 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
-
 const auth = getAuth(app);
+
+const db = getFirestore(app);
 
 const googleProvider = new GoogleAuthProvider();
 
 
 // ==========================================
-// ADMIN CONFIG
-// IMPORTANT: CHANGE THIS EMAIL
+// ADMIN EMAIL
 // ==========================================
+
+// IMPORTANT:
+// Yaha wahi Gmail daalo jisko admin banana hai.
 
 const ADMIN_EMAIL = "aditya9288raj@gmail.com";
 
@@ -79,46 +135,70 @@ const ADMIN_EMAIL = "aditya9288raj@gmail.com";
 
 let currentUser = null;
 
-let currentUserIsAdmin = false;
+let isAdmin = false;
 
-let userLocation = "Location not available";
+let userReports = [];
 
-let allReports = [];
-
-let unsubscribeReports = null;
+let currentLocation = null;
 
 
 // ==========================================
-// HELPERS
+// DOM ELEMENTS
 // ==========================================
 
-function isAdmin(user) {
+const authButtons =
+  document.getElementById("authButtons");
 
-  if (!user) return false;
+const userProfile =
+  document.getElementById("userProfile");
 
-  return user.email === ADMIN_EMAIL;
+const userName =
+  document.getElementById("userName");
 
-}
+const reportsContainer =
+  document.getElementById("reportsContainer");
 
-
-function getUserDisplayName(user) {
-
-  if (!user) return "User";
-
-  return (
-    user.displayName ||
-    user.email?.split("@")[0] ||
-    "User"
-  );
-
-}
+const clearAllButton =
+  document.getElementById("clearAllButton");
 
 
 // ==========================================
-// REPORT MODAL
+// MODAL FUNCTIONS
 // ==========================================
 
-function openReportForm() {
+window.openLoginModal = function () {
+
+  document.getElementById("loginModal")
+    .style.display = "block";
+
+};
+
+
+window.closeLoginModal = function () {
+
+  document.getElementById("loginModal")
+    .style.display = "none";
+
+};
+
+
+window.openSignupModal = function () {
+
+  document.getElementById("signupModal")
+    .style.display = "block";
+
+};
+
+
+window.closeSignupModal = function () {
+
+  document.getElementById("signupModal")
+    .style.display = "none";
+
+};
+
+
+window.openReportForm = function () {
 
   if (!currentUser) {
 
@@ -130,129 +210,364 @@ function openReportForm() {
 
   }
 
-  const modal =
-    document.getElementById("reportModal");
 
-  if (modal) {
-    modal.style.display = "block";
-  }
+  document.getElementById("reportModal")
+    .style.display = "block";
 
-}
+};
 
 
-function openSOSForm() {
+window.openSOSForm = function () {
 
   openReportForm();
 
-  setTimeout(() => {
+};
 
-    const emergencyType =
-      document.getElementById("emergencyType");
 
-    if (emergencyType) {
-      emergencyType.focus();
+window.closeReportForm = function () {
+
+  document.getElementById("reportModal")
+    .style.display = "none";
+
+};
+
+
+// ==========================================
+// CLOSE MODAL WHEN CLICKING OUTSIDE
+// ==========================================
+
+window.addEventListener("click", function (event) {
+
+  const modals = document.querySelectorAll(".modal");
+
+  modals.forEach(function (modal) {
+
+    if (event.target === modal) {
+
+      modal.style.display = "none";
+
     }
 
-  }, 200);
+  });
 
-}
+});
 
 
-function closeReportForm() {
+// ==========================================
+// SIGNUP USER
+// ==========================================
 
-  const modal =
-    document.getElementById("reportModal");
+window.signupUser = async function () {
 
-  if (modal) {
-    modal.style.display = "none";
+  const name =
+    document.getElementById("signupName").value.trim();
+
+  const email =
+    document.getElementById("signupEmail").value.trim();
+
+  const password =
+    document.getElementById("signupPassword").value;
+
+
+  if (!name || !email || !password) {
+
+    alert("Please fill all fields.");
+
+    return;
+
   }
 
-}
+
+  if (password.length < 6) {
+
+    alert("Password must be at least 6 characters.");
+
+    return;
+
+  }
 
 
-window.openReportForm = openReportForm;
-window.openSOSForm = openSOSForm;
-window.closeReportForm = closeReportForm;
+  try {
+
+    const userCredential =
+      await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+
+    await updateProfile(
+      userCredential.user,
+      {
+        displayName: name
+      }
+    );
+
+
+    alert("Account created successfully! 🚀");
+
+
+    document.getElementById("signupForm").reset();
+
+    closeSignupModal();
+
+
+  } catch (error) {
+
+    alert(error.message);
+
+  }
+
+};
+
+
+// ==========================================
+// LOGIN USER
+// ==========================================
+
+window.loginUser = async function () {
+
+  const email =
+    document.getElementById("loginEmail").value.trim();
+
+  const password =
+    document.getElementById("loginPassword").value;
+
+
+  if (!email || !password) {
+
+    alert("Please enter email and password.");
+
+    return;
+
+  }
+
+
+  try {
+
+    await signInWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+
+
+    alert("Login successful! 🎉");
+
+
+    document.getElementById("loginForm").reset();
+
+    closeLoginModal();
+
+
+  } catch (error) {
+
+    alert(error.message);
+
+  }
+
+};
+
+
+// ==========================================
+// GOOGLE LOGIN
+// ==========================================
+
+window.googleLogin = async function () {
+
+  try {
+
+    await signInWithPopup(
+      auth,
+      googleProvider
+    );
+
+
+    closeLoginModal();
+
+    closeSignupModal();
+
+
+  } catch (error) {
+
+    alert(error.message);
+
+  }
+
+};
+
+
+// ==========================================
+// LOGOUT
+// ==========================================
+
+window.logoutUser = async function () {
+
+  try {
+
+    await signOut(auth);
+
+    alert("Logged out successfully.");
+
+  } catch (error) {
+
+    alert(error.message);
+
+  }
+
+};
+
+
+// ==========================================
+// AUTH STATE
+// ==========================================
+
+onAuthStateChanged(
+  auth,
+  async function (user) {
+
+    currentUser = user;
+
+
+    if (user) {
+
+      // Check Admin
+
+      isAdmin =
+        user.email.toLowerCase() ===
+        ADMIN_EMAIL.toLowerCase();
+
+
+      // Navbar
+
+      authButtons.style.display = "none";
+
+      userProfile.style.display = "flex";
+
+
+      userName.textContent =
+        isAdmin
+          ? `🛡️ Admin: ${user.displayName || user.email}`
+          : `👤 ${user.displayName || user.email}`;
+
+
+      // Clear Button
+
+      if (clearAllButton) {
+
+        clearAllButton.style.display =
+          isAdmin
+            ? "block"
+            : "none";
+
+      }
+
+
+      await loadReports();
+
+
+    } else {
+
+      currentUser = null;
+
+      isAdmin = false;
+
+      userReports = [];
+
+
+      authButtons.style.display = "flex";
+
+      userProfile.style.display = "none";
+
+
+      if (clearAllButton) {
+
+        clearAllButton.style.display = "none";
+
+      }
+
+
+      reportsContainer.innerHTML = `
+        <p class="no-report">
+          🔐 Login to view your emergency reports.
+        </p>
+      `;
+
+
+      updateDashboard([]);
+
+    }
+
+  }
+);
 
 
 // ==========================================
 // GET LOCATION
 // ==========================================
 
-function getLocation() {
+window.getLocation = function () {
 
-  const status =
+  const locationStatus =
     document.getElementById("locationStatus");
+
 
   if (!navigator.geolocation) {
 
-    if (status) {
-      status.innerText =
-        "Browser does not support location.";
-    }
+    locationStatus.textContent =
+      "Geolocation is not supported by this browser.";
 
     return;
 
   }
 
-  if (status) {
-    status.innerText =
-      "Getting your location... 📍";
-  }
+
+  locationStatus.textContent =
+    "Getting location...";
+
 
   navigator.geolocation.getCurrentPosition(
 
     function (position) {
 
-      const latitude =
-        position.coords.latitude;
+      currentLocation = {
 
-      const longitude =
-        position.coords.longitude;
+        latitude:
+          position.coords.latitude,
 
-      userLocation =
-        latitude.toFixed(5) +
-        ", " +
-        longitude.toFixed(5);
+        longitude:
+          position.coords.longitude
 
-      if (status) {
-        status.innerText =
-          "Location added successfully ✅";
-      }
+      };
+
+
+      locationStatus.textContent =
+        "📍 Location added successfully.";
 
     },
 
+
     function () {
 
-      if (status) {
-        status.innerText =
-          "Location permission denied.";
-      }
+      locationStatus.textContent =
+        "Unable to get location.";
 
     }
 
   );
 
-}
-
-
-window.getLocation = getLocation;
+};
 
 
 // ==========================================
-// SUBMIT REPORT
+// SUBMIT EMERGENCY REPORT
 // ==========================================
 
-const emergencyForm =
-  document.getElementById("emergencyForm");
-
-
-if (emergencyForm) {
-
-  emergencyForm.addEventListener(
-
+document
+  .getElementById("emergencyForm")
+  .addEventListener(
     "submit",
-
     async function (event) {
 
       event.preventDefault();
@@ -274,18 +589,16 @@ if (emergencyForm) {
       const name =
         document.getElementById("name").value.trim();
 
-
-      const type =
+      const emergencyType =
         document.getElementById("emergencyType").value;
-
 
       const description =
         document.getElementById("description").value.trim();
 
 
-      if (!name || !type || !description) {
+      if (!name || !emergencyType || !description) {
 
-        alert("Please fill all required details.");
+        alert("Please fill all required fields.");
 
         return;
 
@@ -295,34 +608,34 @@ if (emergencyForm) {
       try {
 
         await addDoc(
-
           collection(db, "reports"),
-
           {
 
-            // REPORT DETAILS
-            name: name,
-            type: type,
-            description: description,
-            location: userLocation,
+            userId:
+              currentUser.uid,
 
-            // OWNER DETAILS
-            userId: currentUser.uid,
-            userEmail: currentUser.email,
-            userName: getUserDisplayName(currentUser),
+            userEmail:
+              currentUser.email,
 
-            // ADMIN ONLY STATUS
-            status: "Active",
+            name:
+              name,
 
-            // TIMESTAMP
-            timestamp: Date.now(),
-            createdAt: serverTimestamp(),
+            emergencyType:
+              emergencyType,
 
-            time:
-              new Date().toLocaleString()
+            description:
+              description,
+
+            location:
+              currentLocation,
+
+            status:
+              "Active",
+
+            createdAt:
+              serverTimestamp()
 
           }
-
         );
 
 
@@ -331,270 +644,151 @@ if (emergencyForm) {
         );
 
 
-        emergencyForm.reset();
+        document
+          .getElementById("emergencyForm")
+          .reset();
 
 
-        userLocation =
-          "Location not available";
+        currentLocation = null;
 
 
-        const locationStatus =
-          document.getElementById("locationStatus");
-
-
-        if (locationStatus) {
-          locationStatus.innerText = "";
-        }
+        document
+          .getElementById("locationStatus")
+          .textContent = "";
 
 
         closeReportForm();
 
-      }
+
+        await loadReports();
 
 
-      catch (error) {
+      } catch (error) {
 
-        console.error(
-          "Report Error:",
-          error
-        );
-
+        console.error(error);
 
         alert(
-          "Report submission failed: " +
+          "Error submitting report: " +
           error.message
         );
 
       }
 
     }
-
   );
+
+
+// ==========================================
+// LOAD REPORTS
+// ==========================================
+
+async function loadReports() {
+
+  if (!currentUser) return;
+
+
+  try {
+
+    let reportsQuery;
+
+
+    if (isAdmin) {
+
+      reportsQuery =
+        query(
+          collection(db, "reports"),
+          orderBy(
+            "createdAt",
+            "desc"
+          )
+        );
+
+    } else {
+
+      reportsQuery =
+        query(
+          collection(db, "reports"),
+          where(
+            "userId",
+            "==",
+            currentUser.uid
+          )
+        );
+
+    }
+
+
+    const snapshot =
+      await getDocs(reportsQuery);
+
+
+    userReports = [];
+
+
+    snapshot.forEach(function (documentSnapshot) {
+
+      userReports.push({
+
+        id:
+          documentSnapshot.id,
+
+        ...documentSnapshot.data()
+
+      });
+
+    });
+
+
+    // Sort manually
+    // avoids Firestore index requirement
+
+    userReports.sort(function (a, b) {
+
+      const aTime =
+        a.createdAt?.seconds || 0;
+
+      const bTime =
+        b.createdAt?.seconds || 0;
+
+      return bTime - aTime;
+
+    });
+
+
+    displayReports(userReports);
+
+
+    updateDashboard(userReports);
+
+
+  } catch (error) {
+
+    console.error(
+      "Error loading reports:",
+      error
+    );
+
+
+    reportsContainer.innerHTML = `
+      <p class="no-report">
+        Unable to load reports.
+      </p>
+    `;
+
+  }
 
 }
 
 
 // ==========================================
-// FIRESTORE REPORT LISTENER
+// DISPLAY REPORTS
 // ==========================================
 
-function listenToReports() {
-
-  // Stop previous listener
-
-  if (unsubscribeReports) {
-
-    unsubscribeReports();
-
-    unsubscribeReports = null;
-
-  }
-
+function displayReports(reports) {
 
   if (!currentUser) {
 
-    allReports = [];
-
-    showReports();
-
-    return;
-
-  }
-
-
-  let reportsQuery;
-
-
-  // ADMIN SEES ALL REPORTS
-
-  if (currentUserIsAdmin) {
-
-    reportsQuery = query(
-
-      collection(db, "reports"),
-
-      orderBy("timestamp", "desc")
-
-    );
-
-  }
-
-
-  // NORMAL USER SEES ONLY OWN REPORTS
-
-  else {
-
-    reportsQuery = query(
-
-      collection(db, "reports"),
-
-      where(
-        "userId",
-        "==",
-        currentUser.uid
-      ),
-
-      orderBy("timestamp", "desc")
-
-    );
-
-  }
-
-
-  unsubscribeReports = onSnapshot(
-
-    reportsQuery,
-
-
-    function (snapshot) {
-
-      allReports = [];
-
-
-      snapshot.forEach(
-
-        function (document) {
-
-          allReports.push({
-
-            id: document.id,
-
-            ...document.data()
-
-          });
-
-        }
-
-      );
-
-
-      showReports();
-
-    },
-
-
-    function (error) {
-
-      console.error(
-        "Firestore Listener Error:",
-        error
-      );
-
-    }
-
-  );
-
-}
-
-
-// ==========================================
-// UPDATE DASHBOARD
-// ==========================================
-
-function updateDashboardCounters() {
-
-  const reportCount =
-    document.getElementById("reportCount");
-
-  const totalReports =
-    document.getElementById("totalReports");
-
-  const activeCounter =
-    document.getElementById("activeReports");
-
-  const resolvedCounter =
-    document.getElementById("resolvedReports");
-
-
-  // USER TOTAL = OWN REPORTS
-  // ADMIN TOTAL = ALL REPORTS
-
-  if (reportCount) {
-
-    reportCount.innerText =
-      allReports.length;
-
-  }
-
-
-  if (totalReports) {
-
-    totalReports.innerText =
-      allReports.length;
-
-  }
-
-
-  // Only admin should see status data
-
-  if (!currentUserIsAdmin) {
-
-    if (activeCounter) {
-      activeCounter.innerText = "-";
-    }
-
-    if (resolvedCounter) {
-      resolvedCounter.innerText = "-";
-    }
-
-    return;
-
-  }
-
-
-  const activeReports =
-    allReports.filter(
-      report =>
-        report.status === "Active"
-    );
-
-
-  const resolvedReports =
-    allReports.filter(
-      report =>
-        report.status === "Resolved"
-    );
-
-
-  if (activeCounter) {
-
-    activeCounter.innerText =
-      activeReports.length;
-
-  }
-
-
-  if (resolvedCounter) {
-
-    resolvedCounter.innerText =
-      resolvedReports.length;
-
-  }
-
-}
-
-
-// ==========================================
-// SHOW REPORTS
-// ==========================================
-
-function showReports() {
-
-  const container =
-    document.getElementById("reportsContainer");
-
-
-  if (!container) return;
-
-
-  updateDashboardCounters();
-
-
-  // NOT LOGGED IN
-
-  if (!currentUser) {
-
-    container.innerHTML = `
+    reportsContainer.innerHTML = `
       <p class="no-report">
         🔐 Login to view your emergency reports.
       </p>
@@ -605,50 +799,11 @@ function showReports() {
   }
 
 
-  // FILTER
+  if (reports.length === 0) {
 
-  const filterElement =
-    document.getElementById("reportFilter");
-
-
-  let selectedFilter = "All";
-
-
-  if (filterElement) {
-
-    selectedFilter =
-      filterElement.value;
-
-  }
-
-
-  let filteredReports =
-    allReports;
-
-
-  if (selectedFilter !== "All") {
-
-    filteredReports =
-      allReports.filter(
-
-        report =>
-          report.type === selectedFilter
-
-      );
-
-  }
-
-
-  // NO REPORTS
-
-  if (filteredReports.length === 0) {
-
-    container.innerHTML = `
+    reportsContainer.innerHTML = `
       <p class="no-report">
-        ${currentUserIsAdmin
-          ? "No emergency reports found."
-          : "You have not submitted any emergency reports yet."
-        }
+        No emergency reports found.
       </p>
     `;
 
@@ -657,235 +812,219 @@ function showReports() {
   }
 
 
-  container.innerHTML = "";
+  reportsContainer.innerHTML = "";
 
 
-  filteredReports.forEach(
+  reports.forEach(function (report) {
 
-    function (report) {
-
-      const card =
-        document.createElement("div");
-
-
-      card.className =
-        "report-card";
+    const date = report.createdAt
+      ? report.createdAt
+          .toDate()
+          .toLocaleString()
+      : "Just now";
 
 
-      // ======================================
-      // ADMIN VIEW
-      // ======================================
-
-      if (currentUserIsAdmin) {
-
-        const statusClass =
-          report.status === "Active"
-            ? "active-status"
-            : "resolved-status";
+    let adminActions = "";
 
 
-        const statusButton =
-          report.status === "Active"
+    // ONLY ADMIN CAN SEE STATUS + ACTIONS
 
-            ? `
-              <button
-                class="resolve-btn"
-                onclick="toggleStatus('${report.id}')"
-              >
-                ✅ Mark Resolved
-              </button>
-            `
+    if (isAdmin) {
 
-            : `
-              <button
-                class="active-btn"
-                onclick="toggleStatus('${report.id}')"
-              >
-                🔄 Mark Active
-              </button>
-            `;
+      const statusClass =
+        report.status === "Resolved"
+          ? "resolved-status"
+          : "active-status";
 
 
-        card.innerHTML = `
+      adminActions = `
 
-          <div class="report-top">
-
-            <h3>
-              🚨 ${report.type}
-            </h3>
-
-            <span class="status-badge ${statusClass}">
-              ${report.status}
-            </span>
-
-          </div>
-
-          <p>
-            <strong>Reported By:</strong>
-            ${report.name}
-          </p>
-
-          <p>
-            <strong>User Email:</strong>
-            ${report.userEmail || "Not available"}
-          </p>
-
-          <p>
-            <strong>Problem:</strong>
-            ${report.description}
-          </p>
-
-          <p>
-            <strong>Location:</strong>
-            ${report.location}
-          </p>
-
-          <p>
-            <strong>Time:</strong>
-            ${report.time}
-          </p>
-
-          <div class="report-actions">
-
-            ${statusButton}
-
-            <button
-              class="delete-btn"
-              onclick="deleteReport('${report.id}')"
-            >
-              🗑️ Delete
-            </button>
-
-          </div>
-
-        `;
-
-      }
+        <span
+          class="status-badge ${statusClass}"
+        >
+          ${report.status || "Active"}
+        </span>
 
 
-      // ======================================
-      // NORMAL USER VIEW
-      // ======================================
+        <div class="report-actions">
 
-      else {
-
-        card.innerHTML = `
-
-          <div class="report-top">
-
-            <h3>
-              🚨 ${report.type}
-            </h3>
-
-            <span class="my-report-badge">
-              Your Report
-            </span>
-
-          </div>
-
-          <p>
-            <strong>Name:</strong>
-            ${report.name}
-          </p>
-
-          <p>
-            <strong>Problem:</strong>
-            ${report.description}
-          </p>
-
-          <p>
-            <strong>Location:</strong>
-            ${report.location}
-          </p>
-
-          <p>
-            <strong>Submitted:</strong>
-            ${report.time}
-          </p>
-
-          <p class="report-info">
-            ℹ️ Your emergency request has been securely submitted.
-            Response status is managed by the emergency administration.
-          </p>
-
-        `;
-
-      }
+          <button
+            class="resolve-btn"
+            onclick="updateReportStatus(
+              '${report.id}',
+              'Resolved'
+            )"
+          >
+            ✅ Resolve
+          </button>
 
 
-      container.appendChild(card);
+          <button
+            class="active-btn"
+            onclick="updateReportStatus(
+              '${report.id}',
+              'Active'
+            )"
+          >
+            🔴 Mark Active
+          </button>
+
+
+          <button
+            class="delete-btn"
+            onclick="deleteReport(
+              '${report.id}'
+            )"
+          >
+            🗑️ Delete
+          </button>
+
+        </div>
+
+      `;
 
     }
 
-  );
+
+    reportsContainer.innerHTML += `
+
+      <div class="report-card">
+
+        <div class="report-top">
+
+          <h3>
+            ${report.emergencyType}
+          </h3>
+
+          ${
+            isAdmin
+              ? adminActions
+                  .split('<div class="report-actions">')[0]
+              : ""
+          }
+
+        </div>
+
+
+        <p>
+          <strong>Name:</strong>
+          ${report.name}
+        </p>
+
+
+        ${
+          isAdmin
+            ? `
+              <p>
+                <strong>User:</strong>
+                ${report.userEmail}
+              </p>
+            `
+            : ""
+        }
+
+
+        <p>
+          <strong>Description:</strong>
+          ${report.description}
+        </p>
+
+
+        <p>
+          <strong>Submitted:</strong>
+          ${date}
+        </p>
+
+
+        ${
+          report.location &&
+          report.location.latitude
+            ? `
+              <p>
+                📍 ${report.location.latitude.toFixed(4)},
+                ${report.location.longitude.toFixed(4)}
+              </p>
+            `
+            : ""
+        }
+
+
+        ${
+          isAdmin
+            ? adminActions.includes(
+                '<div class="report-actions">'
+              )
+                ? '<div class="report-actions">' +
+                  adminActions
+                    .split(
+                      '<div class="report-actions">'
+                    )[1]
+                : ""
+            : ""
+        }
+
+      </div>
+
+    `;
+
+  });
 
 }
 
 
 // ==========================================
-// TOGGLE REPORT STATUS
+// UPDATE REPORT STATUS
 // ADMIN ONLY
 // ==========================================
 
-async function toggleStatus(id) {
+window.updateReportStatus =
+  async function (
+    reportId,
+    newStatus
+  ) {
 
-  if (!currentUserIsAdmin) {
+    if (!isAdmin) {
 
-    alert(
-      "Only admin can change report status."
-    );
+      alert(
+        "Only admin can update report status."
+      );
 
-    return;
+      return;
 
-  }
+    }
 
 
-  try {
+    try {
 
-    const report =
-      allReports.find(
-        report =>
-          report.id === id
+      await updateDoc(
+        doc(
+          db,
+          "reports",
+          reportId
+        ),
+        {
+
+          status:
+            newStatus
+
+        }
       );
 
 
-    if (!report) return;
+      await loadReports();
 
 
-    const newStatus =
-      report.status === "Active"
-        ? "Resolved"
-        : "Active";
+    } catch (error) {
 
+      console.error(error);
 
-    await updateDoc(
+      alert(
+        "Error updating report status."
+      );
 
-      doc(db, "reports", id),
+    }
 
-      {
-        status: newStatus
-      }
-
-    );
-
-  }
-
-
-  catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Status update failed."
-    );
-
-  }
-
-}
-
-
-window.toggleStatus =
-  toggleStatus;
+  };
 
 
 // ==========================================
@@ -893,66 +1032,54 @@ window.toggleStatus =
 // ADMIN ONLY
 // ==========================================
 
-async function deleteReport(id) {
-
-  if (!currentUserIsAdmin) {
-
-    alert(
-      "Only admin can delete reports."
-    );
-
-    return;
-
-  }
-
-
-  const confirmDelete = confirm(
-    "Are you sure? This report will be permanently deleted."
-  );
-
-
-  if (!confirmDelete) return;
-
-
-  try {
-
-    await deleteDoc(
-      doc(db, "reports", id)
-    );
-
-  }
-
-
-  catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Report deletion failed."
-    );
-
-  }
-
-}
-
-
 window.deleteReport =
-  deleteReport;
+  async function (reportId) {
+
+    if (!isAdmin) {
+
+      alert(
+        "Only admin can delete reports."
+      );
+
+      return;
+
+    }
 
 
-// ==========================================
-// FILTER REPORTS
-// ==========================================
-
-function filterReports() {
-
-  showReports();
-
-}
+    const confirmation =
+      confirm(
+        "Delete this emergency report?"
+      );
 
 
-window.filterReports =
-  filterReports;
+    if (!confirmation) return;
+
+
+    try {
+
+      await deleteDoc(
+        doc(
+          db,
+          "reports",
+          reportId
+        )
+      );
+
+
+      await loadReports();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Error deleting report."
+      );
+
+    }
+
+  };
 
 
 // ==========================================
@@ -960,149 +1087,379 @@ window.filterReports =
 // ADMIN ONLY
 // ==========================================
 
-async function clearAllReports() {
+window.clearAllReports =
+  async function () {
 
-  if (!currentUserIsAdmin) {
+    if (!isAdmin) {
 
-    alert(
-      "Only admin can clear reports."
-    );
+      alert(
+        "Only admin can clear reports."
+      );
+
+      return;
+
+    }
+
+
+    const confirmation =
+      confirm(
+        "Are you sure you want to delete ALL reports?"
+      );
+
+
+    if (!confirmation) return;
+
+
+    try {
+
+      const snapshot =
+        await getDocs(
+          collection(
+            db,
+            "reports"
+          )
+        );
+
+
+      const deletePromises = [];
+
+
+      snapshot.forEach(
+        function (documentSnapshot) {
+
+          deletePromises.push(
+
+            deleteDoc(
+              doc(
+                db,
+                "reports",
+                documentSnapshot.id
+              )
+            )
+
+          );
+
+        }
+      );
+
+
+      await Promise.all(
+        deletePromises
+      );
+
+
+      await loadReports();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Error clearing reports."
+      );
+
+    }
+
+  };
+
+
+// ==========================================
+// FILTER REPORTS
+// ==========================================
+
+window.filterReports = function () {
+
+  const filter =
+    document.getElementById(
+      "reportFilter"
+    ).value;
+
+
+  if (filter === "All") {
+
+    displayReports(userReports);
 
     return;
 
   }
 
 
-  const confirmClear = confirm(
-    "Delete ALL emergency reports permanently?"
+  const filteredReports =
+    userReports.filter(
+      function (report) {
+
+        return (
+          report.emergencyType ===
+          filter
+        );
+
+      }
+    );
+
+
+  displayReports(
+    filteredReports
   );
 
+};
 
-  if (!confirmClear) return;
+
+// ==========================================
+// UPDATE DASHBOARD
+// ==========================================
+
+function updateDashboard(reports) {
+
+  const totalReports =
+    document.getElementById(
+      "totalReports"
+    );
+
+  const reportCount =
+    document.getElementById(
+      "reportCount"
+    );
+
+  const activeReports =
+    document.getElementById(
+      "activeReports"
+    );
+
+  const resolvedReports =
+    document.getElementById(
+      "resolvedReports"
+    );
 
 
-  try {
+  // Total reports user/admin both can see
 
-    for (const report of allReports) {
+  if (totalReports) {
 
-      await deleteDoc(
-        doc(db, "reports", report.id)
-      );
+    totalReports.textContent =
+      reports.length;
+
+  }
+
+
+  if (reportCount) {
+
+    reportCount.textContent =
+      reports.length;
+
+  }
+
+
+  // ONLY ADMIN CAN SEE STATUS COUNTS
+
+  if (isAdmin) {
+
+    const activeCount =
+      reports.filter(
+        report =>
+          report.status === "Active"
+      ).length;
+
+
+    const resolvedCount =
+      reports.filter(
+        report =>
+          report.status === "Resolved"
+      ).length;
+
+
+    if (activeReports) {
+
+      activeReports.textContent =
+        activeCount;
 
     }
 
 
-    alert(
-      "All reports cleared."
-    );
+    if (resolvedReports) {
 
-  }
+      resolvedReports.textContent =
+        resolvedCount;
 
+    }
 
-  catch (error) {
+  } else {
 
-    console.error(error);
+    // USER DOES NOT SEE STATUS
 
-    alert(
-      "Reports could not be cleared."
-    );
+    if (activeReports) {
 
-  }
+      activeReports.textContent =
+        "-";
 
-}
-
-
-window.clearAllReports =
-  clearAllReports;
+    }
 
 
-// ==========================================
-// LOGIN MODAL
-// ==========================================
+    if (resolvedReports) {
 
-function openLoginModal() {
+      resolvedReports.textContent =
+        "-";
 
-  const modal =
-    document.getElementById("loginModal");
-
-
-  if (modal) {
-
-    modal.style.display = "block";
+    }
 
   }
 
 }
+};
 
 
-function closeLoginModal() {
+// ==========================================
+// INITIALIZE FIREBASE
+// ==========================================
 
-  const modal =
-    document.getElementById("loginModal");
+const app = initializeApp(firebaseConfig);
+
+const auth = getAuth(app);
+
+const db = getFirestore(app);
+
+const googleProvider = new GoogleAuthProvider();
 
 
-  if (modal) {
+// ==========================================
+// ADMIN EMAIL
+// ==========================================
 
-    modal.style.display = "none";
+// IMPORTANT:
+// Yaha wahi Gmail daalo jisko admin banana hai.
+
+const ADMIN_EMAIL = "YOUR_ADMIN_GMAIL@gmail.com";
+
+
+// ==========================================
+// GLOBAL VARIABLES
+// ==========================================
+
+let currentUser = null;
+
+let isAdmin = false;
+
+let userReports = [];
+
+let currentLocation = null;
+
+
+// ==========================================
+// DOM ELEMENTS
+// ==========================================
+
+const authButtons =
+  document.getElementById("authButtons");
+
+const userProfile =
+  document.getElementById("userProfile");
+
+const userName =
+  document.getElementById("userName");
+
+const reportsContainer =
+  document.getElementById("reportsContainer");
+
+const clearAllButton =
+  document.getElementById("clearAllButton");
+
+
+// ==========================================
+// MODAL FUNCTIONS
+// ==========================================
+
+window.openLoginModal = function () {
+
+  document.getElementById("loginModal")
+    .style.display = "block";
+
+};
+
+
+window.closeLoginModal = function () {
+
+  document.getElementById("loginModal")
+    .style.display = "none";
+
+};
+
+
+window.openSignupModal = function () {
+
+  document.getElementById("signupModal")
+    .style.display = "block";
+
+};
+
+
+window.closeSignupModal = function () {
+
+  document.getElementById("signupModal")
+    .style.display = "none";
+
+};
+
+
+window.openReportForm = function () {
+
+  if (!currentUser) {
+
+    alert("Please login first to submit an emergency report.");
+
+    openLoginModal();
+
+    return;
 
   }
 
-}
+
+  document.getElementById("reportModal")
+    .style.display = "block";
+
+};
 
 
-window.openLoginModal =
-  openLoginModal;
+window.openSOSForm = function () {
 
-window.closeLoginModal =
-  closeLoginModal;
+  openReportForm();
 
-
-// ==========================================
-// SIGNUP MODAL
-// ==========================================
-
-function openSignupModal() {
-
-  const modal =
-    document.getElementById("signupModal");
+};
 
 
-  if (modal) {
+window.closeReportForm = function () {
 
-    modal.style.display = "block";
+  document.getElementById("reportModal")
+    .style.display = "none";
 
-  }
-
-}
-
-
-function closeSignupModal() {
-
-  const modal =
-    document.getElementById("signupModal");
-
-
-  if (modal) {
-
-    modal.style.display = "none";
-
-  }
-
-}
-
-
-window.openSignupModal =
-  openSignupModal;
-
-window.closeSignupModal =
-  closeSignupModal;
+};
 
 
 // ==========================================
-// EMAIL SIGNUP
+// CLOSE MODAL WHEN CLICKING OUTSIDE
 // ==========================================
 
-async function signupUser() {
+window.addEventListener("click", function (event) {
+
+  const modals = document.querySelectorAll(".modal");
+
+  modals.forEach(function (modal) {
+
+    if (event.target === modal) {
+
+      modal.style.display = "none";
+
+    }
+
+  });
+
+});
+
+
+// ==========================================
+// SIGNUP USER
+// ==========================================
+
+window.signupUser = async function () {
 
   const name =
     document.getElementById("signupName").value.trim();
@@ -1114,11 +1471,9 @@ async function signupUser() {
     document.getElementById("signupPassword").value;
 
 
-  if (!email || !password) {
+  if (!name || !email || !password) {
 
-    alert(
-      "Please fill email and password."
-    );
+    alert("Please fill all fields.");
 
     return;
 
@@ -1127,9 +1482,7 @@ async function signupUser() {
 
   if (password.length < 6) {
 
-    alert(
-      "Password must contain at least 6 characters."
-    );
+    alert("Password must be at least 6 characters.");
 
     return;
 
@@ -1140,93 +1493,42 @@ async function signupUser() {
 
     const userCredential =
       await createUserWithEmailAndPassword(
-
         auth,
         email,
         password
-
       );
 
 
-    if (name) {
-
-      await updateProfile(
-
-        userCredential.user,
-
-        {
-          displayName: name
-        }
-
-      );
-
-    }
-
-
-    alert(
-      "Account created successfully! 🎉"
+    await updateProfile(
+      userCredential.user,
+      {
+        displayName: name
+      }
     );
 
+
+    alert("Account created successfully! 🚀");
+
+
+    document.getElementById("signupForm").reset();
 
     closeSignupModal();
 
 
-    const signupForm =
-      document.getElementById("signupForm");
+  } catch (error) {
 
-
-    if (signupForm) {
-
-      signupForm.reset();
-
-    }
+    alert(error.message);
 
   }
 
-
-  catch (error) {
-
-    console.error(
-      "Signup Error:",
-      error
-    );
-
-
-    if (
-      error.code ===
-      "auth/email-already-in-use"
-    ) {
-
-      alert(
-        "This email already has an account. Please login."
-      );
-
-    }
-
-
-    else {
-
-      alert(
-        "Signup failed: " +
-        error.message
-      );
-
-    }
-
-  }
-
-}
-
-
-window.signupUser =
-  signupUser;
+};
 
 
 // ==========================================
-// EMAIL LOGIN
+// LOGIN USER
 // ==========================================
 
-async function loginUser() {
+window.loginUser = async function () {
 
   const email =
     document.getElementById("loginEmail").value.trim();
@@ -1237,9 +1539,7 @@ async function loginUser() {
 
   if (!email || !password) {
 
-    alert(
-      "Please fill email and password."
-    );
+    alert("Please enter email and password.");
 
     return;
 
@@ -1249,86 +1549,40 @@ async function loginUser() {
   try {
 
     await signInWithEmailAndPassword(
-
       auth,
       email,
       password
-
     );
 
 
-    alert(
-      "Login successful! 🚀"
-    );
+    alert("Login successful! 🎉");
 
+
+    document.getElementById("loginForm").reset();
 
     closeLoginModal();
 
 
-    const loginForm =
-      document.getElementById("loginForm");
+  } catch (error) {
 
-
-    if (loginForm) {
-
-      loginForm.reset();
-
-    }
+    alert(error.message);
 
   }
 
-
-  catch (error) {
-
-    console.error(
-      "Login Error:",
-      error
-    );
-
-
-    if (
-      error.code ===
-      "auth/invalid-credential"
-    ) {
-
-      alert(
-        "Incorrect email or password."
-      );
-
-    }
-
-
-    else {
-
-      alert(
-        "Login failed: " +
-        error.message
-      );
-
-    }
-
-  }
-
-}
-
-
-window.loginUser =
-  loginUser;
+};
 
 
 // ==========================================
 // GOOGLE LOGIN
 // ==========================================
 
-async function googleLogin() {
+window.googleLogin = async function () {
 
   try {
 
     await signInWithPopup(
-
       auth,
       googleProvider
-
     );
 
 
@@ -1337,311 +1591,919 @@ async function googleLogin() {
     closeSignupModal();
 
 
-    alert(
-      "Google login successful! 🎉"
-    );
+  } catch (error) {
+
+    alert(error.message);
 
   }
 
-
-  catch (error) {
-
-    console.error(
-      "Google Login Error:",
-      error
-    );
-
-
-    alert(
-      "Google login failed: " +
-      error.message
-    );
-
-  }
-
-}
-
-
-window.googleLogin =
-  googleLogin;
+};
 
 
 // ==========================================
 // LOGOUT
 // ==========================================
 
-async function logoutUser() {
+window.logoutUser = async function () {
 
   try {
 
     await signOut(auth);
 
+    alert("Logged out successfully.");
 
-    alert(
-      "Logout successful! 👋"
-    );
+  } catch (error) {
 
-  }
-
-
-  catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Logout failed."
-    );
+    alert(error.message);
 
   }
 
-}
-
-
-window.logoutUser =
-  logoutUser;
+};
 
 
 // ==========================================
-// UPDATE UI BY ROLE
-// ==========================================
-
-function updateRoleUI() {
-
-  const clearButton =
-    document.querySelector(".clear-btn");
-
-
-  const dashboardHeading =
-    document.querySelector(
-      ".dashboard-heading p:not(.tag)"
-    );
-
-
-  if (currentUserIsAdmin) {
-
-    if (clearButton) {
-      clearButton.style.display = "block";
-    }
-
-
-    if (dashboardHeading) {
-      dashboardHeading.innerText =
-        "Admin dashboard - monitoring all emergency reports.";
-    }
-
-  }
-
-
-  else {
-
-    if (clearButton) {
-      clearButton.style.display = "none";
-    }
-
-
-    if (dashboardHeading) {
-      dashboardHeading.innerText =
-        "Your personal emergency report overview.";
-    }
-
-  }
-
-}
-
-
-// ==========================================
-// AUTH STATE LISTENER
+// AUTH STATE
 // ==========================================
 
 onAuthStateChanged(
-
   auth,
-
-  function (user) {
-
-    const authButtons =
-      document.getElementById("authButtons");
-
-    const userProfile =
-      document.getElementById("userProfile");
-
-    const userName =
-      document.getElementById("userName");
-
+  async function (user) {
 
     currentUser = user;
 
-    currentUserIsAdmin =
-      isAdmin(user);
-
-
-    // ======================================
-    // USER LOGGED IN
-    // ======================================
 
     if (user) {
 
-      console.log(
-        "User logged in:",
-        user.email
-      );
+      // Check Admin
+
+      isAdmin =
+        user.email.toLowerCase() ===
+        ADMIN_EMAIL.toLowerCase();
 
 
-      console.log(
-        "Is Admin:",
-        currentUserIsAdmin
-      );
+      // Navbar
+
+      authButtons.style.display = "none";
+
+      userProfile.style.display = "flex";
 
 
-      if (authButtons) {
-
-        authButtons.style.display = "none";
-
-      }
-
-
-      if (userProfile) {
-
-        userProfile.style.display = "flex";
-
-      }
+      userName.textContent =
+        isAdmin
+          ? `🛡️ Admin: ${user.displayName || user.email}`
+          : `👤 ${user.displayName || user.email}`;
 
 
-      if (userName) {
+      // Clear Button
 
-        const roleText =
-          currentUserIsAdmin
-            ? "ADMIN"
-            : "USER";
+      if (clearAllButton) {
 
-
-        userName.innerText =
-          `👤 ${getUserDisplayName(user)} (${roleText})`;
+        clearAllButton.style.display =
+          isAdmin
+            ? "block"
+            : "none";
 
       }
 
 
-      updateRoleUI();
+      await loadReports();
 
 
-      listenToReports();
+    } else {
+
+      currentUser = null;
+
+      isAdmin = false;
+
+      userReports = [];
+
+
+      authButtons.style.display = "flex";
+
+      userProfile.style.display = "none";
+
+
+      if (clearAllButton) {
+
+        clearAllButton.style.display = "none";
+
+      }
+
+
+      reportsContainer.innerHTML = `
+        <p class="no-report">
+          🔐 Login to view your emergency reports.
+        </p>
+      `;
+
+
+      updateDashboard([]);
+
+    }
+
+  }
+);
+
+
+// ==========================================
+// GET LOCATION
+// ==========================================
+
+window.getLocation = function () {
+
+  const locationStatus =
+    document.getElementById("locationStatus");
+
+
+  if (!navigator.geolocation) {
+
+    locationStatus.textContent =
+      "Geolocation is not supported by this browser.";
+
+    return;
+
+  }
+
+
+  locationStatus.textContent =
+    "Getting location...";
+
+
+  navigator.geolocation.getCurrentPosition(
+
+    function (position) {
+
+      currentLocation = {
+
+        latitude:
+          position.coords.latitude,
+
+        longitude:
+          position.coords.longitude
+
+      };
+
+
+      locationStatus.textContent =
+        "📍 Location added successfully.";
+
+    },
+
+
+    function () {
+
+      locationStatus.textContent =
+        "Unable to get location.";
+
+    }
+
+  );
+
+};
+
+
+// ==========================================
+// SUBMIT EMERGENCY REPORT
+// ==========================================
+
+document
+  .getElementById("emergencyForm")
+  .addEventListener(
+    "submit",
+    async function (event) {
+
+      event.preventDefault();
+
+
+      if (!currentUser) {
+
+        alert("Please login first.");
+
+        closeReportForm();
+
+        openLoginModal();
+
+        return;
+
+      }
+
+
+      const name =
+        document.getElementById("name").value.trim();
+
+      const emergencyType =
+        document.getElementById("emergencyType").value;
+
+      const description =
+        document.getElementById("description").value.trim();
+
+
+      if (!name || !emergencyType || !description) {
+
+        alert("Please fill all required fields.");
+
+        return;
+
+      }
+
+
+      try {
+
+        await addDoc(
+          collection(db, "reports"),
+          {
+
+            userId:
+              currentUser.uid,
+
+            userEmail:
+              currentUser.email,
+
+            name:
+              name,
+
+            emergencyType:
+              emergencyType,
+
+            description:
+              description,
+
+            location:
+              currentLocation,
+
+            status:
+              "Active",
+
+            createdAt:
+              serverTimestamp()
+
+          }
+        );
+
+
+        alert(
+          "Emergency report submitted successfully! 🚨"
+        );
+
+
+        document
+          .getElementById("emergencyForm")
+          .reset();
+
+
+        currentLocation = null;
+
+
+        document
+          .getElementById("locationStatus")
+          .textContent = "";
+
+
+        closeReportForm();
+
+
+        await loadReports();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "Error submitting report: " +
+          error.message
+        );
+
+      }
+
+    }
+  );
+
+
+// ==========================================
+// LOAD REPORTS
+// ==========================================
+
+async function loadReports() {
+
+  if (!currentUser) return;
+
+
+  try {
+
+    let reportsQuery;
+
+
+    if (isAdmin) {
+
+      reportsQuery =
+        query(
+          collection(db, "reports"),
+          orderBy(
+            "createdAt",
+            "desc"
+          )
+        );
+
+    } else {
+
+      reportsQuery =
+        query(
+          collection(db, "reports"),
+          where(
+            "userId",
+            "==",
+            currentUser.uid
+          )
+        );
 
     }
 
 
-    // ======================================
-    // USER LOGGED OUT
-    // ======================================
+    const snapshot =
+      await getDocs(reportsQuery);
 
-    else {
 
-      console.log(
-        "No user logged in"
+    userReports = [];
+
+
+    snapshot.forEach(function (documentSnapshot) {
+
+      userReports.push({
+
+        id:
+          documentSnapshot.id,
+
+        ...documentSnapshot.data()
+
+      });
+
+    });
+
+
+    // Sort manually
+    // avoids Firestore index requirement
+
+    userReports.sort(function (a, b) {
+
+      const aTime =
+        a.createdAt?.seconds || 0;
+
+      const bTime =
+        b.createdAt?.seconds || 0;
+
+      return bTime - aTime;
+
+    });
+
+
+    displayReports(userReports);
+
+
+    updateDashboard(userReports);
+
+
+  } catch (error) {
+
+    console.error(
+      "Error loading reports:",
+      error
+    );
+
+
+    reportsContainer.innerHTML = `
+      <p class="no-report">
+        Unable to load reports.
+      </p>
+    `;
+
+  }
+
+}
+
+
+// ==========================================
+// DISPLAY REPORTS
+// ==========================================
+
+function displayReports(reports) {
+
+  if (!currentUser) {
+
+    reportsContainer.innerHTML = `
+      <p class="no-report">
+        🔐 Login to view your emergency reports.
+      </p>
+    `;
+
+    return;
+
+  }
+
+
+  if (reports.length === 0) {
+
+    reportsContainer.innerHTML = `
+      <p class="no-report">
+        No emergency reports found.
+      </p>
+    `;
+
+    return;
+
+  }
+
+
+  reportsContainer.innerHTML = "";
+
+
+  reports.forEach(function (report) {
+
+    const date = report.createdAt
+      ? report.createdAt
+          .toDate()
+          .toLocaleString()
+      : "Just now";
+
+
+    let adminActions = "";
+
+
+    // ONLY ADMIN CAN SEE STATUS + ACTIONS
+
+    if (isAdmin) {
+
+      const statusClass =
+        report.status === "Resolved"
+          ? "resolved-status"
+          : "active-status";
+
+
+      adminActions = `
+
+        <span
+          class="status-badge ${statusClass}"
+        >
+          ${report.status || "Active"}
+        </span>
+
+
+        <div class="report-actions">
+
+          <button
+            class="resolve-btn"
+            onclick="updateReportStatus(
+              '${report.id}',
+              'Resolved'
+            )"
+          >
+            ✅ Resolve
+          </button>
+
+
+          <button
+            class="active-btn"
+            onclick="updateReportStatus(
+              '${report.id}',
+              'Active'
+            )"
+          >
+            🔴 Mark Active
+          </button>
+
+
+          <button
+            class="delete-btn"
+            onclick="deleteReport(
+              '${report.id}'
+            )"
+          >
+            🗑️ Delete
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+
+    reportsContainer.innerHTML += `
+
+      <div class="report-card">
+
+        <div class="report-top">
+
+          <h3>
+            ${report.emergencyType}
+          </h3>
+
+          ${
+            isAdmin
+              ? adminActions
+                  .split('<div class="report-actions">')[0]
+              : ""
+          }
+
+        </div>
+
+
+        <p>
+          <strong>Name:</strong>
+          ${report.name}
+        </p>
+
+
+        ${
+          isAdmin
+            ? `
+              <p>
+                <strong>User:</strong>
+                ${report.userEmail}
+              </p>
+            `
+            : ""
+        }
+
+
+        <p>
+          <strong>Description:</strong>
+          ${report.description}
+        </p>
+
+
+        <p>
+          <strong>Submitted:</strong>
+          ${date}
+        </p>
+
+
+        ${
+          report.location &&
+          report.location.latitude
+            ? `
+              <p>
+                📍 ${report.location.latitude.toFixed(4)},
+                ${report.location.longitude.toFixed(4)}
+              </p>
+            `
+            : ""
+        }
+
+
+        ${
+          isAdmin
+            ? adminActions.includes(
+                '<div class="report-actions">'
+              )
+                ? '<div class="report-actions">' +
+                  adminActions
+                    .split(
+                      '<div class="report-actions">'
+                    )[1]
+                : ""
+            : ""
+        }
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+// ==========================================
+// UPDATE REPORT STATUS
+// ADMIN ONLY
+// ==========================================
+
+window.updateReportStatus =
+  async function (
+    reportId,
+    newStatus
+  ) {
+
+    if (!isAdmin) {
+
+      alert(
+        "Only admin can update report status."
+      );
+
+      return;
+
+    }
+
+
+    try {
+
+      await updateDoc(
+        doc(
+          db,
+          "reports",
+          reportId
+        ),
+        {
+
+          status:
+            newStatus
+
+        }
       );
 
 
-      if (authButtons) {
+      await loadReports();
 
-        authButtons.style.display = "flex";
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Error updating report status."
+      );
+
+    }
+
+  };
+
+
+// ==========================================
+// DELETE REPORT
+// ADMIN ONLY
+// ==========================================
+
+window.deleteReport =
+  async function (reportId) {
+
+    if (!isAdmin) {
+
+      alert(
+        "Only admin can delete reports."
+      );
+
+      return;
+
+    }
+
+
+    const confirmation =
+      confirm(
+        "Delete this emergency report?"
+      );
+
+
+    if (!confirmation) return;
+
+
+    try {
+
+      await deleteDoc(
+        doc(
+          db,
+          "reports",
+          reportId
+        )
+      );
+
+
+      await loadReports();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Error deleting report."
+      );
+
+    }
+
+  };
+
+
+// ==========================================
+// CLEAR ALL REPORTS
+// ADMIN ONLY
+// ==========================================
+
+window.clearAllReports =
+  async function () {
+
+    if (!isAdmin) {
+
+      alert(
+        "Only admin can clear reports."
+      );
+
+      return;
+
+    }
+
+
+    const confirmation =
+      confirm(
+        "Are you sure you want to delete ALL reports?"
+      );
+
+
+    if (!confirmation) return;
+
+
+    try {
+
+      const snapshot =
+        await getDocs(
+          collection(
+            db,
+            "reports"
+          )
+        );
+
+
+      const deletePromises = [];
+
+
+      snapshot.forEach(
+        function (documentSnapshot) {
+
+          deletePromises.push(
+
+            deleteDoc(
+              doc(
+                db,
+                "reports",
+                documentSnapshot.id
+              )
+            )
+
+          );
+
+        }
+      );
+
+
+      await Promise.all(
+        deletePromises
+      );
+
+
+      await loadReports();
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Error clearing reports."
+      );
+
+    }
+
+  };
+
+
+// ==========================================
+// FILTER REPORTS
+// ==========================================
+
+window.filterReports = function () {
+
+  const filter =
+    document.getElementById(
+      "reportFilter"
+    ).value;
+
+
+  if (filter === "All") {
+
+    displayReports(userReports);
+
+    return;
+
+  }
+
+
+  const filteredReports =
+    userReports.filter(
+      function (report) {
+
+        return (
+          report.emergencyType ===
+          filter
+        );
 
       }
+    );
 
 
-      if (userProfile) {
+  displayReports(
+    filteredReports
+  );
 
-        userProfile.style.display = "none";
-
-      }
-
-
-      currentUserIsAdmin = false;
+};
 
 
-      updateRoleUI();
+// ==========================================
+// UPDATE DASHBOARD
+// ==========================================
+
+function updateDashboard(reports) {
+
+  const totalReports =
+    document.getElementById(
+      "totalReports"
+    );
+
+  const reportCount =
+    document.getElementById(
+      "reportCount"
+    );
+
+  const activeReports =
+    document.getElementById(
+      "activeReports"
+    );
+
+  const resolvedReports =
+    document.getElementById(
+      "resolvedReports"
+    );
 
 
-      if (unsubscribeReports) {
+  // Total reports user/admin both can see
 
-        unsubscribeReports();
+  if (totalReports) {
 
-        unsubscribeReports = null;
+    totalReports.textContent =
+      reports.length;
 
-      }
-
-
-      allReports = [];
+  }
 
 
-      showReports();
+  if (reportCount) {
+
+    reportCount.textContent =
+      reports.length;
+
+  }
+
+
+  // ONLY ADMIN CAN SEE STATUS COUNTS
+
+  if (isAdmin) {
+
+    const activeCount =
+      reports.filter(
+        report =>
+          report.status === "Active"
+      ).length;
+
+
+    const resolvedCount =
+      reports.filter(
+        report =>
+          report.status === "Resolved"
+      ).length;
+
+
+    if (activeReports) {
+
+      activeReports.textContent =
+        activeCount;
+
+    }
+
+
+    if (resolvedReports) {
+
+      resolvedReports.textContent =
+        resolvedCount;
+
+    }
+
+  } else {
+
+    // USER DOES NOT SEE STATUS
+
+    if (activeReports) {
+
+      activeReports.textContent =
+        "-";
+
+    }
+
+
+    if (resolvedReports) {
+
+      resolvedReports.textContent =
+        "-";
 
     }
 
   }
 
-);
-
-
-// ==========================================
-// OUTSIDE MODAL CLICK
-// ==========================================
-
-window.addEventListener(
-
-  "click",
-
-  function (event) {
-
-    const reportModal =
-      document.getElementById("reportModal");
-
-    const loginModal =
-      document.getElementById("loginModal");
-
-    const signupModal =
-      document.getElementById("signupModal");
-
-
-    if (event.target === reportModal) {
-
-      closeReportForm();
-
-    }
-
-
-    if (event.target === loginModal) {
-
-      closeLoginModal();
-
-    }
-
-
-    if (event.target === signupModal) {
-
-      closeSignupModal();
-
-    }
-
-  }
-
-);
-
-
-// ==========================================
-// START
-// ==========================================
-
-console.log(
-  "🚨 NOVA Disaster Response - Phase 4 Ready"
-);
-
-console.log(
-  "🔐 Authentication Enabled"
-);
-
-console.log(
-  "👤 User Based Reports Enabled"
-);
-
-console.log(
-  "🛡️ Admin Role System Enabled"
-);
+}
