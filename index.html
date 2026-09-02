@@ -2,33 +2,63 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>NOVA Disaster Response</title>
 
-  <link rel="stylesheet" href="style.css">
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
 </head>
 
+
 <body>
+
 
   <!-- ================= NAVBAR ================= -->
 
   <nav>
 
-    <div class="logo">🚨 NOVA</div>
-
-    <div class="nav-links">
-      <a href="#home">Home</a>
-      <a href="#report">Report</a>
-      <a href="#reports">Reports</a>
-      <a href="#about">About</a>
+    <div class="logo">
+      🚨 NOVA
     </div>
 
 
-    <!-- LOGIN / SIGNUP -->
+    <div class="nav-links">
 
-    <div class="auth-buttons" id="authButtons">
+      <a href="#home">
+        Home
+      </a>
+
+      <a href="#report">
+        Report
+      </a>
+
+      <a href="#reports">
+        My Reports
+      </a>
+
+      <a href="#about">
+        About
+      </a>
+
+    </div>
+
+
+    <!-- AUTH BUTTONS -->
+
+    <div
+      class="auth-buttons"
+      id="authButtons"
+    >
 
       <button
         class="login-nav-btn"
@@ -37,6 +67,7 @@
       >
         Login
       </button>
+
 
       <button
         class="signup-nav-btn"
@@ -59,10 +90,6 @@
 
       <span id="userName"></span>
 
-      <span
-        id="userRole"
-        style="margin-left: 8px;"
-      ></span>
 
       <button
         class="logout-btn"
@@ -77,10 +104,12 @@
   </nav>
 
 
-
   <!-- ================= HERO ================= -->
 
-  <section class="hero" id="home">
+  <section
+    class="hero"
+    id="home"
+  >
 
     <div class="hero-content">
 
@@ -88,15 +117,19 @@
         EMERGENCY RESPONSE PLATFORM
       </p>
 
+
       <h1>
         Emergency me help<br>
         jaldi milni chahiye.
       </h1>
 
+
       <p class="hero-text">
-        NOVA ek emergency response platform hai jahan users
-        emergency reports submit kar sakte hain aur unki information
-        securely manage ki ja sakti hai.
+
+        NOVA ek smart disaster response platform hai
+        jaha users emergency reports submit kar sakte hain
+        aur administrators emergency situations manage kar sakte hain.
+
       </p>
 
 
@@ -129,28 +162,50 @@
     <div class="hero-card">
 
       <div class="status">
+
         <span class="pulse"></span>
+
         System Active
+
       </div>
 
-      <h3>Emergency hai?</h3>
+
+      <h3>
+        Emergency Response Network
+      </h3>
+
 
       <p>
-        Emergency details aur location share karke
-        quickly report submit karo.
+        Emergency details securely submit karo aur
+        disaster response system ko information provide karo.
       </p>
 
 
       <div class="stats">
 
         <div>
-          <strong id="reportCount">0</strong>
-          <span>My Reports</span>
+
+          <strong id="reportCount">
+            0
+          </strong>
+
+          <span>
+            My Reports
+          </span>
+
         </div>
 
+
         <div>
-          <strong>24/7</strong>
-          <span>Available</span>
+
+          <strong>
+            24/7
+          </strong>
+
+          <span>
+            Available
+          </span>
+
         </div>
 
       </div>
@@ -160,29 +215,42 @@
   </section>
 
 
-
   <!-- ================= FEATURES ================= -->
 
-  <section class="features" id="about">
+  <section
+    class="features"
+    id="about"
+  >
 
-    <h2>Yaha kya kya kar sakte ho?</h2>
+    <h2>
+      What can you do here?
+    </h2>
+
 
     <p class="subtitle">
-      Emergency reporting ko simple aur faster banane ke liye
-      kuch useful features.
+
+      NOVA helps users report emergencies
+      and enables administrators to manage disaster responses.
+
     </p>
 
 
     <div class="feature-grid">
 
+
       <div class="feature-card">
 
-        <div class="icon">🚨</div>
+        <div class="icon">
+          🚨
+        </div>
 
-        <h3>Quick SOS</h3>
+        <h3>
+          Quick SOS
+        </h3>
 
         <p>
-          Emergency ho toh quickly SOS request bhej sakte ho.
+          Emergency situations can be quickly reported
+          through the NOVA emergency reporting system.
         </p>
 
       </div>
@@ -190,12 +258,17 @@
 
       <div class="feature-card">
 
-        <div class="icon">📍</div>
+        <div class="icon">
+          📍
+        </div>
 
-        <h3>Location</h3>
+        <h3>
+          Location Sharing
+        </h3>
 
         <p>
-          Apni location report ke saath securely save kar sakte ho.
+          Your approximate location can be attached
+          with emergency reports.
         </p>
 
       </div>
@@ -203,12 +276,17 @@
 
       <div class="feature-card">
 
-        <div class="icon">📢</div>
+        <div class="icon">
+          🔐
+        </div>
 
-        <h3>My Reports</h3>
+        <h3>
+          Personal Reports
+        </h3>
 
         <p>
-          Apni submitted emergency reports ek jagah dekh sakte ho.
+          Every user can access only their own
+          submitted emergency reports.
         </p>
 
       </div>
@@ -216,20 +294,25 @@
 
       <div class="feature-card">
 
-        <div class="icon">👥</div>
+        <div class="icon">
+          🛡️
+        </div>
 
-        <h3>Community Help</h3>
+        <h3>
+          Admin Control
+        </h3>
 
         <p>
-          Future me volunteers aur emergency responders connect honge.
+          Administrators can monitor, manage and
+          update emergency response reports.
         </p>
 
       </div>
+
 
     </div>
 
   </section>
-
 
 
   <!-- ================= EMERGENCY ================= -->
@@ -239,11 +322,14 @@
     id="report"
   >
 
-    <h2>Emergency Report Karni Hai?</h2>
+    <h2>
+      Need to Report an Emergency?
+    </h2>
+
 
     <p>
-      Jo information pata hai wahi fill karo.
-      Login ke baad report securely tumhare account se link hogi.
+      Provide only the necessary information.
+      Login is required to securely submit an emergency report.
     </p>
 
 
@@ -258,7 +344,6 @@
   </section>
 
 
-
   <!-- ================= DASHBOARD ================= -->
 
   <section class="dashboard-section">
@@ -266,15 +351,17 @@
     <div class="dashboard-heading">
 
       <p class="tag">
-        PERSONAL DASHBOARD
+        LIVE DASHBOARD
       </p>
 
-      <h2 id="dashboardTitle">
-        My Emergency Overview
+
+      <h2>
+        Emergency Overview
       </h2>
 
-      <p id="dashboardSubtitle">
-        Tumhari submitted reports ka overview.
+
+      <p>
+        Your personal emergency report overview.
       </p>
 
     </div>
@@ -283,9 +370,7 @@
     <div class="dashboard-cards">
 
 
-      <!-- TOTAL -->
-
-      <div class="dashboard-card total-card">
+      <div class="dashboard-card">
 
         <div class="dashboard-icon">
           🚨
@@ -293,8 +378,8 @@
 
         <div>
 
-          <span id="totalLabel">
-            My Reports
+          <span>
+            Total Reports
           </span>
 
           <strong id="totalReports">
@@ -306,14 +391,7 @@
       </div>
 
 
-
-      <!-- ACTIVE -->
-
-      <div
-        class="dashboard-card active-card"
-        id="activeDashboardCard"
-        style="display: none;"
-      >
+      <div class="dashboard-card">
 
         <div class="dashboard-icon">
           🔴
@@ -326,7 +404,7 @@
           </span>
 
           <strong id="activeReports">
-            0
+            -
           </strong>
 
         </div>
@@ -334,14 +412,7 @@
       </div>
 
 
-
-      <!-- RESOLVED -->
-
-      <div
-        class="dashboard-card resolved-card"
-        id="resolvedDashboardCard"
-        style="display: none;"
-      >
+      <div class="dashboard-card">
 
         <div class="dashboard-icon">
           ✅
@@ -354,30 +425,7 @@
           </span>
 
           <strong id="resolvedReports">
-            0
-          </strong>
-
-        </div>
-
-      </div>
-
-
-      <!-- USER INFO CARD -->
-
-      <div class="dashboard-card">
-
-        <div class="dashboard-icon">
-          👤
-        </div>
-
-        <div>
-
-          <span>
-            Account Status
-          </span>
-
-          <strong id="accountStatus">
-            Guest
+            -
           </strong>
 
         </div>
@@ -388,7 +436,6 @@
     </div>
 
   </section>
-
 
 
   <!-- ================= REPORTS ================= -->
@@ -402,25 +449,23 @@
 
       <div>
 
-        <h2 id="reportsTitle">
-          My Reports
+        <h2>
+          Emergency Reports
         </h2>
 
-        <p
-          class="subtitle"
-          id="reportsSubtitle"
-        >
-          Sirf tumhari submitted emergency reports yaha dikhenge.
+
+        <p class="subtitle">
+
+          Users can view their own submitted reports.
+          Admins can monitor all reports.
+
         </p>
 
       </div>
 
 
-      <!-- ADMIN ONLY -->
-
       <button
         class="clear-btn"
-        id="clearAllButton"
         type="button"
         onclick="clearAllReports()"
         style="display: none;"
@@ -431,13 +476,14 @@
     </div>
 
 
-
     <!-- FILTER -->
 
     <div class="filter-box">
 
       <label for="reportFilter">
+
         🔎 Filter Reports:
+
       </label>
 
 
@@ -479,7 +525,6 @@
     </div>
 
 
-
     <!-- REPORTS -->
 
     <div
@@ -488,13 +533,14 @@
     >
 
       <p class="no-report">
-        Login karke apni emergency reports dekho.
+
+        🔐 Login to view your emergency reports.
+
       </p>
 
     </div>
 
   </section>
-
 
 
   <!-- ================= REPORT MODAL ================= -->
@@ -515,12 +561,14 @@
 
 
       <h2>
-        Emergency Details 🚨
+        Emergency Details
       </h2>
 
 
       <p class="form-text">
-        Jo information pata hai wahi fill karo.
+
+        Provide only the information you know.
+
       </p>
 
 
@@ -534,10 +582,9 @@
         <input
           type="text"
           id="name"
-          placeholder="Apna naam likho"
+          placeholder="Enter your name"
           required
         >
-
 
 
         <label>
@@ -550,7 +597,7 @@
         >
 
           <option value="">
-            Select karo
+            Select Emergency
           </option>
 
           <option>
@@ -580,17 +627,15 @@
         </select>
 
 
-
         <label>
-          Kya hua?
+          What happened?
         </label>
 
         <textarea
           id="description"
-          placeholder="Short me batao kya problem hui hai..."
+          placeholder="Briefly describe the emergency..."
           required
         ></textarea>
-
 
 
         <button
@@ -605,21 +650,18 @@
         <p id="locationStatus"></p>
 
 
-
         <button
           type="submit"
           class="submit-btn"
         >
-          Submit Report
+          Submit Emergency Report
         </button>
-
 
       </form>
 
     </div>
 
   </div>
-
 
 
   <!-- ================= LOGIN MODAL ================= -->
@@ -630,7 +672,6 @@
   >
 
     <div class="modal-content auth-content">
-
 
       <span
         class="close"
@@ -646,7 +687,7 @@
 
 
       <p class="form-text">
-        Login karke NOVA community ka part bano.
+        Login to access your NOVA account.
       </p>
 
 
@@ -665,7 +706,6 @@
         >
 
 
-
         <label>
           Password
         </label>
@@ -678,7 +718,6 @@
         >
 
 
-
         <button
           type="button"
           class="submit-btn"
@@ -686,7 +725,6 @@
         >
           Login
         </button>
-
 
 
         <button
@@ -697,13 +735,11 @@
           🔵 Continue with Google
         </button>
 
-
       </form>
 
     </div>
 
   </div>
-
 
 
   <!-- ================= SIGNUP MODAL ================= -->
@@ -714,7 +750,6 @@
   >
 
     <div class="modal-content auth-content">
-
 
       <span
         class="close"
@@ -730,7 +765,7 @@
 
 
       <p class="form-text">
-        NOVA join karo aur emergency response network ka part bano.
+        Join NOVA and become part of the emergency response network.
       </p>
 
 
@@ -744,10 +779,8 @@
         <input
           type="text"
           id="signupName"
-          placeholder="Apna naam likho"
-          required
+          placeholder="Enter your name"
         >
-
 
 
         <label>
@@ -762,6 +795,857 @@
         >
 
 
+        <label>
+          Password
+        </label>
+
+        <input
+          type="password"
+          id="signupPassword"
+          placeholder="Minimum 6 characters"
+          required
+        >
+
+
+        <button
+          type="button"
+          class="submit-btn"
+          onclick="signupUser()"
+        >
+          Create Account
+        </button>
+
+
+        <button
+          type="button"
+          class="google-btn"
+          onclick="googleLogin()"
+        >
+          🔵 Continue with Google
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= FOOTER ================= -->
+
+  <footer>
+
+    <p>
+      NOVA Disaster Response • Made by Aditya Raj 🚀
+    </p>
+
+  </footer>
+
+
+  <script
+    type="module"
+    src="script.js"
+  ></script>
+
+
+</body>
+
+</html><!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>NOVA Disaster Response</title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+</head>
+
+
+<body>
+
+
+  <!-- ================= NAVBAR ================= -->
+
+  <nav>
+
+    <div class="logo">
+      🚨 NOVA
+    </div>
+
+
+    <div class="nav-links">
+
+      <a href="#home">
+        Home
+      </a>
+
+      <a href="#report">
+        Report
+      </a>
+
+      <a href="#reports">
+        My Reports
+      </a>
+
+      <a href="#about">
+        About
+      </a>
+
+    </div>
+
+
+    <!-- AUTH BUTTONS -->
+
+    <div
+      class="auth-buttons"
+      id="authButtons"
+    >
+
+      <button
+        class="login-nav-btn"
+        type="button"
+        onclick="openLoginModal()"
+      >
+        Login
+      </button>
+
+
+      <button
+        class="signup-nav-btn"
+        type="button"
+        onclick="openSignupModal()"
+      >
+        Sign Up
+      </button>
+
+    </div>
+
+
+    <!-- USER PROFILE -->
+
+    <div
+      class="user-profile"
+      id="userProfile"
+      style="display: none;"
+    >
+
+      <span id="userName"></span>
+
+
+      <button
+        class="logout-btn"
+        type="button"
+        onclick="logoutUser()"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </nav>
+
+
+  <!-- ================= HERO ================= -->
+
+  <section
+    class="hero"
+    id="home"
+  >
+
+    <div class="hero-content">
+
+      <p class="tag">
+        EMERGENCY RESPONSE PLATFORM
+      </p>
+
+
+      <h1>
+        Emergency me help<br>
+        jaldi milni chahiye.
+      </h1>
+
+
+      <p class="hero-text">
+
+        NOVA ek smart disaster response platform hai
+        jaha users emergency reports submit kar sakte hain
+        aur administrators emergency situations manage kar sakte hain.
+
+      </p>
+
+
+      <div class="buttons">
+
+        <button
+          class="sos-btn"
+          type="button"
+          onclick="openSOSForm()"
+        >
+          🚨 Send SOS
+        </button>
+
+
+        <button
+          class="report-btn"
+          type="button"
+          onclick="openReportForm()"
+        >
+          Report Emergency
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- HERO CARD -->
+
+    <div class="hero-card">
+
+      <div class="status">
+
+        <span class="pulse"></span>
+
+        System Active
+
+      </div>
+
+
+      <h3>
+        Emergency Response Network
+      </h3>
+
+
+      <p>
+        Emergency details securely submit karo aur
+        disaster response system ko information provide karo.
+      </p>
+
+
+      <div class="stats">
+
+        <div>
+
+          <strong id="reportCount">
+            0
+          </strong>
+
+          <span>
+            My Reports
+          </span>
+
+        </div>
+
+
+        <div>
+
+          <strong>
+            24/7
+          </strong>
+
+          <span>
+            Available
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= FEATURES ================= -->
+
+  <section
+    class="features"
+    id="about"
+  >
+
+    <h2>
+      What can you do here?
+    </h2>
+
+
+    <p class="subtitle">
+
+      NOVA helps users report emergencies
+      and enables administrators to manage disaster responses.
+
+    </p>
+
+
+    <div class="feature-grid">
+
+
+      <div class="feature-card">
+
+        <div class="icon">
+          🚨
+        </div>
+
+        <h3>
+          Quick SOS
+        </h3>
+
+        <p>
+          Emergency situations can be quickly reported
+          through the NOVA emergency reporting system.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="icon">
+          📍
+        </div>
+
+        <h3>
+          Location Sharing
+        </h3>
+
+        <p>
+          Your approximate location can be attached
+          with emergency reports.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="icon">
+          🔐
+        </div>
+
+        <h3>
+          Personal Reports
+        </h3>
+
+        <p>
+          Every user can access only their own
+          submitted emergency reports.
+        </p>
+
+      </div>
+
+
+      <div class="feature-card">
+
+        <div class="icon">
+          🛡️
+        </div>
+
+        <h3>
+          Admin Control
+        </h3>
+
+        <p>
+          Administrators can monitor, manage and
+          update emergency response reports.
+        </p>
+
+      </div>
+
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= EMERGENCY ================= -->
+
+  <section
+    class="emergency-section"
+    id="report"
+  >
+
+    <h2>
+      Need to Report an Emergency?
+    </h2>
+
+
+    <p>
+      Provide only the necessary information.
+      Login is required to securely submit an emergency report.
+    </p>
+
+
+    <button
+      class="big-sos"
+      type="button"
+      onclick="openReportForm()"
+    >
+      🚨 REPORT EMERGENCY
+    </button>
+
+  </section>
+
+
+  <!-- ================= DASHBOARD ================= -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-heading">
+
+      <p class="tag">
+        LIVE DASHBOARD
+      </p>
+
+
+      <h2>
+        Emergency Overview
+      </h2>
+
+
+      <p>
+        Your personal emergency report overview.
+      </p>
+
+    </div>
+
+
+    <div class="dashboard-cards">
+
+
+      <div class="dashboard-card">
+
+        <div class="dashboard-icon">
+          🚨
+        </div>
+
+        <div>
+
+          <span>
+            Total Reports
+          </span>
+
+          <strong id="totalReports">
+            0
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="dashboard-card">
+
+        <div class="dashboard-icon">
+          🔴
+        </div>
+
+        <div>
+
+          <span>
+            Active Cases
+          </span>
+
+          <strong id="activeReports">
+            -
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <div class="dashboard-card">
+
+        <div class="dashboard-icon">
+          ✅
+        </div>
+
+        <div>
+
+          <span>
+            Resolved
+          </span>
+
+          <strong id="resolvedReports">
+            -
+          </strong>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= REPORTS ================= -->
+
+  <section
+    class="reports-section"
+    id="reports"
+  >
+
+    <div class="reports-header">
+
+      <div>
+
+        <h2>
+          Emergency Reports
+        </h2>
+
+
+        <p class="subtitle">
+
+          Users can view their own submitted reports.
+          Admins can monitor all reports.
+
+        </p>
+
+      </div>
+
+
+      <button
+        class="clear-btn"
+        type="button"
+        onclick="clearAllReports()"
+        style="display: none;"
+      >
+        🗑️ Clear All
+      </button>
+
+    </div>
+
+
+    <!-- FILTER -->
+
+    <div class="filter-box">
+
+      <label for="reportFilter">
+
+        🔎 Filter Reports:
+
+      </label>
+
+
+      <select
+        id="reportFilter"
+        onchange="filterReports()"
+      >
+
+        <option value="All">
+          All Emergencies
+        </option>
+
+        <option value="Fire 🔥">
+          Fire 🔥
+        </option>
+
+        <option value="Medical 🚑">
+          Medical 🚑
+        </option>
+
+        <option value="Flood 🌊">
+          Flood 🌊
+        </option>
+
+        <option value="Accident 🚗">
+          Accident 🚗
+        </option>
+
+        <option value="Earthquake 🌍">
+          Earthquake 🌍
+        </option>
+
+        <option value="Other ⚠️">
+          Other ⚠️
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <!-- REPORTS -->
+
+    <div
+      id="reportsContainer"
+      class="reports-container"
+    >
+
+      <p class="no-report">
+
+        🔐 Login to view your emergency reports.
+
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <!-- ================= REPORT MODAL ================= -->
+
+  <div
+    class="modal"
+    id="reportModal"
+  >
+
+    <div class="modal-content">
+
+      <span
+        class="close"
+        onclick="closeReportForm()"
+      >
+        ×
+      </span>
+
+
+      <h2>
+        Emergency Details
+      </h2>
+
+
+      <p class="form-text">
+
+        Provide only the information you know.
+
+      </p>
+
+
+      <form id="emergencyForm">
+
+
+        <label>
+          Name
+        </label>
+
+        <input
+          type="text"
+          id="name"
+          placeholder="Enter your name"
+          required
+        >
+
+
+        <label>
+          Emergency Type
+        </label>
+
+        <select
+          id="emergencyType"
+          required
+        >
+
+          <option value="">
+            Select Emergency
+          </option>
+
+          <option>
+            Fire 🔥
+          </option>
+
+          <option>
+            Medical 🚑
+          </option>
+
+          <option>
+            Flood 🌊
+          </option>
+
+          <option>
+            Accident 🚗
+          </option>
+
+          <option>
+            Earthquake 🌍
+          </option>
+
+          <option>
+            Other ⚠️
+          </option>
+
+        </select>
+
+
+        <label>
+          What happened?
+        </label>
+
+        <textarea
+          id="description"
+          placeholder="Briefly describe the emergency..."
+          required
+        ></textarea>
+
+
+        <button
+          type="button"
+          class="location-btn"
+          onclick="getLocation()"
+        >
+          📍 Get My Location
+        </button>
+
+
+        <p id="locationStatus"></p>
+
+
+        <button
+          type="submit"
+          class="submit-btn"
+        >
+          Submit Emergency Report
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= LOGIN MODAL ================= -->
+
+  <div
+    class="modal"
+    id="loginModal"
+  >
+
+    <div class="modal-content auth-content">
+
+      <span
+        class="close"
+        onclick="closeLoginModal()"
+      >
+        ×
+      </span>
+
+
+      <h2>
+        Welcome Back 👋
+      </h2>
+
+
+      <p class="form-text">
+        Login to access your NOVA account.
+      </p>
+
+
+      <form id="loginForm">
+
+
+        <label>
+          Email
+        </label>
+
+        <input
+          type="email"
+          id="loginEmail"
+          placeholder="Enter your email"
+          required
+        >
+
+
+        <label>
+          Password
+        </label>
+
+        <input
+          type="password"
+          id="loginPassword"
+          placeholder="Enter your password"
+          required
+        >
+
+
+        <button
+          type="button"
+          class="submit-btn"
+          onclick="loginUser()"
+        >
+          Login
+        </button>
+
+
+        <button
+          type="button"
+          class="google-btn"
+          onclick="googleLogin()"
+        >
+          🔵 Continue with Google
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= SIGNUP MODAL ================= -->
+
+  <div
+    class="modal"
+    id="signupModal"
+  >
+
+    <div class="modal-content auth-content">
+
+      <span
+        class="close"
+        onclick="closeSignupModal()"
+      >
+        ×
+      </span>
+
+
+      <h2>
+        Create Account 🚀
+      </h2>
+
+
+      <p class="form-text">
+        Join NOVA and become part of the emergency response network.
+      </p>
+
+
+      <form id="signupForm">
+
+
+        <label>
+          Name
+        </label>
+
+        <input
+          type="text"
+          id="signupName"
+          placeholder="Enter your name"
+        >
+
+
+        <label>
+          Email
+        </label>
+
+        <input
+          type="email"
+          id="signupEmail"
+          placeholder="Enter your email"
+          required
+        >
+
 
         <label>
           Password
@@ -775,7 +1659,6 @@
         >
 
 
-
         <button
           type="button"
           class="submit-btn"
@@ -785,15 +1668,13 @@
         </button>
 
 
-
         <button
           type="button"
           class="google-btn"
           onclick="googleLogin()"
         >
-          🔵 Sign up with Google
+          🔵 Continue with Google
         </button>
-
 
       </form>
 
@@ -802,20 +1683,16 @@
   </div>
 
 
-
   <!-- ================= FOOTER ================= -->
 
   <footer>
 
     <p>
-      🚨 NOVA Disaster Response • Made by Aditya Raj while learning 🚀
+      NOVA Disaster Response • Made by Aditya Raj 🚀
     </p>
 
   </footer>
 
-
-
-  <!-- ================= SCRIPT ================= -->
 
   <script
     type="module"
