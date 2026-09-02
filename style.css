@@ -1,6 +1,6 @@
 /* ===================================
    NOVA DISASTER RESPONSE
-   PHASE 4 FINAL STYLE
+   FINAL STYLE.CSS
 =================================== */
 
 * {
@@ -34,7 +34,9 @@ body {
 .feature-card,
 .report-card,
 .dashboard-card,
-.modal-content {
+.modal-content,
+.contact-card,
+.feedback-card {
   background: rgba(16, 28, 46, 0.72);
 
   backdrop-filter: blur(14px);
@@ -92,7 +94,7 @@ nav {
 
 
 /* ===================================
-   AUTH BUTTONS
+   AUTHENTICATION
 =================================== */
 
 .auth-buttons {
@@ -101,31 +103,36 @@ nav {
   gap: 10px;
 }
 
+.login-btn,
 .login-nav-btn {
   background: transparent;
   color: white;
+
   border: 1px solid #334155;
+
   padding: 10px 18px;
 }
 
+.login-btn:hover,
 .login-nav-btn:hover {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.signup-btn,
 .signup-nav-btn {
   background: #2563eb;
   color: white;
+
   padding: 10px 18px;
 }
 
+.signup-btn:hover,
 .signup-nav-btn:hover {
   background: #1d4ed8;
 }
 
 
-/* ===================================
-   USER PROFILE
-=================================== */
+/* Logged in user */
 
 .user-profile {
   display: flex;
@@ -141,8 +148,11 @@ nav {
 
 .logout-btn {
   background: rgba(239, 68, 68, 0.15);
+
   border: 1px solid rgba(239, 68, 68, 0.35);
+
   color: #f87171;
+
   padding: 9px 15px;
   font-size: 14px;
 }
@@ -248,11 +258,15 @@ button:hover {
 
 .pulse {
   display: inline-block;
+
   width: 9px;
   height: 9px;
+
   background: #4ade80;
   border-radius: 50%;
+
   margin-right: 8px;
+
   animation: greenPulse 1.5s infinite;
 }
 
@@ -269,8 +283,10 @@ button:hover {
 .stats {
   display: flex;
   justify-content: space-between;
+
   margin-top: 30px;
   padding-top: 20px;
+
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -291,6 +307,85 @@ button:hover {
 
 
 /* ===================================
+   EMERGENCY CONTACTS
+=================================== */
+
+.contacts-section {
+  padding: 80px 10%;
+  text-align: center;
+
+  background: rgba(11, 22, 38, 0.55);
+}
+
+.contacts-section h2 {
+  font-size: 38px;
+  margin-bottom: 15px;
+}
+
+.contacts-subtitle {
+  color: #94a3b8;
+  margin-bottom: 40px;
+}
+
+.contacts-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+
+  max-width: 1200px;
+  margin: auto;
+}
+
+.contact-card {
+  padding: 25px 18px;
+  border-radius: 16px;
+  transition: 0.3s;
+}
+
+.contact-card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.contact-icon {
+  font-size: 38px;
+  margin-bottom: 15px;
+}
+
+.contact-card h3 {
+  margin-bottom: 10px;
+  font-size: 18px;
+}
+
+.contact-number {
+  color: #4ade80;
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.call-btn {
+  display: inline-block;
+
+  background: #ef4444;
+  color: white;
+
+  padding: 10px 18px;
+  border-radius: 8px;
+
+  text-decoration: none;
+  font-size: 14px;
+
+  transition: 0.3s;
+}
+
+.call-btn:hover {
+  background: #dc2626;
+  transform: translateY(-3px);
+}
+
+
+/* ===================================
    FEATURES
 =================================== */
 
@@ -303,7 +398,8 @@ button:hover {
 .features h2,
 .emergency-section h2,
 .reports-section h2,
-.dashboard-section h2 {
+.dashboard-section h2,
+.feedback-section h2 {
   font-size: 38px;
   margin-bottom: 15px;
 }
@@ -394,6 +490,7 @@ button:hover {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 20px;
+
   max-width: 1000px;
   margin: auto;
 }
@@ -401,9 +498,11 @@ button:hover {
 .dashboard-card {
   border-radius: 16px;
   padding: 25px;
+
   display: flex;
   align-items: center;
   gap: 18px;
+
   transition: 0.3s;
 }
 
@@ -432,7 +531,7 @@ button:hover {
 
 
 /* ===================================
-   REPORTS
+   REPORTS SECTION
 =================================== */
 
 .reports-section {
@@ -444,13 +543,16 @@ button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
+
   max-width: 900px;
   margin: auto;
 }
 
 .clear-btn {
   background: rgba(239, 68, 68, 0.12);
+
   border: 1px solid rgba(239, 68, 68, 0.4);
+
   color: #f87171;
 }
 
@@ -460,13 +562,12 @@ button:hover {
 }
 
 
-/* ===================================
-   FILTER
-=================================== */
+/* FILTER */
 
 .filter-box {
   max-width: 900px;
   margin: 25px auto;
+
   display: flex;
   gap: 12px;
   align-items: center;
@@ -478,16 +579,16 @@ button:hover {
 
 .filter-box select {
   padding: 11px 15px;
+
   background: #101c2e;
   color: white;
+
   border: 1px solid #334155;
   border-radius: 8px;
 }
 
 
-/* ===================================
-   REPORT CONTAINER
-=================================== */
+/* REPORT CONTAINER */
 
 .reports-container {
   max-width: 900px;
@@ -528,42 +629,56 @@ button:hover {
 
 /* STATUS BADGES */
 
-.status-badge,
-.my-report-badge {
+.status-badge {
   padding: 7px 13px;
   border-radius: 20px;
+
   font-size: 13px;
   font-weight: bold;
 }
 
 .active-status {
   color: #f87171;
+
   background: rgba(239, 68, 68, 0.12);
   border: 1px solid rgba(239, 68, 68, 0.3);
 }
 
+.pending-status {
+  color: #fbbf24;
+
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
 .resolved-status {
   color: #4ade80;
+
   background: rgba(34, 197, 94, 0.12);
   border: 1px solid rgba(34, 197, 94, 0.3);
 }
 
-.my-report-badge {
-  color: #60a5fa;
-  background: rgba(37, 99, 235, 0.12);
-  border: 1px solid rgba(37, 99, 235, 0.3);
+
+/* USER STATUS BOX */
+
+.case-status {
+  margin-top: 15px;
+  padding: 12px 15px;
+
+  border-radius: 10px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: rgba(255, 255, 255, 0.04);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-
-/* USER INFO */
-
-.report-info {
-  margin-top: 18px !important;
-  padding: 12px;
-  border-radius: 8px;
-  background: rgba(37, 99, 235, 0.1);
-  border-left: 3px solid #2563eb;
-  font-size: 13px;
+.case-status span:first-child {
+  color: #94a3b8;
+  font-size: 14px;
 }
 
 
@@ -573,6 +688,7 @@ button:hover {
   display: flex;
   gap: 12px;
   margin-top: 18px;
+  flex-wrap: wrap;
 }
 
 .resolve-btn {
@@ -585,10 +701,70 @@ button:hover {
   color: white;
 }
 
+.pending-btn {
+  background: #eab308;
+  color: white;
+}
+
 .delete-btn {
   background: rgba(239, 68, 68, 0.15);
+
   color: #f87171;
+
   border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+
+/* ===================================
+   FEEDBACK SECTION
+=================================== */
+
+.feedback-section {
+  padding: 90px 10%;
+  text-align: center;
+}
+
+.feedback-section > p {
+  color: #94a3b8;
+  margin-bottom: 35px;
+}
+
+.feedback-wrapper {
+  max-width: 700px;
+  margin: auto;
+}
+
+.feedback-card {
+  padding: 35px;
+  border-radius: 18px;
+  text-align: left;
+}
+
+.feedback-card h3 {
+  margin-bottom: 10px;
+}
+
+.feedback-card p {
+  color: #94a3b8;
+  margin-bottom: 20px;
+}
+
+.feedback-card textarea {
+  width: 100%;
+}
+
+.feedback-submit-btn {
+  width: 100%;
+  margin-top: 18px;
+
+  background: #2563eb;
+  color: white;
+
+  font-weight: bold;
+}
+
+.feedback-submit-btn:hover {
+  background: #1d4ed8;
 }
 
 
@@ -598,6 +774,7 @@ button:hover {
 
 .modal {
   display: none;
+
   position: fixed;
   z-index: 100;
 
@@ -618,10 +795,14 @@ button:hover {
 .modal-content {
   margin: 7% auto;
   padding: 30px;
+
   border-radius: 18px;
+
   width: 90%;
   max-width: 500px;
+
   position: relative;
+
   animation: modalOpen 0.35s ease;
 }
 
@@ -636,10 +817,14 @@ button:hover {
 
 .close {
   position: absolute;
+
   right: 20px;
   top: 15px;
+
   font-size: 30px;
+
   cursor: pointer;
+
   color: #94a3b8;
 }
 
@@ -649,7 +834,39 @@ button:hover {
 
 
 /* ===================================
-   FORMS
+   AUTH MODAL
+=================================== */
+
+.auth-content {
+  max-width: 420px;
+}
+
+.auth-modal input {
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.auth-modal .submit-btn {
+  width: 100%;
+}
+
+.google-btn {
+  width: 100%;
+  margin-top: 12px;
+
+  background: white;
+  color: #111827;
+
+  font-weight: bold;
+}
+
+.google-btn:hover {
+  background: #e5e7eb;
+}
+
+
+/* ===================================
+   FORM
 =================================== */
 
 form {
@@ -665,11 +882,17 @@ input,
 select,
 textarea {
   padding: 13px;
+
   border-radius: 8px;
+
   border: 1px solid #334155;
+
   background: rgba(8, 17, 32, 0.8);
+
   color: white;
+
   font-size: 15px;
+
   outline: none;
 }
 
@@ -686,6 +909,7 @@ textarea {
 
 .location-btn {
   margin-top: 20px;
+
   background: #2563eb;
   color: white;
 }
@@ -698,21 +922,11 @@ textarea {
 
 .submit-btn {
   margin-top: 20px;
+
   background: #22c55e;
   color: white;
-  font-weight: bold;
-}
 
-.google-btn {
-  width: 100%;
-  margin-top: 12px;
-  background: white;
-  color: #111827;
   font-weight: bold;
-}
-
-.google-btn:hover {
-  background: #e5e7eb;
 }
 
 
@@ -722,9 +936,13 @@ textarea {
 
 footer {
   text-align: center;
+
   padding: 25px;
+
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+
   color: #718096;
+
   font-size: 14px;
 }
 
@@ -747,7 +965,6 @@ footer {
 
 }
 
-
 @keyframes slideRight {
 
   from {
@@ -761,7 +978,6 @@ footer {
   }
 
 }
-
 
 @keyframes sosPulse {
 
@@ -779,7 +995,6 @@ footer {
 
 }
 
-
 @keyframes greenPulse {
 
   0% {
@@ -796,7 +1011,6 @@ footer {
 
 }
 
-
 @keyframes reportAppear {
 
   from {
@@ -810,7 +1024,6 @@ footer {
   }
 
 }
-
 
 @keyframes modalOpen {
 
@@ -831,11 +1044,26 @@ footer {
    RESPONSIVE
 =================================== */
 
+@media (max-width: 1000px) {
+
+  .contacts-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .feature-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+}
+
+
 @media (max-width: 900px) {
 
   .hero {
     flex-direction: column;
+
     text-align: center;
+
     padding: 70px 8%;
   }
 
@@ -845,10 +1073,6 @@ footer {
 
   .buttons {
     justify-content: center;
-  }
-
-  .feature-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 
   .hero-card {
@@ -882,6 +1106,8 @@ footer {
     gap: 6px;
   }
 
+  .login-btn,
+  .signup-btn,
   .login-nav-btn,
   .signup-nav-btn {
     padding: 8px 10px;
@@ -901,20 +1127,25 @@ footer {
     font-size: 36px;
   }
 
-  .feature-grid {
+  .feature-grid,
+  .contacts-grid {
     grid-template-columns: 1fr;
   }
 
   .features h2,
+  .contacts-section h2,
   .emergency-section h2,
   .reports-section h2,
-  .dashboard-section h2 {
+  .dashboard-section h2,
+  .feedback-section h2 {
     font-size: 30px;
   }
 
   .reports-header {
     flex-direction: column;
+
     align-items: flex-start;
+
     gap: 20px;
   }
 
@@ -929,6 +1160,16 @@ footer {
 
   .modal-content {
     margin: 15% auto;
+  }
+
+  .feedback-card {
+    padding: 25px 20px;
+  }
+
+  .case-status {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
 }
