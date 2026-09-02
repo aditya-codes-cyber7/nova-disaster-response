@@ -33,7 +33,6 @@ import {
   updateDoc,
   query,
   where,
-  orderBy,
   serverTimestamp,
   onSnapshot
 } from
@@ -86,6 +85,10 @@ let currentLocation = null;
 
 let unsubscribeReports = null;
 
+let unsubscribeFeedback = null;
+
+let feedbackList = [];
+
 
 // ==========================================
 // DOM ELEMENTS
@@ -127,6 +130,11 @@ onAuthStateChanged(auth, (user) => {
 
   currentUser = user;
 
+
+  // ==========================================
+  // USER LOGGED IN
+  // ==========================================
+
   if (user) {
 
     isAdmin =
@@ -137,52 +145,80 @@ onAuthStateChanged(auth, (user) => {
 
     // Show profile
 
-    authButtons.style.display = "none";
+    if (authButtons) {
+      authButtons.style.display = "none";
+    }
 
-    userProfile.style.display = "flex";
+    if (userProfile) {
+      userProfile.style.display = "flex";
+    }
 
 
-    // User name
+    // Display name
 
     const displayName =
       user.displayName ||
       user.email.split("@")[0];
 
 
-    if (isAdmin) {
+    if (userName) {
 
-      userName.textContent =
-        `${displayName} 🛡️ ADMIN`;
+      if (isAdmin) {
 
-    } else {
+        userName.textContent =
+          `${displayName} 🛡️ ADMIN`;
 
-      userName.textContent =
-        `${displayName} 👤`;
+      } else {
+
+        userName.textContent =
+          `${displayName} 👤`;
+
+      }
 
     }
 
 
     // Admin clear button
 
-    if (isAdmin) {
+    if (clearButton) {
 
-      clearButton.style.display =
-        "block";
+      if (isAdmin) {
 
-    } else {
+        clearButton.style.display =
+          "block";
 
-      clearButton.style.display =
-        "none";
+      } else {
+
+        clearButton.style.display =
+          "none";
+
+      }
 
     }
 
 
-    // Start report listener
+    // Load reports
 
     loadReports();
 
 
-  } else {
+    // Load feedback for admin
+
+    if (isAdmin) {
+
+      loadFeedback();
+
+    }
+
+
+  }
+
+
+  // ==========================================
+  // USER LOGGED OUT
+  // ==========================================
+
+  else {
 
     currentUser = null;
 
@@ -190,19 +226,23 @@ onAuthStateChanged(auth, (user) => {
 
     userReports = [];
 
-
-    authButtons.style.display =
-      "flex";
-
-    userProfile.style.display =
-      "none";
+    feedbackList = [];
 
 
-    clearButton.style.display =
-      "none";
+    if (authButtons) {
+      authButtons.style.display = "flex";
+    }
+
+    if (userProfile) {
+      userProfile.style.display = "none";
+    }
+
+    if (clearButton) {
+      clearButton.style.display = "none";
+    }
 
 
-    // Stop Firestore listener
+    // Stop reports listener
 
     if (unsubscribeReports) {
 
@@ -213,12 +253,28 @@ onAuthStateChanged(auth, (user) => {
     }
 
 
-    // Reset UI
+    // Stop feedback listener
 
-    reportsContainer.innerHTML =
-      `<p class="no-report">
-        🔐 Login to view your emergency reports.
-      </p>`;
+    if (unsubscribeFeedback) {
+
+      unsubscribeFeedback();
+
+      unsubscribeFeedback = null;
+
+    }
+
+
+    // Reset reports UI
+
+    if (reportsContainer) {
+
+      reportsContainer.innerHTML = `
+        <p class="no-report">
+          🔐 Login to view your emergency reports.
+        </p>
+      `;
+
+    }
 
 
     updateDashboard([]);
@@ -236,17 +292,17 @@ window.signupUser = async function () {
 
   const name =
     document.getElementById("signupName")
-    .value
-    .trim();
+      .value
+      .trim();
 
   const email =
     document.getElementById("signupEmail")
-    .value
-    .trim();
+      .value
+      .trim();
 
   const password =
     document.getElementById("signupPassword")
-    .value;
+      .value;
 
 
   if (!email || !password) {
@@ -301,7 +357,14 @@ window.signupUser = async function () {
     closeSignupModal();
 
 
+    document
+      .getElementById("signupForm")
+      .reset();
+
+
   } catch (error) {
+
+    console.error(error);
 
     alert(
       error.message
@@ -320,12 +383,12 @@ window.loginUser = async function () {
 
   const email =
     document.getElementById("loginEmail")
-    .value
-    .trim();
+      .value
+      .trim();
 
   const password =
     document.getElementById("loginPassword")
-    .value;
+      .value;
 
 
   if (!email || !password) {
@@ -356,7 +419,14 @@ window.loginUser = async function () {
     closeLoginModal();
 
 
+    document
+      .getElementById("loginForm")
+      .reset();
+
+
   } catch (error) {
+
+    console.error(error);
 
     alert(
       "Login failed: " +
@@ -393,6 +463,8 @@ window.googleLogin = async function () {
 
   } catch (error) {
 
+    console.error(error);
+
     alert(
       "Google login failed: " +
       error.message
@@ -407,8 +479,7 @@ window.googleLogin = async function () {
 // LOGOUT
 // ==========================================
 
-window.logoutUser =
-async function () {
+window.logoutUser = async function () {
 
   try {
 
@@ -450,23 +521,24 @@ function loadReports() {
   let reportsQuery;
 
 
+  // ==========================================
   // ADMIN → ALL REPORTS
+  // ==========================================
 
   if (isAdmin) {
 
     reportsQuery =
-      query(
-        collection(db, "reports"),
-        orderBy(
-          "createdAt",
-          "desc"
-        )
+      collection(
+        db,
+        "reports"
       );
 
   }
 
 
-  // USER → ONLY OWN REPORTS
+  // ==========================================
+  // NORMAL USER → ONLY OWN REPORTS
+  // ==========================================
 
   else {
 
@@ -483,8 +555,13 @@ function loadReports() {
   }
 
 
+  // ==========================================
+  // REALTIME LISTENER
+  // ==========================================
+
   unsubscribeReports =
     onSnapshot(
+
       reportsQuery,
 
       (snapshot) => {
@@ -508,8 +585,7 @@ function loadReports() {
         );
 
 
-        // Sort manually
-        // avoids Firestore index requirement
+        // Sort latest first
 
         userReports.sort(
           (a, b) => {
@@ -534,6 +610,7 @@ function loadReports() {
 
       },
 
+
       (error) => {
 
         console.error(
@@ -542,10 +619,15 @@ function loadReports() {
         );
 
 
-        reportsContainer.innerHTML =
-          `<p class="no-report">
-            Unable to load reports.
-          </p>`;
+        if (reportsContainer) {
+
+          reportsContainer.innerHTML = `
+            <p class="no-report">
+              Unable to load reports.
+            </p>
+          `;
+
+        }
 
       }
 
@@ -563,15 +645,23 @@ function renderReports() {
   if (!currentUser) return;
 
 
-  const filter =
+  const filterElement =
     document.getElementById(
       "reportFilter"
-    ).value;
+    );
+
+
+  const filter =
+    filterElement
+      ? filterElement.value
+      : "All";
 
 
   let filteredReports =
     userReports;
 
+
+  // Filter reports
 
   if (filter !== "All") {
 
@@ -584,14 +674,17 @@ function renderReports() {
   }
 
 
+  // No reports
+
   if (
     filteredReports.length === 0
   ) {
 
-    reportsContainer.innerHTML =
-      `<p class="no-report">
+    reportsContainer.innerHTML = `
+      <p class="no-report">
         No emergency reports found.
-      </p>`;
+      </p>
+    `;
 
     return;
 
@@ -600,6 +693,10 @@ function renderReports() {
 
   reportsContainer.innerHTML = "";
 
+
+  // ==========================================
+  // CREATE REPORT CARDS
+  // ==========================================
 
   filteredReports.forEach(
     (report) => {
@@ -612,7 +709,9 @@ function renderReports() {
         "report-card";
 
 
-      // Date
+      // ======================================
+      // DATE
+      // ======================================
 
       let dateText =
         "Just now";
@@ -629,7 +728,9 @@ function renderReports() {
       }
 
 
-      // Location
+      // ======================================
+      // LOCATION
+      // ======================================
 
       let locationText =
         "Not shared";
@@ -637,7 +738,7 @@ function renderReports() {
 
       if (
         report.location &&
-        report.location.latitude
+        typeof report.location.latitude === "number"
       ) {
 
         locationText =
@@ -647,21 +748,38 @@ function renderReports() {
       }
 
 
-      // =====================================
+      // ======================================
+      // STATUS
+      // ======================================
+
+      const status =
+        report.status || "Pending";
+
+
+      let statusClass =
+        "pending-status";
+
+
+      if (status === "Resolved") {
+
+        statusClass =
+          "resolved-status";
+
+      }
+
+      else if (status === "Active") {
+
+        statusClass =
+          "active-status";
+
+      }
+
+
+      // ======================================
       // ADMIN VIEW
-      // =====================================
+      // ======================================
 
       if (isAdmin) {
-
-        const status =
-          report.status || "Active";
-
-
-        const statusClass =
-          status === "Resolved"
-            ? "resolved-status"
-            : "active-status";
-
 
         card.innerHTML = `
 
@@ -676,7 +794,7 @@ function renderReports() {
             <span
               class="status-badge ${statusClass}"
             >
-              ${status}
+              ${escapeHTML(status)}
             </span>
 
           </div>
@@ -684,9 +802,7 @@ function renderReports() {
 
           <p>
             <strong>Name:</strong>
-            ${escapeHTML(
-              report.name
-            )}
+            ${escapeHTML(report.name)}
           </p>
 
 
@@ -720,6 +836,29 @@ function renderReports() {
 
           <div class="report-actions">
 
+
+            <button
+              class="pending-btn"
+              onclick="changeReportStatus(
+                '${report.id}',
+                'Pending'
+              )"
+            >
+              ⏳ Pending
+            </button>
+
+
+            <button
+              class="active-btn"
+              onclick="changeReportStatus(
+                '${report.id}',
+                'Active'
+              )"
+            >
+              🔴 Active
+            </button>
+
+
             <button
               class="resolve-btn"
               onclick="changeReportStatus(
@@ -732,17 +871,6 @@ function renderReports() {
 
 
             <button
-              class="active-btn"
-              onclick="changeReportStatus(
-                '${report.id}',
-                'Active'
-              )"
-            >
-              🔴 Mark Active
-            </button>
-
-
-            <button
               class="delete-btn"
               onclick="deleteReport(
                 '${report.id}'
@@ -751,6 +879,7 @@ function renderReports() {
               🗑 Delete
             </button>
 
+
           </div>
 
         `;
@@ -758,10 +887,9 @@ function renderReports() {
       }
 
 
-      // =====================================
+      // ======================================
       // NORMAL USER VIEW
-      // STATUS HIDDEN
-      // =====================================
+      // ======================================
 
       else {
 
@@ -774,6 +902,13 @@ function renderReports() {
                 report.emergencyType
               )}
             </h3>
+
+
+            <span
+              class="status-badge ${statusClass}"
+            >
+              ${escapeHTML(status)}
+            </span>
 
           </div>
 
@@ -805,6 +940,22 @@ function renderReports() {
             ${dateText}
           </p>
 
+
+          <div class="case-status">
+
+            <span>
+              📋 Case Status
+            </span>
+
+
+            <span
+              class="status-badge ${statusClass}"
+            >
+              ${escapeHTML(status)}
+            </span>
+
+          </div>
+
         `;
 
       }
@@ -834,7 +985,7 @@ function () {
 
 
 // ==========================================
-// DASHBOARD
+// UPDATE DASHBOARD
 // ==========================================
 
 function updateDashboard(reports) {
@@ -851,13 +1002,19 @@ function updateDashboard(reports) {
   reports.forEach(
     (report) => {
 
+      const status =
+        report.status || "Pending";
+
+
       if (
-        report.status === "Resolved"
+        status === "Resolved"
       ) {
 
         resolved++;
 
-      } else {
+      }
+
+      else {
 
         active++;
 
@@ -867,34 +1024,21 @@ function updateDashboard(reports) {
   );
 
 
-  reportCount.textContent =
-    total;
-
-
-  totalReports.textContent =
-    total;
-
-
-  // USER KO STATUS COUNTS NAHI DIKHENGE
-
-  if (!isAdmin) {
-
-    activeReports.textContent =
-      "-";
-
-    resolvedReports.textContent =
-      "-";
-
-    return;
-
+  if (reportCount) {
+    reportCount.textContent = total;
   }
 
+  if (totalReports) {
+    totalReports.textContent = total;
+  }
 
-  activeReports.textContent =
-    active;
+  if (activeReports) {
+    activeReports.textContent = active;
+  }
 
-  resolvedReports.textContent =
-    resolved;
+  if (resolvedReports) {
+    resolvedReports.textContent = resolved;
+  }
 
 }
 
@@ -936,6 +1080,11 @@ async function (
           newStatus
       }
 
+    );
+
+
+    alert(
+      `Report marked as ${newStatus}`
     );
 
 
@@ -1139,7 +1288,9 @@ function () {
 };
 
 
-// SOS opens report form
+// ==========================================
+// SOS OPENS REPORT FORM
+// ==========================================
 
 window.openSOSForm =
 function () {
@@ -1165,7 +1316,7 @@ function () {
 
 
 // ==========================================
-// LOCATION
+// GET LOCATION
 // ==========================================
 
 window.getLocation =
@@ -1177,9 +1328,7 @@ function () {
     );
 
 
-  if (
-    !navigator.geolocation
-  ) {
+  if (!navigator.geolocation) {
 
     status.textContent =
       "Geolocation is not supported.";
@@ -1238,11 +1387,10 @@ document
     "emergencyForm"
   )
   .addEventListener(
+
     "submit",
 
-    async function (
-      event
-    ) {
+    async function (event) {
 
       event.preventDefault();
 
@@ -1311,22 +1459,17 @@ document
             description:
               description,
 
-
             location:
               currentLocation,
-
 
             userId:
               currentUser.uid,
 
-
             userEmail:
               currentUser.email,
 
-
             status:
-              "Active",
-
+              "Pending",
 
             createdAt:
               serverTimestamp()
@@ -1375,6 +1518,382 @@ document
     }
 
   );
+
+
+// ==========================================
+// FEEDBACK SYSTEM
+// ==========================================
+
+window.submitFeedback =
+async function () {
+
+  if (!currentUser) {
+
+    alert(
+      "Please login first to submit feedback."
+    );
+
+    openLoginModal();
+
+    return;
+
+  }
+
+
+  const feedbackInput =
+    document.getElementById(
+      "feedbackMessage"
+    );
+
+
+  if (!feedbackInput) {
+
+    console.error(
+      "Feedback input not found."
+    );
+
+    return;
+
+  }
+
+
+  const feedback =
+    feedbackInput.value.trim();
+
+
+  if (!feedback) {
+
+    alert(
+      "Please write your feedback first."
+    );
+
+    return;
+
+  }
+
+
+  try {
+
+    await addDoc(
+
+      collection(
+        db,
+        "feedback"
+      ),
+
+      {
+
+        message:
+          feedback,
+
+        userId:
+          currentUser.uid,
+
+        userEmail:
+          currentUser.email,
+
+        userName:
+          currentUser.displayName ||
+          currentUser.email.split("@")[0],
+
+        createdAt:
+          serverTimestamp()
+
+      }
+
+    );
+
+
+    feedbackInput.value = "";
+
+
+    alert(
+      "Thank you for your feedback! ❤️"
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Unable to submit feedback."
+    );
+
+  }
+
+};
+
+
+// ==========================================
+// LOAD FEEDBACK
+// ADMIN ONLY
+// ==========================================
+
+function loadFeedback() {
+
+  if (!isAdmin) return;
+
+
+  if (unsubscribeFeedback) {
+
+    unsubscribeFeedback();
+
+  }
+
+
+  unsubscribeFeedback =
+    onSnapshot(
+
+      collection(
+        db,
+        "feedback"
+      ),
+
+      (snapshot) => {
+
+        feedbackList = [];
+
+
+        snapshot.forEach(
+          (documentSnapshot) => {
+
+            feedbackList.push({
+
+              id:
+                documentSnapshot.id,
+
+              ...documentSnapshot.data()
+
+            });
+
+          }
+        );
+
+
+        feedbackList.sort(
+          (a, b) => {
+
+            const timeA =
+              a.createdAt?.seconds || 0;
+
+            const timeB =
+              b.createdAt?.seconds || 0;
+
+            return timeB - timeA;
+
+          }
+        );
+
+
+        renderFeedback();
+
+      },
+
+
+      (error) => {
+
+        console.error(
+          "Feedback loading error:",
+          error
+        );
+
+      }
+
+    );
+
+}
+
+
+// ==========================================
+// RENDER FEEDBACK
+// ADMIN ONLY
+// ==========================================
+
+function renderFeedback() {
+
+  const feedbackContainer =
+    document.getElementById(
+      "feedbackContainer"
+    );
+
+
+  if (!feedbackContainer) return;
+
+
+  if (!isAdmin) {
+
+    feedbackContainer.innerHTML = "";
+
+    return;
+
+  }
+
+
+  if (
+    feedbackList.length === 0
+  ) {
+
+    feedbackContainer.innerHTML = `
+      <p class="no-report">
+        No feedback received yet.
+      </p>
+    `;
+
+    return;
+
+  }
+
+
+  feedbackContainer.innerHTML = "";
+
+
+  feedbackList.forEach(
+    (feedback) => {
+
+      let dateText =
+        "Just now";
+
+
+      if (feedback.createdAt) {
+
+        dateText =
+          feedback.createdAt
+            .toDate()
+            .toLocaleString();
+
+      }
+
+
+      const card =
+        document.createElement(
+          "div"
+        );
+
+
+      card.className =
+        "report-card";
+
+
+      card.innerHTML = `
+
+        <div class="report-top">
+
+          <h3>
+            💬 User Feedback
+          </h3>
+
+          <button
+            class="delete-btn"
+            onclick="deleteFeedback(
+              '${feedback.id}'
+            )"
+          >
+            🗑 Delete
+          </button>
+
+        </div>
+
+
+        <p>
+          <strong>Name:</strong>
+          ${escapeHTML(
+            feedback.userName ||
+            "Unknown"
+          )}
+        </p>
+
+
+        <p>
+          <strong>Email:</strong>
+          ${escapeHTML(
+            feedback.userEmail ||
+            "Unknown"
+          )}
+        </p>
+
+
+        <p>
+          <strong>Feedback:</strong>
+          ${escapeHTML(
+            feedback.message
+          )}
+        </p>
+
+
+        <p>
+          <strong>Submitted:</strong>
+          ${dateText}
+        </p>
+
+      `;
+
+
+      feedbackContainer.appendChild(
+        card
+      );
+
+    }
+
+  );
+
+}
+
+
+// ==========================================
+// DELETE FEEDBACK
+// ADMIN ONLY
+// ==========================================
+
+window.deleteFeedback =
+async function (
+  feedbackId
+) {
+
+  if (!isAdmin) {
+
+    alert(
+      "Admin access required."
+    );
+
+    return;
+
+  }
+
+
+  const confirmDelete =
+    confirm(
+      "Delete this feedback?"
+    );
+
+
+  if (!confirmDelete) return;
+
+
+  try {
+
+    await deleteDoc(
+
+      doc(
+        db,
+        "feedback",
+        feedbackId
+      )
+
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Unable to delete feedback."
+    );
+
+  }
+
+};
 
 
 // ==========================================
@@ -1434,23 +1953,20 @@ function () {
 // ==========================================
 
 window.addEventListener(
+
   "click",
 
-  function (
-    event
-  ) {
+  function (event) {
 
     const reportModal =
       document.getElementById(
         "reportModal"
       );
 
-
     const loginModal =
       document.getElementById(
         "loginModal"
       );
-
 
     const signupModal =
       document.getElementById(
@@ -1534,5 +2050,5 @@ function escapeHTML(value) {
 // ==========================================
 
 console.log(
-  "🚨 NOVA Disaster Response Loaded"
+  "🚨 NOVA Disaster Response Loaded Successfully"
 );
