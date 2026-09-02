@@ -7,14 +7,14 @@
 
   <title>NOVA Disaster Response</title>
 
-  <!-- styling wali file -->
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <!-- upar navigation bar -->
+  <!-- NAVBAR -->
   <nav>
+
     <div class="logo">🚨 NOVA</div>
 
     <div class="nav-links">
@@ -23,10 +23,49 @@
       <a href="#reports">Reports</a>
       <a href="#about">About</a>
     </div>
+
+    <!-- LOGIN / SIGNUP -->
+    <div class="auth-buttons" id="authButtons">
+
+      <button
+        class="login-btn"
+        onclick="openLoginModal()"
+      >
+        Login
+      </button>
+
+      <button
+        class="signup-btn"
+        onclick="openSignupModal()"
+      >
+        Sign Up
+      </button>
+
+    </div>
+
+
+    <!-- USER PROFILE -->
+    <div
+      class="user-profile"
+      id="userProfile"
+      style="display:none"
+    >
+
+      <span id="userName"></span>
+
+      <button
+        class="logout-btn"
+        onclick="logoutUser()"
+      >
+        Logout
+      </button>
+
+    </div>
+
   </nav>
 
 
-  <!-- main hero section -->
+  <!-- HERO -->
   <section class="hero" id="home">
 
     <div class="hero-content">
@@ -59,7 +98,6 @@
     </div>
 
 
-    <!-- right side info card -->
     <div class="hero-card">
 
       <div class="status">
@@ -92,7 +130,7 @@
   </section>
 
 
-  <!-- features section -->
+  <!-- FEATURES -->
   <section class="features" id="about">
 
     <h2>Yaha kya kya kar sakte ho?</h2>
@@ -132,7 +170,7 @@
   </section>
 
 
-  <!-- emergency report section -->
+  <!-- EMERGENCY REPORT -->
   <section class="emergency-section" id="report">
 
     <h2>Emergency Report Karni Hai?</h2>
@@ -148,7 +186,7 @@
   </section>
 
 
-  <!-- DASHBOARD SECTION -->
+  <!-- DASHBOARD -->
   <section class="dashboard-section">
 
     <div class="dashboard-heading">
@@ -157,8 +195,6 @@
       <p>Reports ka quick overview yaha dikhega.</p>
     </div>
 
-
-    <!-- counters -->
     <div class="dashboard-cards">
 
       <div class="dashboard-card total-card">
@@ -169,7 +205,6 @@
         </div>
       </div>
 
-
       <div class="dashboard-card active-card">
         <div class="dashboard-icon">🔴</div>
         <div>
@@ -177,7 +212,6 @@
           <strong id="activeReports">0</strong>
         </div>
       </div>
-
 
       <div class="dashboard-card resolved-card">
         <div class="dashboard-icon">✅</div>
@@ -192,21 +226,21 @@
   </section>
 
 
-  <!-- submitted reports -->
+  <!-- REPORTS -->
   <section class="reports-section" id="reports">
 
     <div class="reports-header">
 
       <div>
+
         <h2>Recent Reports</h2>
 
         <p class="subtitle">
-          Abhi demo ke liye reports browser me save ho rahi hain.
+          Live emergency reports Firestore se aa rahi hain.
         </p>
+
       </div>
 
-
-      <!-- clear all button -->
       <button class="clear-btn" onclick="clearAllReports()">
         🗑️ Clear All
       </button>
@@ -214,12 +248,16 @@
     </div>
 
 
-    <!-- filter -->
     <div class="filter-box">
 
-      <label for="reportFilter">🔎 Filter Reports:</label>
+      <label for="reportFilter">
+        🔎 Filter Reports:
+      </label>
 
-      <select id="reportFilter" onchange="filterReports()">
+      <select
+        id="reportFilter"
+        onchange="filterReports()"
+      >
 
         <option value="All">All Emergencies</option>
         <option value="Fire 🔥">Fire 🔥</option>
@@ -234,10 +272,13 @@
     </div>
 
 
-    <div id="reportsContainer" class="reports-container">
+    <div
+      id="reportsContainer"
+      class="reports-container"
+    >
 
       <p class="no-report">
-        Abhi tak koi report submit nahi hui.
+        Loading reports...
       </p>
 
     </div>
@@ -245,17 +286,22 @@
   </section>
 
 
-  <!-- popup form -->
+  <!-- REPORT MODAL -->
   <div class="modal" id="reportModal">
 
     <div class="modal-content">
 
-      <span class="close" onclick="closeReportForm()">×</span>
+      <span
+        class="close"
+        onclick="closeReportForm()"
+      >
+        ×
+      </span>
 
       <h2>Emergency Details</h2>
 
       <p class="form-text">
-        Jo pata hai wahi fill karo, tension lene ki zarurat nahi 😅
+        Jo pata hai wahi fill karo.
       </p>
 
       <form id="emergencyForm">
@@ -290,8 +336,8 @@
         <textarea
           id="description"
           placeholder="Short me batao kya problem hui hai..."
-          required>
-        </textarea>
+          required
+        ></textarea>
 
 
         <button
@@ -305,11 +351,105 @@
         <p id="locationStatus"></p>
 
 
-        <button type="submit" class="submit-btn">
+        <button
+          type="submit"
+          class="submit-btn"
+        >
           Submit Report
         </button>
 
       </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- LOGIN MODAL -->
+  <div class="modal" id="loginModal">
+
+    <div class="modal-content auth-modal">
+
+      <span
+        class="close"
+        onclick="closeLoginModal()"
+      >
+        ×
+      </span>
+
+      <h2>Welcome Back 👋</h2>
+
+      <p class="form-text">
+        Login karke NOVA use karo.
+      </p>
+
+      <input
+        type="email"
+        id="loginEmail"
+        placeholder="Email address"
+      >
+
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Password"
+      >
+
+      <button
+        class="submit-btn"
+        onclick="loginUser()"
+      >
+        Login
+      </button>
+
+      <button
+        class="google-btn"
+        onclick="googleLogin()"
+      >
+        Continue with Google 🔵
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- SIGNUP MODAL -->
+  <div class="modal" id="signupModal">
+
+    <div class="modal-content auth-modal">
+
+      <span
+        class="close"
+        onclick="closeSignupModal()"
+      >
+        ×
+      </span>
+
+      <h2>Create Account 🚀</h2>
+
+      <p class="form-text">
+        NOVA community join karo.
+      </p>
+
+      <input
+        type="email"
+        id="signupEmail"
+        placeholder="Email address"
+      >
+
+      <input
+        type="password"
+        id="signupPassword"
+        placeholder="Password (minimum 6 characters)"
+      >
+
+      <button
+        class="submit-btn"
+        onclick="signupUser()"
+      >
+        Create Account
+      </button>
 
     </div>
 
