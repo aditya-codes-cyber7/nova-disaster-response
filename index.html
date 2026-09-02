@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -15,36 +16,65 @@
     rel="stylesheet"
     href="style.css"
   >
+
 </head>
 
 
 <body>
 
+
   <!-- ================= NAVBAR ================= -->
 
   <nav>
 
-    <div class="logo">
-      🚨 NOVA
+    <!-- LOGO + EMERGENCY CONTACT -->
+
+    <div class="nav-left">
+
+      <div class="logo">
+        🚨 NOVA
+      </div>
+
+      <button
+        class="emergency-contact-btn"
+        type="button"
+        onclick="openEmergencyContacts()"
+      >
+        ☎ Emergency Contacts
+      </button>
+
     </div>
 
 
+    <!-- NAVIGATION -->
+
     <div class="nav-links">
 
-      <a href="#home">Home</a>
+      <a href="#home">
+        Home
+      </a>
 
-      <a href="#report">Report</a>
+      <a href="#report">
+        Report
+      </a>
 
-      <a href="#reports">My Reports</a>
+      <a href="#reports">
+        My Reports
+      </a>
 
-      <a href="#about">About</a>
+      <a href="#about">
+        About
+      </a>
 
     </div>
 
 
     <!-- AUTH BUTTONS -->
 
-    <div class="auth-buttons" id="authButtons">
+    <div
+      class="auth-buttons"
+      id="authButtons"
+    >
 
       <button
         class="login-nav-btn"
@@ -76,6 +106,7 @@
 
       <span id="userName"></span>
 
+
       <button
         class="logout-btn"
         type="button"
@@ -87,6 +118,218 @@
     </div>
 
   </nav>
+
+
+  <!-- ================= EMERGENCY CONTACT MODAL ================= -->
+
+  <div
+    class="modal"
+    id="emergencyContactsModal"
+  >
+
+    <div class="modal-content emergency-contacts-content">
+
+      <span
+        class="close"
+        onclick="closeEmergencyContacts()"
+      >
+        ×
+      </span>
+
+
+      <h2>
+        🚨 Emergency Contacts
+      </h2>
+
+
+      <p class="form-text">
+        In case of immediate danger, contact the appropriate emergency service.
+      </p>
+
+
+      <div class="contacts-list">
+
+
+        <a href="tel:112" class="contact-card">
+
+          <span class="contact-icon">
+            🆘
+          </span>
+
+          <div>
+
+            <strong>
+              National Emergency
+            </strong>
+
+            <p>
+              112
+            </p>
+
+          </div>
+
+          <span class="call-text">
+            Call
+          </span>
+
+        </a>
+
+
+        <a href="tel:101" class="contact-card">
+
+          <span class="contact-icon">
+            🚒
+          </span>
+
+          <div>
+
+            <strong>
+              Fire Brigade
+            </strong>
+
+            <p>
+              101
+            </p>
+
+          </div>
+
+          <span class="call-text">
+            Call
+          </span>
+
+        </a>
+
+
+        <a href="tel:108" class="contact-card">
+
+          <span class="contact-icon">
+            🚑
+          </span>
+
+          <div>
+
+            <strong>
+              Ambulance
+            </strong>
+
+            <p>
+              108
+            </p>
+
+          </div>
+
+          <span class="call-text">
+            Call
+          </span>
+
+        </a>
+
+
+        <a href="tel:100" class="contact-card">
+
+          <span class="contact-icon">
+            🚓
+          </span>
+
+          <div>
+
+            <strong>
+              Police
+            </strong>
+
+            <p>
+              100 / 112
+            </p>
+
+          </div>
+
+          <span class="call-text">
+            Call
+          </span>
+
+        </a>
+
+
+        <a href="tel:1091" class="contact-card">
+
+          <span class="contact-icon">
+            👩
+          </span>
+
+          <div>
+
+            <strong>
+              Women Helpline
+            </strong>
+
+            <p>
+              1091
+            </p>
+
+          </div>
+
+          <span class="call-text">
+            Call
+          </span>
+
+        </a>
+
+
+        <a href="tel:1098" class="contact-card">
+
+          <span class="contact-icon">
+            🧒
+          </span>
+
+          <div>
+
+            <strong>
+              Child Helpline
+            </strong>
+
+            <p>
+              1098
+            </p>
+
+          </div>
+
+          <span class="call-text">
+            Call
+          </span>
+
+        </a>
+
+
+        <a href="tel:1078" class="contact-card">
+
+          <span class="contact-icon">
+            🌊
+          </span>
+
+          <div>
+
+            <strong>
+              Disaster Management
+            </strong>
+
+            <p>
+              1078
+            </p>
+
+          </div>
+
+          <span class="call-text">
+            Call
+          </span>
+
+        </a>
+
+
+      </div>
+
+    </div>
+
+  </div>
 
 
   <!-- ================= HERO ================= -->
@@ -170,18 +413,26 @@
 
         <div>
 
-          <strong id="reportCount">0</strong>
+          <strong id="reportCount">
+            0
+          </strong>
 
-          <span>My Reports</span>
+          <span>
+            My Reports
+          </span>
 
         </div>
 
 
         <div>
 
-          <strong>24/7</strong>
+          <strong>
+            24/7
+          </strong>
 
-          <span>Available</span>
+          <span>
+            Available
+          </span>
 
         </div>
 
@@ -217,9 +468,13 @@
 
       <div class="feature-card">
 
-        <div class="icon">🚨</div>
+        <div class="icon">
+          🚨
+        </div>
 
-        <h3>Quick SOS</h3>
+        <h3>
+          Quick SOS
+        </h3>
 
         <p>
           Emergency situations can be quickly reported
@@ -231,9 +486,13 @@
 
       <div class="feature-card">
 
-        <div class="icon">📍</div>
+        <div class="icon">
+          📍
+        </div>
 
-        <h3>Location Sharing</h3>
+        <h3>
+          Location Sharing
+        </h3>
 
         <p>
           Your approximate location can be attached
@@ -245,13 +504,17 @@
 
       <div class="feature-card">
 
-        <div class="icon">🔐</div>
+        <div class="icon">
+          💬
+        </div>
 
-        <h3>Personal Reports</h3>
+        <h3>
+          Case Tracking
+        </h3>
 
         <p>
-          Every user can access only their own
-          submitted emergency reports.
+          Track whether your emergency case is pending,
+          in progress, or solved.
         </p>
 
       </div>
@@ -259,16 +522,21 @@
 
       <div class="feature-card">
 
-        <div class="icon">🛡️</div>
+        <div class="icon">
+          🛡️
+        </div>
 
-        <h3>Admin Control</h3>
+        <h3>
+          Admin Control
+        </h3>
 
         <p>
-          Administrators can monitor, manage and
-          update emergency response reports.
+          Administrators can monitor cases, update status
+          and review user feedback.
         </p>
 
       </div>
+
 
     </div>
 
@@ -321,7 +589,7 @@
 
 
       <p>
-        Your personal emergency report overview.
+        Track your emergency reports and case progress.
       </p>
 
     </div>
@@ -329,8 +597,6 @@
 
     <div class="dashboard-cards">
 
-
-      <!-- TOTAL REPORTS -->
 
       <div class="dashboard-card">
 
@@ -353,22 +619,20 @@
       </div>
 
 
-      <!-- USER CANNOT SEE STATUS -->
-
       <div class="dashboard-card">
 
         <div class="dashboard-icon">
-          🔒
+          ⏳
         </div>
 
         <div>
 
           <span>
-            Response Status
+            Pending / In Progress
           </span>
 
           <strong id="activeReports">
-            Admin Only
+            0
           </strong>
 
         </div>
@@ -376,27 +640,26 @@
       </div>
 
 
-      <!-- ADMIN ONLY -->
-
       <div class="dashboard-card">
 
         <div class="dashboard-icon">
-          🛡️
+          ✅
         </div>
 
         <div>
 
           <span>
-            Emergency Management
+            Solved
           </span>
 
           <strong id="resolvedReports">
-            Secure
+            0
           </strong>
 
         </div>
 
       </div>
+
 
     </div>
 
@@ -415,24 +678,21 @@
       <div>
 
         <h2>
-          My Emergency Reports
+          Emergency Reports
         </h2>
 
 
         <p class="subtitle">
 
-          You can view only the emergency reports
-          submitted from your account.
+          Track your emergency case status and submit feedback.
 
         </p>
 
       </div>
 
 
-      <!-- ADMIN ONLY BUTTON -->
       <button
         class="clear-btn"
-        id="clearAllButton"
         type="button"
         onclick="clearAllReports()"
         style="display: none;"
@@ -490,7 +750,7 @@
     </div>
 
 
-    <!-- REPORTS CONTAINER -->
+    <!-- REPORTS -->
 
     <div
       id="reportsContainer"
@@ -558,23 +818,16 @@
           </option>
 
           <option>Fire 🔥</option>
-
           <option>Medical 🚑</option>
-
           <option>Flood 🌊</option>
-
           <option>Accident 🚗</option>
-
           <option>Earthquake 🌍</option>
-
           <option>Other ⚠️</option>
 
         </select>
 
 
-        <label>
-          What happened?
-        </label>
+        <label>What happened?</label>
 
         <textarea
           id="description"
@@ -600,6 +853,68 @@
           class="submit-btn"
         >
           Submit Emergency Report
+        </button>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================= FEEDBACK MODAL ================= -->
+
+  <div
+    class="modal"
+    id="feedbackModal"
+  >
+
+    <div class="modal-content feedback-content">
+
+      <span
+        class="close"
+        onclick="closeFeedbackModal()"
+      >
+        ×
+      </span>
+
+
+      <h2>
+        💬 Submit Feedback
+      </h2>
+
+
+      <p class="form-text">
+        Share your feedback regarding the emergency response.
+      </p>
+
+
+      <form id="feedbackForm">
+
+
+        <input
+          type="hidden"
+          id="feedbackReportId"
+        >
+
+
+        <label>
+          Your Feedback
+        </label>
+
+
+        <textarea
+          id="feedbackText"
+          placeholder="Write your experience or feedback..."
+          required
+        ></textarea>
+
+
+        <button
+          type="submit"
+          class="submit-btn"
+        >
+          Submit Feedback
         </button>
 
       </form>
@@ -637,7 +952,6 @@
 
 
       <form id="loginForm">
-
 
         <label>Email</label>
 
@@ -719,7 +1033,6 @@
           type="text"
           id="signupName"
           placeholder="Enter your name"
-          required
         >
 
 
@@ -778,8 +1091,6 @@
   </footer>
 
 
-  <!-- ================= JAVASCRIPT ================= -->
-
   <script
     type="module"
     src="script.js"
@@ -787,4 +1098,5 @@
 
 
 </body>
+
 </html>
