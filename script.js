@@ -34,9 +34,11 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  updateProfile
 } from
   "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
+
 
 
 // ==========================================
@@ -62,6 +64,7 @@ const firebaseConfig = {
 };
 
 
+
 // ==========================================
 // INITIALIZE FIREBASE
 // ==========================================
@@ -75,6 +78,7 @@ const auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 
+
 // ==========================================
 // GLOBAL VARIABLES
 // ==========================================
@@ -84,46 +88,62 @@ let userLocation = "Location nahi mili";
 let allReports = [];
 
 
+
 // ==========================================
 // REPORT FORM OPEN / CLOSE
 // ==========================================
 
 function openReportForm() {
 
-  document.getElementById(
-    "reportModal"
-  ).style.display = "block";
+  const modal =
+    document.getElementById("reportModal");
+
+  if (modal) {
+
+    modal.style.display = "block";
+
+  }
 
 }
+
 
 
 function openSOSForm() {
 
-  document.getElementById(
-    "reportModal"
-  ).style.display = "block";
+  openReportForm();
 
-  document.getElementById(
-    "emergencyType"
-  ).focus();
+  const emergencyType =
+    document.getElementById("emergencyType");
+
+  if (emergencyType) {
+
+    emergencyType.focus();
+
+  }
 
 }
+
 
 
 function closeReportForm() {
 
-  document.getElementById(
-    "reportModal"
-  ).style.display = "none";
+  const modal =
+    document.getElementById("reportModal");
+
+  if (modal) {
+
+    modal.style.display = "none";
+
+  }
 
 }
 
 
+
 window.openReportForm = openReportForm;
-
 window.openSOSForm = openSOSForm;
-
 window.closeReportForm = closeReportForm;
+
 
 
 // ==========================================
@@ -133,9 +153,10 @@ window.closeReportForm = closeReportForm;
 function getLocation() {
 
   const status =
-    document.getElementById(
-      "locationStatus"
-    );
+    document.getElementById("locationStatus");
+
+
+  if (!status) return;
 
 
   if (navigator.geolocation) {
@@ -191,107 +212,105 @@ function getLocation() {
 window.getLocation = getLocation;
 
 
+
 // ==========================================
 // SUBMIT REPORT TO FIRESTORE
 // ==========================================
 
 const emergencyForm =
-  document.getElementById(
-    "emergencyForm"
+  document.getElementById("emergencyForm");
+
+
+if (emergencyForm) {
+
+  emergencyForm.addEventListener(
+
+    "submit",
+
+    async function (event) {
+
+      event.preventDefault();
+
+
+      const name =
+        document.getElementById("name").value;
+
+
+      const type =
+        document.getElementById("emergencyType").value;
+
+
+      const description =
+        document.getElementById("description").value;
+
+
+      try {
+
+        await addDoc(
+
+          collection(db, "reports"),
+
+          {
+
+            name: name,
+
+            type: type,
+
+            description: description,
+
+            location: userLocation,
+
+            status: "Active",
+
+            timestamp: Date.now(),
+
+            time:
+              new Date().toLocaleString()
+
+          }
+
+        );
+
+
+        alert(
+          "Emergency Report submit ho gayi! 🚨"
+        );
+
+
+        emergencyForm.reset();
+
+
+        userLocation =
+          "Location nahi mili";
+
+
+        document.getElementById(
+          "locationStatus"
+        ).innerText = "";
+
+
+        closeReportForm();
+
+      }
+
+
+      catch (error) {
+
+        console.error(error);
+
+
+        alert(
+          "Report submit nahi hui. Firebase check karo."
+        );
+
+      }
+
+    }
+
   );
 
+}
 
-emergencyForm.addEventListener(
-
-  "submit",
-
-  async function (event) {
-
-    event.preventDefault();
-
-
-    const name =
-      document.getElementById(
-        "name"
-      ).value;
-
-
-    const type =
-      document.getElementById(
-        "emergencyType"
-      ).value;
-
-
-    const description =
-      document.getElementById(
-        "description"
-      ).value;
-
-
-    try {
-
-      await addDoc(
-
-        collection(db, "reports"),
-
-        {
-
-          name: name,
-
-          type: type,
-
-          description: description,
-
-          location: userLocation,
-
-          status: "Active",
-
-          timestamp: Date.now(),
-
-          time:
-            new Date().toLocaleString()
-
-        }
-
-      );
-
-
-      alert(
-        "Emergency Report submit ho gayi! 🚨"
-      );
-
-
-      emergencyForm.reset();
-
-
-      userLocation =
-        "Location nahi mili";
-
-
-      document.getElementById(
-        "locationStatus"
-      ).innerText = "";
-
-
-      closeReportForm();
-
-    }
-
-
-    catch (error) {
-
-      console.error(error);
-
-
-      alert(
-        "Report submit nahi hui. Firebase check karo."
-      );
-
-    }
-
-  }
-
-);
 
 
 // ==========================================
@@ -357,6 +376,7 @@ function listenToReports() {
 }
 
 
+
 // ==========================================
 // SHOW REPORTS
 // ==========================================
@@ -370,6 +390,7 @@ function showReports() {
 
 
   if (!container) return;
+
 
 
   // HERO COUNT
@@ -388,6 +409,7 @@ function showReports() {
   }
 
 
+
   // TOTAL REPORTS
 
   const totalReports =
@@ -404,6 +426,7 @@ function showReports() {
   }
 
 
+
   // ACTIVE REPORTS
 
   const activeReports =
@@ -415,6 +438,7 @@ function showReports() {
     );
 
 
+
   // RESOLVED REPORTS
 
   const resolvedReports =
@@ -424,6 +448,7 @@ function showReports() {
         report.status === "Resolved"
 
     );
+
 
 
   const activeCounter =
@@ -440,6 +465,7 @@ function showReports() {
   }
 
 
+
   const resolvedCounter =
     document.getElementById(
       "resolvedReports"
@@ -452,6 +478,7 @@ function showReports() {
       resolvedReports.length;
 
   }
+
 
 
   // FILTER
@@ -490,6 +517,7 @@ function showReports() {
   }
 
 
+
   // NO REPORT
 
   if (filteredReports.length === 0) {
@@ -506,6 +534,7 @@ function showReports() {
 
 
   container.innerHTML = "";
+
 
 
   // CREATE REPORT CARDS
@@ -632,6 +661,7 @@ function showReports() {
 }
 
 
+
 // ==========================================
 // UPDATE REPORT STATUS
 // ==========================================
@@ -671,8 +701,7 @@ async function toggleStatus(id) {
 
       {
 
-        status:
-          newStatus
+        status: newStatus
 
       }
 
@@ -685,7 +714,6 @@ async function toggleStatus(id) {
 
     console.error(error);
 
-
     alert(
       "Status update nahi hua."
     );
@@ -697,6 +725,7 @@ async function toggleStatus(id) {
 
 window.toggleStatus =
   toggleStatus;
+
 
 
 // ==========================================
@@ -734,7 +763,6 @@ async function deleteReport(id) {
 
     console.error(error);
 
-
     alert(
       "Report delete nahi hui."
     );
@@ -746,6 +774,7 @@ async function deleteReport(id) {
 
 window.deleteReport =
   deleteReport;
+
 
 
 // ==========================================
@@ -761,6 +790,7 @@ function filterReports() {
 
 window.filterReports =
   filterReports;
+
 
 
 // ==========================================
@@ -781,11 +811,7 @@ async function clearAllReports() {
 
   try {
 
-    for (
-
-      const report of allReports
-
-    ) {
+    for (const report of allReports) {
 
       await deleteDoc(
 
@@ -806,7 +832,6 @@ async function clearAllReports() {
 
     console.error(error);
 
-
     alert(
       "Reports delete nahi hui."
     );
@@ -820,28 +845,40 @@ window.clearAllReports =
   clearAllReports;
 
 
+
 // ==========================================
-// PHASE 3
-// FIREBASE AUTHENTICATION
+// PHASE 3 - AUTHENTICATION
 // ==========================================
 
 
-// OPEN LOGIN MODAL
+// ==========================================
+// LOGIN MODAL
+// ==========================================
 
 function openLoginModal() {
 
-  document.getElementById(
-    "loginModal"
-  ).style.display = "block";
+  const modal =
+    document.getElementById("loginModal");
+
+  if (modal) {
+
+    modal.style.display = "block";
+
+  }
 
 }
 
 
 function closeLoginModal() {
 
-  document.getElementById(
-    "loginModal"
-  ).style.display = "none";
+  const modal =
+    document.getElementById("loginModal");
+
+  if (modal) {
+
+    modal.style.display = "none";
+
+  }
 
 }
 
@@ -853,24 +890,35 @@ window.closeLoginModal =
   closeLoginModal;
 
 
+
 // ==========================================
-// OPEN SIGNUP MODAL
+// SIGNUP MODAL
 // ==========================================
 
 function openSignupModal() {
 
-  document.getElementById(
-    "signupModal"
-  ).style.display = "block";
+  const modal =
+    document.getElementById("signupModal");
+
+  if (modal) {
+
+    modal.style.display = "block";
+
+  }
 
 }
 
 
 function closeSignupModal() {
 
-  document.getElementById(
-    "signupModal"
-  ).style.display = "none";
+  const modal =
+    document.getElementById("signupModal");
+
+  if (modal) {
+
+    modal.style.display = "none";
+
+  }
 
 }
 
@@ -882,11 +930,18 @@ window.closeSignupModal =
   closeSignupModal;
 
 
+
 // ==========================================
-// EMAIL SIGNUP
+// EMAIL / PASSWORD SIGNUP
 // ==========================================
 
 async function signupUser() {
+
+  const name =
+    document.getElementById(
+      "signupName"
+    ).value.trim();
+
 
   const email =
     document.getElementById(
@@ -900,10 +955,10 @@ async function signupUser() {
     ).value;
 
 
-  if (!email || !password) {
+  if (!name || !email || !password) {
 
     alert(
-      "Email aur password fill karo!"
+      "Saari details fill karo!"
     );
 
     return;
@@ -924,20 +979,50 @@ async function signupUser() {
 
   try {
 
-    await createUserWithEmailAndPassword(
+    // CREATE USER
 
-      auth,
+    const userCredential =
+      await createUserWithEmailAndPassword(
 
-      email,
+        auth,
+        email,
+        password
 
-      password
+      );
+
+
+    const user =
+      userCredential.user;
+
+
+    // SAVE NAME IN FIREBASE PROFILE
+
+    await updateProfile(
+
+      user,
+
+      {
+        displayName: name
+      }
 
     );
+
+
+    // UPDATE UI IMMEDIATELY
+
+    updateUserInterface(user);
 
 
     alert(
       "Account successfully create ho gaya! 🎉"
     );
+
+
+    // CLEAR FORM
+
+    document.getElementById(
+      "signupName"
+    ).value = "";
 
 
     document.getElementById(
@@ -950,16 +1035,17 @@ async function signupUser() {
     ).value = "";
 
 
+    // CLOSE MODAL
+
     closeSignupModal();
+
 
   }
 
 
   catch (error) {
 
-    console.error(
-      error
-    );
+    console.error(error);
 
 
     alert(
@@ -976,8 +1062,9 @@ window.signupUser =
   signupUser;
 
 
+
 // ==========================================
-// EMAIL LOGIN
+// EMAIL / PASSWORD LOGIN
 // ==========================================
 
 async function loginUser() {
@@ -1007,14 +1094,18 @@ async function loginUser() {
 
   try {
 
-    await signInWithEmailAndPassword(
+    const userCredential =
+      await signInWithEmailAndPassword(
 
-      auth,
+        auth,
+        email,
+        password
 
-      email,
+      );
 
-      password
 
+    updateUserInterface(
+      userCredential.user
     );
 
 
@@ -1035,14 +1126,13 @@ async function loginUser() {
 
     closeLoginModal();
 
+
   }
 
 
   catch (error) {
 
-    console.error(
-      error
-    );
+    console.error(error);
 
 
     alert(
@@ -1059,20 +1149,26 @@ window.loginUser =
   loginUser;
 
 
+
 // ==========================================
-// GOOGLE LOGIN
+// GOOGLE LOGIN / SIGNUP
 // ==========================================
 
 async function googleLogin() {
 
   try {
 
-    await signInWithPopup(
+    const result =
+      await signInWithPopup(
 
-      auth,
+        auth,
+        googleProvider
 
-      googleProvider
+      );
 
+
+    updateUserInterface(
+      result.user
     );
 
 
@@ -1083,14 +1179,15 @@ async function googleLogin() {
 
     closeLoginModal();
 
+    closeSignupModal();
+
+
   }
 
 
   catch (error) {
 
-    console.error(
-      error
-    );
+    console.error(error);
 
 
     alert(
@@ -1107,8 +1204,9 @@ window.googleLogin =
   googleLogin;
 
 
+
 // ==========================================
-// LOGOUT USER
+// LOGOUT
 // ==========================================
 
 async function logoutUser() {
@@ -1127,10 +1225,7 @@ async function logoutUser() {
 
   catch (error) {
 
-    console.error(
-      error
-    );
-
+    console.error(error);
 
     alert(
       "Logout failed."
@@ -1145,6 +1240,89 @@ window.logoutUser =
   logoutUser;
 
 
+
+// ==========================================
+// UPDATE USER INTERFACE
+// ==========================================
+
+function updateUserInterface(user) {
+
+  const authButtons =
+    document.getElementById(
+      "authButtons"
+    );
+
+
+  const userProfile =
+    document.getElementById(
+      "userProfile"
+    );
+
+
+  const userName =
+    document.getElementById(
+      "userName"
+    );
+
+
+  if (user) {
+
+    if (authButtons) {
+
+      authButtons.style.display =
+        "none";
+
+    }
+
+
+    if (userProfile) {
+
+      userProfile.style.display =
+        "flex";
+
+    }
+
+
+    if (userName) {
+
+      const displayName =
+
+        user.displayName ||
+
+        user.email.split("@")[0];
+
+
+      userName.innerText =
+        "👤 " + displayName;
+
+    }
+
+  }
+
+
+  else {
+
+    if (authButtons) {
+
+      authButtons.style.display =
+        "flex";
+
+    }
+
+
+    if (userProfile) {
+
+      userProfile.style.display =
+        "none";
+
+    }
+
+  }
+
+}
+
+
+
 // ==========================================
 // AUTH STATE LISTENER
 // ==========================================
@@ -1155,33 +1333,6 @@ onAuthStateChanged(
 
   function (user) {
 
-    const authButtons =
-      document.getElementById(
-        "authButtons"
-      );
-
-
-    const userProfile =
-      document.getElementById(
-        "userProfile"
-      );
-
-
-    const userName =
-      document.getElementById(
-        "userName"
-      );
-
-
-    if (!authButtons ||
-        !userProfile ||
-        !userName) {
-
-      return;
-
-    }
-
-
     if (user) {
 
       console.log(
@@ -1189,21 +1340,7 @@ onAuthStateChanged(
         user.email
       );
 
-
-      authButtons.style.display =
-        "none";
-
-
-      userProfile.style.display =
-        "flex";
-
-
-      userName.innerText =
-        "👤 " +
-        (
-          user.displayName ||
-          user.email
-        );
+      updateUserInterface(user);
 
     }
 
@@ -1214,13 +1351,7 @@ onAuthStateChanged(
         "🔓 No user logged in"
       );
 
-
-      authButtons.style.display =
-        "flex";
-
-
-      userProfile.style.display =
-        "none";
+      updateUserInterface(null);
 
     }
 
@@ -1229,15 +1360,17 @@ onAuthStateChanged(
 );
 
 
+
 // ==========================================
-// START FIRESTORE LISTENER
+// START FIRESTORE
 // ==========================================
 
 listenToReports();
 
 
+
 // ==========================================
-// MODAL OUTSIDE CLICK
+// CLOSE MODALS ON OUTSIDE CLICK
 // ==========================================
 
 window.addEventListener(
@@ -1295,12 +1428,13 @@ window.addEventListener(
 );
 
 
+
 // ==========================================
 // CONSOLE STATUS
 // ==========================================
 
 console.log(
-  "🚀 NOVA Phase 2 - Real-time Firestore Connected"
+  "🚀 NOVA Phase 2 - Firestore Connected"
 );
 
 console.log(
