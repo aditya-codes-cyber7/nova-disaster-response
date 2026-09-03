@@ -380,7 +380,7 @@ nav {
 
 
 /* ==========================================
-   EMERGENCY REPORT SECTION
+   EMERGENCY SECTION
 ========================================== */
 
 .emergency-section {
@@ -436,21 +436,31 @@ nav {
 
 .emergency-contacts {
   padding: 90px 6%;
-
   text-align: center;
-
   background: #101c2f;
 }
 
-.emergency-contacts h2 {
-  font-size: 48px;
-  margin-bottom: 10px;
+.contact-heading {
+  max-width: 850px;
+  margin: 0 auto 50px;
 }
 
-.contacts-subtitle {
+.contact-heading .tag {
+  color: #7de3a5;
+  letter-spacing: 4px;
+  font-size: 13px;
+  margin-bottom: 15px;
+}
+
+.contact-heading h2 {
+  font-size: 48px;
+  color: white;
+  margin-bottom: 15px;
+}
+
+.contact-heading p:not(.tag) {
   color: #c2cad5;
   font-size: 18px;
-  margin-bottom: 45px;
 }
 
 .contact-grid {
@@ -472,9 +482,9 @@ nav {
 
   border-radius: 22px;
 
-  padding: 38px 20px;
+  padding: 30px 20px;
 
-  min-height: 210px;
+  min-height: 280px;
 
   display: flex;
   flex-direction: column;
@@ -486,43 +496,115 @@ nav {
 }
 
 .contact-card:hover {
-  transform: translateY(-7px);
+  transform: translateY(-8px);
+
   border-color: #5274a8;
 
   box-shadow:
-    0 15px 35px rgba(0, 0, 0, 0.25);
+    0 15px 35px rgba(0, 0, 0, 0.3);
 }
 
 .contact-icon {
-  font-size: 45px;
-  margin-bottom: 16px;
+  font-size: 48px;
+  margin-bottom: 14px;
 }
 
 .contact-card h3 {
-  font-size: 23px;
-  margin-bottom: 10px;
+  font-size: 22px;
+  color: white;
+  margin-bottom: 12px;
+}
+
+
+/* BIG NUMBER */
+
+.contact-number {
+  font-size: 38px;
+  font-weight: bold;
+
+  color: #5f7cff;
+
+  margin-bottom: 8px;
+
+  letter-spacing: 2px;
 }
 
 .contact-card p {
-  font-size: 18px;
-  color: #c9ced7;
+  font-size: 16px;
+
+  color: #b9c3d0;
+
+  margin-bottom: 20px;
 }
 
-.contact-card a {
-  color: #4d70ff;
 
-  font-size: 22px;
+/* CALL BUTTON */
+
+.call-btn {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 10px 22px;
+
+  background: #315db6;
+
+  color: white !important;
+
+  border-radius: 10px;
+
+  font-size: 15px !important;
   font-weight: bold;
 
-  text-decoration: underline;
-
-  margin-right: 5px;
+  text-decoration: none !important;
 
   transition: 0.3s;
 }
 
-.contact-card a:hover {
-  color: #8da4ff;
+.call-btn:hover {
+  background: #4175df;
+  transform: scale(1.05);
+}
+
+
+/* IMPORTANT NOTE */
+
+.emergency-note {
+  max-width: 900px;
+
+  margin: 50px auto 0;
+
+  padding: 20px 25px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 15px;
+
+  background:
+    rgba(49, 93, 182, 0.1);
+
+  border: 1px solid #304a75;
+
+  border-radius: 15px;
+
+  color: #c5cfdd;
+}
+
+.note-icon {
+  font-size: 28px;
+}
+
+.emergency-note p {
+  margin: 0;
+  font-size: 16px;
+}
+
+.emergency-note strong {
+  color: white;
 }
 
 
@@ -601,6 +683,7 @@ nav {
 
 .reports-header {
   display: flex;
+
   align-items: center;
   justify-content: space-between;
 
@@ -625,6 +708,7 @@ nav {
 
 .filter-box {
   display: flex;
+
   align-items: center;
 
   gap: 12px;
@@ -675,6 +759,7 @@ nav {
 
 .report-top {
   display: flex;
+
   align-items: center;
   justify-content: space-between;
 
@@ -716,23 +801,27 @@ nav {
 
 .active-status,
 .pending-status {
-  background: rgba(255, 166, 0, 0.15);
+  background:
+    rgba(255, 166, 0, 0.15);
 
   color: #ffb84d;
 
-  border: 1px solid rgba(255, 166, 0, 0.35);
+  border:
+    1px solid rgba(255, 166, 0, 0.35);
 }
 
 .resolved-status {
-  background: rgba(72, 199, 116, 0.12);
+  background:
+    rgba(72, 199, 116, 0.12);
 
   color: #65dc91;
 
-  border: 1px solid rgba(72, 199, 116, 0.35);
+  border:
+    1px solid rgba(72, 199, 116, 0.35);
 }
 
 
-/* USER STATUS DISPLAY */
+/* USER STATUS */
 
 .case-status {
   margin-top: 18px;
@@ -747,17 +836,21 @@ nav {
 }
 
 .case-status.pending {
-  background: rgba(255, 174, 0, 0.1);
+  background:
+    rgba(255, 174, 0, 0.1);
 
-  border: 1px solid rgba(255, 174, 0, 0.25);
+  border:
+    1px solid rgba(255, 174, 0, 0.25);
 
   color: #ffbd59;
 }
 
 .case-status.resolved {
-  background: rgba(77, 210, 124, 0.1);
+  background:
+    rgba(77, 210, 124, 0.1);
 
-  border: 1px solid rgba(77, 210, 124, 0.25);
+  border:
+    1px solid rgba(77, 210, 124, 0.25);
 
   color: #6ce09b;
 }
@@ -1118,8 +1211,6 @@ nav {
   font-weight: bold;
 
   cursor: pointer;
-
-  transition: 0.3s;
 }
 
 .google-btn:hover {
@@ -1145,7 +1236,7 @@ footer {
 
 
 /* ==========================================
-   RESPONSIVE - TABLET
+   RESPONSIVE TABLET
 ========================================== */
 
 @media (max-width: 1100px) {
@@ -1178,7 +1269,7 @@ footer {
 
 
 /* ==========================================
-   RESPONSIVE - MOBILE
+   RESPONSIVE MOBILE
 ========================================== */
 
 @media (max-width: 700px) {
@@ -1254,6 +1345,14 @@ footer {
     font-size: 32px;
   }
 
+  .contact-heading h2 {
+    font-size: 32px;
+  }
+
+  .contact-heading p:not(.tag) {
+    font-size: 16px;
+  }
+
   .reports-header {
     flex-direction: column;
 
@@ -1267,7 +1366,16 @@ footer {
   }
 
   .contact-card {
-    min-height: 190px;
+    min-height: 250px;
+  }
+
+  .contact-number {
+    font-size: 34px;
+  }
+
+  .emergency-note {
+    flex-direction: column;
+    text-align: center;
   }
 
   .feedback-card {
