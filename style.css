@@ -5,8 +5,27 @@
 
 
 /* ==========================================
-   GLOBAL
+   ROOT & GLOBAL
 ========================================== */
+
+:root {
+  --bg: #0b1526;
+  --bg-light: #101c2f;
+  --card: #162235;
+  --card-hover: #1b2a42;
+
+  --border: #2d405c;
+
+  --text: #ffffff;
+  --muted: #aeb9c8;
+
+  --primary: #315db6;
+  --primary-hover: #4175df;
+
+  --danger: #e63946;
+  --success: #42c978;
+  --warning: #ffb84d;
+}
 
 * {
   margin: 0;
@@ -19,21 +38,48 @@ html {
 }
 
 body {
-  font-family: Arial, sans-serif;
-  background: #0b1526;
-  color: #f5f5f5;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 button,
 input,
-select,
-textarea {
+textarea,
+select {
   font-family: inherit;
 }
 
 button {
   cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+
+/* ==========================================
+   SCROLLBAR
+========================================== */
+
+::-webkit-scrollbar {
+  width: 9px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09111f;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #304765;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #46658f;
 }
 
 
@@ -43,7 +89,7 @@ button {
 
 nav {
   width: 100%;
-  min-height: 84px;
+  min-height: 80px;
 
   display: flex;
   align-items: center;
@@ -51,24 +97,26 @@ nav {
 
   padding: 0 8%;
 
-  background: #0d1829;
+  background: rgba(13, 24, 41, 0.97);
+
   border-bottom: 1px solid #25344b;
 
   position: sticky;
   top: 0;
   z-index: 1000;
+
+  backdrop-filter: blur(15px);
 }
 
 .logo {
   font-size: 27px;
   font-weight: bold;
   letter-spacing: 2px;
-  color: white;
 }
 
 .nav-links {
   display: flex;
-  gap: 30px;
+  gap: 28px;
 }
 
 .nav-links a {
@@ -84,23 +132,26 @@ nav {
 
 .auth-buttons {
   display: flex;
-  gap: 12px;
+  gap: 10px;
 }
 
 .login-nav-btn,
 .signup-nav-btn,
 .logout-btn {
   padding: 11px 20px;
+
   border-radius: 10px;
-  font-size: 15px;
-  cursor: pointer;
+
+  font-size: 14px;
+  font-weight: 500;
+
   transition: 0.3s;
 }
 
 .login-nav-btn {
   background: transparent;
-  color: white;
   border: 1px solid #60708a;
+  color: white;
 }
 
 .login-nav-btn:hover {
@@ -108,13 +159,14 @@ nav {
 }
 
 .signup-nav-btn {
+  background: var(--primary);
   border: none;
   color: white;
-  background: #315db6;
 }
 
 .signup-nav-btn:hover {
-  background: #4175df;
+  background: var(--primary-hover);
+  transform: translateY(-2px);
 }
 
 .user-profile {
@@ -131,7 +183,7 @@ nav {
 .logout-btn {
   border: 1px solid #7a3d46;
   background: #251923;
-  color: #ff9da4;
+  color: #ff9da5;
 }
 
 .logout-btn:hover {
@@ -157,7 +209,7 @@ nav {
   background:
     radial-gradient(
       circle at top right,
-      #1d2940,
+      #243451,
       transparent 45%
     );
 }
@@ -168,8 +220,9 @@ nav {
 
 .tag {
   color: #7de3a5;
-  letter-spacing: 4px;
+  letter-spacing: 3px;
   font-size: 13px;
+  font-weight: bold;
   margin-bottom: 18px;
 }
 
@@ -180,9 +233,8 @@ nav {
 }
 
 .hero-text {
-  color: #aeb9c8;
+  color: var(--muted);
   font-size: 18px;
-  max-width: 620px;
   margin-bottom: 30px;
 }
 
@@ -197,22 +249,23 @@ nav {
   padding: 15px 25px;
 
   border-radius: 10px;
+
   font-size: 16px;
   font-weight: bold;
 
-  cursor: pointer;
   transition: 0.3s;
 }
 
 .sos-btn {
-  background: #e53b48;
-  border: none;
+  background: var(--danger);
   color: white;
+  border: none;
 }
 
 .sos-btn:hover {
   background: #ff5360;
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(230, 57, 70, 0.25);
 }
 
 .report-btn {
@@ -227,13 +280,14 @@ nav {
 
 
 /* ==========================================
-   HERO CARD
+   HERO STATUS CARD
 ========================================== */
 
 .hero-card {
   width: 390px;
 
-  background: #131f31;
+  background: rgba(19, 31, 49, 0.95);
+
   border: 1px solid #2a3a52;
 
   border-radius: 20px;
@@ -241,7 +295,7 @@ nav {
   padding: 35px;
 
   box-shadow:
-    0 20px 50px rgba(0, 0, 0, 0.25);
+    0 20px 50px rgba(0, 0, 0, 0.3);
 }
 
 .status {
@@ -250,7 +304,6 @@ nav {
   gap: 10px;
 
   color: #72d89a;
-  font-size: 15px;
 }
 
 .pulse {
@@ -259,8 +312,6 @@ nav {
 
   border-radius: 50%;
   background: #56d689;
-
-  display: inline-block;
 
   animation: pulseAnimation 1.5s infinite;
 }
@@ -272,13 +323,12 @@ nav {
   }
 
   70% {
-    box-shadow: 0 0 0 12px rgba(86, 214, 137, 0);
+    box-shadow: 0 0 0 13px rgba(86, 214, 137, 0);
   }
 
   100% {
     box-shadow: 0 0 0 0 rgba(86, 214, 137, 0);
   }
-
 }
 
 .hero-card h3 {
@@ -311,12 +361,11 @@ nav {
 .stats strong {
   display: block;
   font-size: 28px;
-  color: white;
 }
 
 .stats span {
   color: #8e9aae;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 
@@ -353,7 +402,6 @@ nav {
   background: #141f31;
 
   border: 1px solid #2a3a52;
-
   border-radius: 18px;
 
   transition: 0.3s;
@@ -362,6 +410,7 @@ nav {
 .feature-card:hover {
   transform: translateY(-8px);
   border-color: #4269b1;
+  background: var(--card-hover);
 }
 
 .icon {
@@ -380,7 +429,7 @@ nav {
 
 
 /* ==========================================
-   EMERGENCY SECTION
+   SOS SECTION
 ========================================== */
 
 .emergency-section {
@@ -408,9 +457,10 @@ nav {
 .big-sos {
   margin-top: 30px;
 
-  padding: 18px 35px;
+  padding: 18px 40px;
 
-  background: #e63946;
+  background: var(--danger);
+
   color: white;
 
   border: none;
@@ -424,7 +474,7 @@ nav {
 
 .big-sos:hover {
   background: #ff4d59;
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
 
@@ -433,15 +483,14 @@ nav {
 ========================================== */
 
 .emergency-contacts {
-  padding: 100px 7%;
+  padding: 100px 6%;
   text-align: center;
   background: #101c2f;
 }
 
 .contact-heading {
-  max-width: 700px;
+  max-width: 750px;
   margin: auto;
-  margin-bottom: 50px;
 }
 
 .contact-heading h2 {
@@ -450,18 +499,20 @@ nav {
 }
 
 .contact-heading > p:last-child {
-  color: #aeb9c8;
+  color: #b5c0cf;
   font-size: 17px;
 }
 
 .contact-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+
+  grid-template-columns:
+    repeat(4, 1fr);
 
   gap: 24px;
 
   max-width: 1450px;
-  margin: auto;
+  margin: 55px auto 0;
 }
 
 .contact-card {
@@ -490,11 +541,11 @@ nav {
   border-color: #5274a8;
 
   box-shadow:
-    0 18px 40px rgba(0, 0, 0, 0.3);
+    0 18px 35px rgba(0, 0, 0, 0.3);
 }
 
 .contact-icon {
-  font-size: 48px;
+  font-size: 45px;
   margin-bottom: 15px;
 }
 
@@ -504,14 +555,15 @@ nav {
 }
 
 .contact-number {
-  font-size: 42px;
+  font-size: 38px;
+
   font-weight: bold;
 
-  color: #6fa8ff;
+  color: #7ee0a5;
 
   letter-spacing: 2px;
 
-  margin-bottom: 10px;
+  margin-bottom: 8px;
 }
 
 .contact-card p {
@@ -522,15 +574,15 @@ nav {
 .call-btn {
   display: inline-block;
 
-  padding: 10px 22px;
+  text-decoration: none;
 
-  background: #1f5fbf;
+  padding: 10px 20px;
+
+  border-radius: 8px;
+
+  background: #254f91;
 
   color: white;
-
-  border-radius: 9px;
-
-  text-decoration: none;
 
   font-weight: bold;
 
@@ -538,16 +590,16 @@ nav {
 }
 
 .call-btn:hover {
-  background: #3979dd;
-  transform: scale(1.04);
+  background: #356cc0;
+  transform: scale(1.05);
 }
 
 .emergency-note {
-  max-width: 850px;
+  max-width: 900px;
 
   margin: 50px auto 0;
 
-  padding: 20px 25px;
+  padding: 22px 28px;
 
   display: flex;
   align-items: center;
@@ -555,13 +607,13 @@ nav {
 
   gap: 15px;
 
-  background: rgba(229, 57, 70, 0.08);
+  background: rgba(255, 184, 77, 0.08);
 
-  border: 1px solid rgba(229, 57, 70, 0.3);
+  border: 1px solid rgba(255, 184, 77, 0.3);
 
-  border-radius: 14px;
+  border-radius: 15px;
 
-  color: #cbd4df;
+  color: #d6dce6;
 }
 
 .note-icon {
@@ -593,9 +645,12 @@ nav {
 
 .dashboard-cards {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+
+  grid-template-columns:
+    repeat(3, 1fr);
 
   gap: 25px;
+
   margin-top: 50px;
 }
 
@@ -603,6 +658,7 @@ nav {
   display: flex;
 
   align-items: center;
+
   gap: 20px;
 
   padding: 30px;
@@ -618,7 +674,7 @@ nav {
 
 .dashboard-card:hover {
   transform: translateY(-5px);
-  border-color: #456da8;
+  border-color: #466da8;
 }
 
 .dashboard-icon {
@@ -647,6 +703,7 @@ nav {
 
 .reports-header {
   display: flex;
+
   align-items: center;
   justify-content: space-between;
 
@@ -667,12 +724,6 @@ nav {
   color: #ff9da4;
 
   cursor: pointer;
-
-  transition: 0.3s;
-}
-
-.clear-btn:hover {
-  background: #5a2932;
 }
 
 .filter-box {
@@ -704,7 +755,7 @@ nav {
   display: grid;
 
   grid-template-columns:
-    repeat(auto-fit, minmax(350px, 1fr));
+    repeat(auto-fit, minmax(330px, 1fr));
 
   gap: 22px;
 }
@@ -731,7 +782,7 @@ nav {
   align-items: center;
   justify-content: space-between;
 
-  gap: 15px;
+  gap: 10px;
 
   margin-bottom: 18px;
 }
@@ -757,43 +808,7 @@ nav {
 
 
 /* ==========================================
-   PRIORITY BADGES - PHASE 5
-========================================== */
-
-.priority-badge {
-  display: inline-block;
-
-  padding: 6px 12px;
-
-  border-radius: 20px;
-
-  font-size: 12px;
-  font-weight: bold;
-
-  margin-top: 8px;
-}
-
-.priority-low {
-  background: rgba(72, 199, 116, 0.12);
-  color: #65dc91;
-  border: 1px solid rgba(72, 199, 116, 0.35);
-}
-
-.priority-medium {
-  background: rgba(255, 166, 0, 0.12);
-  color: #ffb84d;
-  border: 1px solid rgba(255, 166, 0, 0.35);
-}
-
-.priority-high {
-  background: rgba(255, 77, 77, 0.12);
-  color: #ff7777;
-  border: 1px solid rgba(255, 77, 77, 0.35);
-}
-
-
-/* ==========================================
-   REPORT STATUS
+   STATUS BADGES
 ========================================== */
 
 .status-badge {
@@ -801,7 +816,7 @@ nav {
 
   border-radius: 20px;
 
-  font-size: 13px;
+  font-size: 12px;
   font-weight: bold;
 
   white-space: nowrap;
@@ -825,14 +840,12 @@ nav {
 }
 
 
-/* ==========================================
-   USER CASE STATUS - PHASE 5
-========================================== */
+/* USER CASE STATUS */
 
 .case-status {
-  margin-top: 20px;
+  margin-top: 18px;
 
-  padding: 15px;
+  padding: 14px;
 
   border-radius: 10px;
 
@@ -859,144 +872,37 @@ nav {
 
 
 /* ==========================================
-   IMAGE PREVIEW - PHASE 5
+   REPORT IMAGE
 ========================================== */
 
 .report-image {
-  width: 100%;
-
-  max-height: 280px;
-
-  object-fit: cover;
-
-  border-radius: 12px;
-
-  margin-top: 15px;
-
-  border: 1px solid #354863;
-}
-
-.image-preview {
   width: 100%;
 
   max-height: 220px;
 
   object-fit: cover;
 
-  border-radius: 10px;
+  border-radius: 12px;
 
   margin-top: 15px;
 
-  display: none;
-
-  border: 1px solid #3a5070;
+  border: 1px solid #334761;
 }
 
+.image-preview {
+  width: 100%;
 
-/* ==========================================
-   LOCATION MAP BUTTON
-========================================== */
+  max-height: 200px;
 
-.map-btn {
-  display: inline-block;
+  object-fit: cover;
+
+  border-radius: 10px;
 
   margin-top: 12px;
 
-  padding: 10px 16px;
+  display: none;
 
-  background: #17345c;
-
-  color: #9fc1ff;
-
-  border: 1px solid #315b94;
-
-  border-radius: 8px;
-
-  text-decoration: none;
-
-  font-size: 14px;
-  font-weight: bold;
-
-  transition: 0.3s;
-}
-
-.map-btn:hover {
-  background: #214879;
-}
-
-
-/* ==========================================
-   ADMIN REPLY SYSTEM - PHASE 5
-========================================== */
-
-.admin-reply-box {
-  margin-top: 20px;
-
-  padding: 18px;
-
-  background: #101c2d;
-
-  border: 1px solid #30435e;
-
-  border-radius: 12px;
-}
-
-.admin-reply-box h4 {
-  color: #8fb6ff;
-  margin-bottom: 8px;
-}
-
-.admin-reply-box p {
-  color: #c2ccd8;
-  margin: 0;
-}
-
-.reply-input {
-  width: 100%;
-
-  min-height: 80px;
-
-  margin-top: 15px;
-
-  padding: 12px;
-
-  background: #0c1727;
-
-  color: white;
-
-  border: 1px solid #354964;
-
-  border-radius: 9px;
-
-  resize: vertical;
-
-  outline: none;
-}
-
-.reply-input:focus {
-  border-color: #4f78d4;
-}
-
-.reply-btn {
-  margin-top: 10px;
-
-  padding: 10px 18px;
-
-  background: #315db6;
-
-  color: white;
-
-  border: none;
-
-  border-radius: 8px;
-
-  font-weight: bold;
-
-  transition: 0.3s;
-}
-
-.reply-btn:hover {
-  background: #4175df;
+  border: 1px solid #3a506f;
 }
 
 
@@ -1022,14 +928,13 @@ nav {
   border: none;
   border-radius: 8px;
 
-  cursor: pointer;
+  color: white;
 
   transition: 0.3s;
 }
 
 .resolve-btn {
   background: #1f6a45;
-  color: white;
 }
 
 .resolve-btn:hover {
@@ -1038,7 +943,6 @@ nav {
 
 .active-btn {
   background: #765018;
-  color: white;
 }
 
 .active-btn:hover {
@@ -1047,7 +951,6 @@ nav {
 
 .delete-btn {
   background: #632a32;
-  color: white;
 }
 
 .delete-btn:hover {
@@ -1151,21 +1054,54 @@ nav {
   border: none;
   border-radius: 10px;
 
-  background: #315db6;
+  background: var(--primary);
 
   color: white;
 
   font-size: 16px;
   font-weight: bold;
 
-  cursor: pointer;
-
   transition: 0.3s;
 }
 
 .feedback-submit-btn:hover {
-  background: #4175df;
+  background: var(--primary-hover);
   transform: translateY(-2px);
+}
+
+
+/* ==========================================
+   FEEDBACK LIST
+========================================== */
+
+.feedback-list {
+  max-width: 850px;
+  margin: 40px auto 0;
+}
+
+.feedback-item {
+  background: #142034;
+
+  border: 1px solid #2c405c;
+
+  border-radius: 14px;
+
+  padding: 20px;
+
+  margin-bottom: 15px;
+}
+
+.feedback-item h4 {
+  margin-bottom: 8px;
+}
+
+.feedback-item p {
+  color: #b6c1cf;
+}
+
+.feedback-rating {
+  color: #ffcc4d;
+  font-size: 18px;
 }
 
 
@@ -1188,7 +1124,8 @@ nav {
 
   overflow-y: auto;
 
-  background: rgba(0, 0, 0, 0.75);
+  background:
+    rgba(0, 0, 0, 0.75);
 
   padding: 40px 15px;
 }
@@ -1208,6 +1145,21 @@ nav {
   padding: 35px;
 
   position: relative;
+
+  animation: modalOpen 0.3s ease;
+}
+
+@keyframes modalOpen {
+
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .auth-content {
@@ -1218,7 +1170,7 @@ nav {
   position: absolute;
 
   right: 22px;
-  top: 14px;
+  top: 12px;
 
   font-size: 32px;
 
@@ -1282,6 +1234,47 @@ nav {
 
 
 /* ==========================================
+   FILE UPLOAD
+========================================== */
+
+.file-upload-wrapper {
+  margin-top: 18px;
+}
+
+.file-upload-label {
+  display: flex !important;
+
+  align-items: center;
+  justify-content: center;
+
+  gap: 10px;
+
+  padding: 14px;
+
+  border: 1px dashed #4b6791 !important;
+
+  border-radius: 10px;
+
+  background: #101d31;
+
+  color: #a9c5ff !important;
+
+  cursor: pointer;
+
+  transition: 0.3s;
+}
+
+.file-upload-label:hover {
+  background: #182a45;
+  border-color: #6b91c7 !important;
+}
+
+#reportImage {
+  display: none;
+}
+
+
+/* ==========================================
    FORM BUTTONS
 ========================================== */
 
@@ -1321,7 +1314,7 @@ nav {
 
   padding: 14px;
 
-  background: #315db6;
+  background: var(--primary);
 
   color: white;
 
@@ -1330,13 +1323,11 @@ nav {
 
   font-weight: bold;
 
-  cursor: pointer;
-
   transition: 0.3s;
 }
 
 .submit-btn:hover {
-  background: #4075df;
+  background: var(--primary-hover);
 }
 
 .google-btn {
@@ -1356,46 +1347,10 @@ nav {
   font-weight: bold;
 
   cursor: pointer;
-
-  transition: 0.3s;
 }
 
 .google-btn:hover {
   background: #e6e6e6;
-}
-
-
-/* ==========================================
-   FILE UPLOAD
-========================================== */
-
-.file-upload-label {
-  display: block;
-
-  margin-top: 18px;
-
-  padding: 14px;
-
-  text-align: center;
-
-  border: 2px dashed #405a80;
-
-  border-radius: 10px;
-
-  color: #9fc1ff;
-
-  cursor: pointer;
-
-  transition: 0.3s;
-}
-
-.file-upload-label:hover {
-  background: #14233a;
-  border-color: #5b85c5;
-}
-
-input[type="file"] {
-  margin-top: 10px;
 }
 
 
@@ -1443,7 +1398,6 @@ footer {
   .dashboard-cards {
     grid-template-columns: 1fr;
   }
-
 }
 
 
@@ -1462,7 +1416,7 @@ footer {
   }
 
   .logo {
-    font-size: 21px;
+    font-size: 22px;
   }
 
   .nav-links {
@@ -1472,7 +1426,7 @@ footer {
 
     justify-content: center;
 
-    gap: 16px;
+    gap: 15px;
 
     flex-wrap: wrap;
   }
@@ -1482,7 +1436,7 @@ footer {
   }
 
   .auth-buttons {
-    gap: 8px;
+    gap: 7px;
   }
 
   .login-nav-btn,
@@ -1493,6 +1447,7 @@ footer {
 
   .hero {
     padding: 70px 6%;
+    min-height: auto;
   }
 
   .hero h1 {
@@ -1505,10 +1460,6 @@ footer {
 
   .hero-card {
     padding: 25px;
-  }
-
-  .stats {
-    flex-direction: column;
   }
 
   .feature-grid,
@@ -1528,21 +1479,17 @@ footer {
   .emergency-section h2,
   .dashboard-heading h2,
   .reports-header h2,
-  .emergency-contacts h2,
+  .contact-heading h2,
   .feedback-wrapper h2 {
     font-size: 31px;
   }
 
-  .contact-heading h2 {
-    font-size: 32px;
-  }
-
   .contact-card {
-    min-height: 260px;
+    min-height: 270px;
   }
 
   .contact-number {
-    font-size: 38px;
+    font-size: 42px;
   }
 
   .reports-header {
@@ -1555,29 +1502,6 @@ footer {
 
   .filter-box {
     flex-wrap: wrap;
-  }
-
-  .reports-container {
-    grid-template-columns: 1fr;
-  }
-
-  .report-card {
-    padding: 20px;
-  }
-
-  .report-top {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .report-actions {
-    flex-direction: column;
-  }
-
-  .resolve-btn,
-  .active-btn,
-  .delete-btn {
-    width: 100%;
   }
 
   .feedback-card {
@@ -1599,12 +1523,20 @@ footer {
 
   .logout-btn {
     padding: 9px 12px;
-    font-size: 13px;
+  }
+
+  .report-actions {
+    flex-direction: column;
+  }
+
+  .resolve-btn,
+  .active-btn,
+  .delete-btn {
+    width: 100%;
   }
 
   .emergency-note {
     flex-direction: column;
     text-align: center;
   }
-
 }
