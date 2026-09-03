@@ -85,10 +85,6 @@ let currentLocation = null;
 
 let unsubscribeReports = null;
 
-let unsubscribeFeedback = null;
-
-let feedbackList = [];
-
 
 // ==========================================
 // DOM ELEMENTS
@@ -130,11 +126,6 @@ onAuthStateChanged(auth, (user) => {
 
   currentUser = user;
 
-
-  // ==========================================
-  // USER LOGGED IN
-  // ==========================================
-
   if (user) {
 
     isAdmin =
@@ -143,18 +134,21 @@ onAuthStateChanged(auth, (user) => {
       ADMIN_EMAIL.toLowerCase();
 
 
-    // Show profile
+    // Hide Login / Signup
 
     if (authButtons) {
       authButtons.style.display = "none";
     }
+
+
+    // Show User Profile
 
     if (userProfile) {
       userProfile.style.display = "flex";
     }
 
 
-    // Display name
+    // User Name
 
     const displayName =
       user.displayName ||
@@ -178,47 +172,22 @@ onAuthStateChanged(auth, (user) => {
     }
 
 
-    // Admin clear button
+    // Admin Clear Button
 
     if (clearButton) {
 
-      if (isAdmin) {
-
-        clearButton.style.display =
-          "block";
-
-      } else {
-
-        clearButton.style.display =
-          "none";
-
-      }
+      clearButton.style.display =
+        isAdmin ? "block" : "none";
 
     }
 
 
-    // Load reports
+    // Load Reports
 
     loadReports();
 
 
-    // Load feedback for admin
-
-    if (isAdmin) {
-
-      loadFeedback();
-
-    }
-
-
-  }
-
-
-  // ==========================================
-  // USER LOGGED OUT
-  // ==========================================
-
-  else {
+  } else {
 
     currentUser = null;
 
@@ -226,23 +195,23 @@ onAuthStateChanged(auth, (user) => {
 
     userReports = [];
 
-    feedbackList = [];
-
 
     if (authButtons) {
       authButtons.style.display = "flex";
     }
 
+
     if (userProfile) {
       userProfile.style.display = "none";
     }
+
 
     if (clearButton) {
       clearButton.style.display = "none";
     }
 
 
-    // Stop reports listener
+    // Stop Firestore Listener
 
     if (unsubscribeReports) {
 
@@ -253,18 +222,7 @@ onAuthStateChanged(auth, (user) => {
     }
 
 
-    // Stop feedback listener
-
-    if (unsubscribeFeedback) {
-
-      unsubscribeFeedback();
-
-      unsubscribeFeedback = null;
-
-    }
-
-
-    // Reset reports UI
+    // Reset Reports
 
     if (reportsContainer) {
 
@@ -291,17 +249,20 @@ onAuthStateChanged(auth, (user) => {
 window.signupUser = async function () {
 
   const name =
-    document.getElementById("signupName")
+    document
+      .getElementById("signupName")
       .value
       .trim();
 
   const email =
-    document.getElementById("signupEmail")
+    document
+      .getElementById("signupEmail")
       .value
       .trim();
 
   const password =
-    document.getElementById("signupPassword")
+    document
+      .getElementById("signupPassword")
       .value;
 
 
@@ -357,16 +318,10 @@ window.signupUser = async function () {
     closeSignupModal();
 
 
-    document
-      .getElementById("signupForm")
-      .reset();
-
-
   } catch (error) {
 
-    console.error(error);
-
     alert(
+      "Signup failed: " +
       error.message
     );
 
@@ -382,12 +337,14 @@ window.signupUser = async function () {
 window.loginUser = async function () {
 
   const email =
-    document.getElementById("loginEmail")
+    document
+      .getElementById("loginEmail")
       .value
       .trim();
 
   const password =
-    document.getElementById("loginPassword")
+    document
+      .getElementById("loginPassword")
       .value;
 
 
@@ -419,14 +376,7 @@ window.loginUser = async function () {
     closeLoginModal();
 
 
-    document
-      .getElementById("loginForm")
-      .reset();
-
-
   } catch (error) {
-
-    console.error(error);
 
     alert(
       "Login failed: " +
@@ -462,8 +412,6 @@ window.googleLogin = async function () {
 
 
   } catch (error) {
-
-    console.error(error);
 
     alert(
       "Google login failed: " +
@@ -521,9 +469,7 @@ function loadReports() {
   let reportsQuery;
 
 
-  // ==========================================
-  // ADMIN → ALL REPORTS
-  // ==========================================
+  // ADMIN CAN SEE ALL REPORTS
 
   if (isAdmin) {
 
@@ -536,15 +482,17 @@ function loadReports() {
   }
 
 
-  // ==========================================
-  // NORMAL USER → ONLY OWN REPORTS
-  // ==========================================
+  // NORMAL USER ONLY OWN REPORTS
 
   else {
 
     reportsQuery =
       query(
-        collection(db, "reports"),
+        collection(
+          db,
+          "reports"
+        ),
+
         where(
           "userId",
           "==",
@@ -555,9 +503,7 @@ function loadReports() {
   }
 
 
-  // ==========================================
   // REALTIME LISTENER
-  // ==========================================
 
   unsubscribeReports =
     onSnapshot(
@@ -585,7 +531,7 @@ function loadReports() {
         );
 
 
-        // Sort latest first
+        // Sort Latest First
 
         userReports.sort(
           (a, b) => {
@@ -642,7 +588,7 @@ function loadReports() {
 
 function renderReports() {
 
-  if (!currentUser) return;
+  if (!currentUser || !reportsContainer) return;
 
 
   const filterElement =
@@ -652,16 +598,14 @@ function renderReports() {
 
 
   const filter =
-    filterElement
-      ? filterElement.value
-      : "All";
+    filterElement ?
+    filterElement.value :
+    "All";
 
 
   let filteredReports =
     userReports;
 
-
-  // Filter reports
 
   if (filter !== "All") {
 
@@ -674,7 +618,7 @@ function renderReports() {
   }
 
 
-  // No reports
+  // NO REPORTS
 
   if (
     filteredReports.length === 0
@@ -694,12 +638,9 @@ function renderReports() {
   reportsContainer.innerHTML = "";
 
 
-  // ==========================================
-  // CREATE REPORT CARDS
-  // ==========================================
-
   filteredReports.forEach(
     (report) => {
+
 
       const card =
         document.createElement("div");
@@ -709,9 +650,7 @@ function renderReports() {
         "report-card";
 
 
-      // ======================================
       // DATE
-      // ======================================
 
       let dateText =
         "Just now";
@@ -728,9 +667,7 @@ function renderReports() {
       }
 
 
-      // ======================================
       // LOCATION
-      // ======================================
 
       let locationText =
         "Not shared";
@@ -738,7 +675,7 @@ function renderReports() {
 
       if (
         report.location &&
-        typeof report.location.latitude === "number"
+        report.location.latitude !== undefined
       ) {
 
         locationText =
@@ -748,36 +685,21 @@ function renderReports() {
       }
 
 
-      // ======================================
       // STATUS
-      // ======================================
 
       const status =
         report.status || "Pending";
 
 
-      let statusClass =
-        "pending-status";
+      const statusClass =
+        status === "Resolved"
+          ? "resolved"
+          : "pending";
 
 
-      if (status === "Resolved") {
-
-        statusClass =
-          "resolved-status";
-
-      }
-
-      else if (status === "Active") {
-
-        statusClass =
-          "active-status";
-
-      }
-
-
-      // ======================================
+      // =====================================
       // ADMIN VIEW
-      // ======================================
+      // =====================================
 
       if (isAdmin) {
 
@@ -791,10 +713,16 @@ function renderReports() {
               )}
             </h3>
 
-            <span
-              class="status-badge ${statusClass}"
-            >
-              ${escapeHTML(status)}
+
+            <span class="
+              status-badge
+              ${status === "Resolved"
+                ? "resolved-status"
+                : "pending-status"}
+            ">
+
+              ${status}
+
             </span>
 
           </div>
@@ -802,7 +730,9 @@ function renderReports() {
 
           <p>
             <strong>Name:</strong>
-            ${escapeHTML(report.name)}
+            ${escapeHTML(
+              report.name
+            )}
           </p>
 
 
@@ -836,29 +766,6 @@ function renderReports() {
 
           <div class="report-actions">
 
-
-            <button
-              class="pending-btn"
-              onclick="changeReportStatus(
-                '${report.id}',
-                'Pending'
-              )"
-            >
-              ⏳ Pending
-            </button>
-
-
-            <button
-              class="active-btn"
-              onclick="changeReportStatus(
-                '${report.id}',
-                'Active'
-              )"
-            >
-              🔴 Active
-            </button>
-
-
             <button
               class="resolve-btn"
               onclick="changeReportStatus(
@@ -866,7 +773,18 @@ function renderReports() {
                 'Resolved'
               )"
             >
-              ✅ Resolve
+              ✅ Mark Resolved
+            </button>
+
+
+            <button
+              class="active-btn"
+              onclick="changeReportStatus(
+                '${report.id}',
+                'Pending'
+              )"
+            >
+              ⏳ Mark Pending
             </button>
 
 
@@ -879,7 +797,6 @@ function renderReports() {
               🗑 Delete
             </button>
 
-
           </div>
 
         `;
@@ -887,11 +804,17 @@ function renderReports() {
       }
 
 
-      // ======================================
+      // =====================================
       // NORMAL USER VIEW
-      // ======================================
+      // =====================================
 
       else {
+
+        const statusMessage =
+          status === "Resolved"
+            ? "✅ Your emergency case has been resolved."
+            : "⏳ Your emergency case is pending and under review.";
+
 
         card.innerHTML = `
 
@@ -904,10 +827,13 @@ function renderReports() {
             </h3>
 
 
-            <span
-              class="status-badge ${statusClass}"
-            >
-              ${escapeHTML(status)}
+            <span class="
+              status-badge
+              ${status === "Resolved"
+                ? "resolved-status"
+                : "pending-status"}
+            ">
+              ${status}
             </span>
 
           </div>
@@ -941,18 +867,12 @@ function renderReports() {
           </p>
 
 
-          <div class="case-status">
+          <div class="
+            case-status
+            ${statusClass}
+          ">
 
-            <span>
-              📋 Case Status
-            </span>
-
-
-            <span
-              class="status-badge ${statusClass}"
-            >
-              ${escapeHTML(status)}
-            </span>
+            ${statusMessage}
 
           </div>
 
@@ -976,8 +896,7 @@ function renderReports() {
 // FILTER REPORTS
 // ==========================================
 
-window.filterReports =
-function () {
+window.filterReports = function () {
 
   renderReports();
 
@@ -994,7 +913,7 @@ function updateDashboard(reports) {
     reports.length;
 
 
-  let active = 0;
+  let pending = 0;
 
   let resolved = 0;
 
@@ -1002,21 +921,15 @@ function updateDashboard(reports) {
   reports.forEach(
     (report) => {
 
-      const status =
-        report.status || "Pending";
-
-
       if (
-        status === "Resolved"
+        report.status === "Resolved"
       ) {
 
         resolved++;
 
-      }
+      } else {
 
-      else {
-
-        active++;
+        pending++;
 
       }
 
@@ -1028,13 +941,18 @@ function updateDashboard(reports) {
     reportCount.textContent = total;
   }
 
+
   if (totalReports) {
     totalReports.textContent = total;
   }
 
+
+  // User can also see their own status
+
   if (activeReports) {
-    activeReports.textContent = active;
+    activeReports.textContent = pending;
   }
+
 
   if (resolvedReports) {
     resolvedReports.textContent = resolved;
@@ -1084,7 +1002,7 @@ async function (
 
 
     alert(
-      `Report marked as ${newStatus}`
+      `Report marked as ${newStatus}.`
     );
 
 
@@ -1141,6 +1059,11 @@ async function (
         reportId
       )
 
+    );
+
+
+    alert(
+      "Report deleted successfully."
     );
 
 
@@ -1267,7 +1190,7 @@ function () {
     "block";
 
 
-  // Auto fill name
+  // AUTO FILL NAME
 
   const nameInput =
     document.getElementById(
@@ -1289,7 +1212,7 @@ function () {
 
 
 // ==========================================
-// SOS OPENS REPORT FORM
+// SOS FORM
 // ==========================================
 
 window.openSOSForm =
@@ -1339,7 +1262,7 @@ function () {
 
 
   status.textContent =
-    "Getting location...";
+    "Getting your location...";
 
 
   navigator.geolocation.getCurrentPosition(
@@ -1382,11 +1305,15 @@ function () {
 // SUBMIT EMERGENCY REPORT
 // ==========================================
 
-document
-  .getElementById(
+const emergencyForm =
+  document.getElementById(
     "emergencyForm"
-  )
-  .addEventListener(
+  );
+
+
+if (emergencyForm) {
+
+  emergencyForm.addEventListener(
 
     "submit",
 
@@ -1407,21 +1334,23 @@ document
 
 
       const name =
-        document.getElementById(
-          "name"
-        ).value.trim();
+        document
+          .getElementById("name")
+          .value
+          .trim();
 
 
       const emergencyType =
-        document.getElementById(
-          "emergencyType"
-        ).value;
+        document
+          .getElementById("emergencyType")
+          .value;
 
 
       const description =
-        document.getElementById(
-          "description"
-        ).value.trim();
+        document
+          .getElementById("description")
+          .value
+          .trim();
 
 
       if (
@@ -1484,15 +1413,10 @@ document
         );
 
 
-        document
-          .getElementById(
-            "emergencyForm"
-          )
-          .reset();
+        emergencyForm.reset();
 
 
-        currentLocation =
-          null;
+        currentLocation = null;
 
 
         document.getElementById(
@@ -1519,381 +1443,136 @@ document
 
   );
 
+}
+
 
 // ==========================================
 // FEEDBACK SYSTEM
 // ==========================================
 
-window.submitFeedback =
-async function () {
-
-  if (!currentUser) {
-
-    alert(
-      "Please login first to submit feedback."
-    );
-
-    openLoginModal();
-
-    return;
-
-  }
+const feedbackForm =
+  document.getElementById(
+    "feedbackForm"
+  );
 
 
-  const feedbackInput =
-    document.getElementById(
-      "feedbackMessage"
-    );
+if (feedbackForm) {
+
+  feedbackForm.addEventListener(
+
+    "submit",
+
+    async function (event) {
+
+      event.preventDefault();
 
 
-  if (!feedbackInput) {
+      if (!currentUser) {
 
-    console.error(
-      "Feedback input not found."
-    );
+        alert(
+          "Please login first to submit feedback."
+        );
 
-    return;
+        openLoginModal();
 
-  }
-
-
-  const feedback =
-    feedbackInput.value.trim();
-
-
-  if (!feedback) {
-
-    alert(
-      "Please write your feedback first."
-    );
-
-    return;
-
-  }
-
-
-  try {
-
-    await addDoc(
-
-      collection(
-        db,
-        "feedback"
-      ),
-
-      {
-
-        message:
-          feedback,
-
-        userId:
-          currentUser.uid,
-
-        userEmail:
-          currentUser.email,
-
-        userName:
-          currentUser.displayName ||
-          currentUser.email.split("@")[0],
-
-        createdAt:
-          serverTimestamp()
+        return;
 
       }
 
-    );
+
+      const feedbackTypeElement =
+        document.getElementById(
+          "feedbackType"
+        );
 
 
-    feedbackInput.value = "";
+      const feedbackMessageElement =
+        document.getElementById(
+          "feedbackMessage"
+        );
 
 
-    alert(
-      "Thank you for your feedback! ❤️"
-    );
+      const feedbackType =
+        feedbackTypeElement ?
+        feedbackTypeElement.value :
+        "General";
 
 
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Unable to submit feedback."
-    );
-
-  }
-
-};
+      const feedbackMessage =
+        feedbackMessageElement ?
+        feedbackMessageElement.value.trim() :
+        "";
 
 
-// ==========================================
-// LOAD FEEDBACK
-// ADMIN ONLY
-// ==========================================
+      if (!feedbackMessage) {
 
-function loadFeedback() {
+        alert(
+          "Please enter your feedback."
+        );
 
-  if (!isAdmin) return;
+        return;
 
-
-  if (unsubscribeFeedback) {
-
-    unsubscribeFeedback();
-
-  }
+      }
 
 
-  unsubscribeFeedback =
-    onSnapshot(
+      try {
 
-      collection(
-        db,
-        "feedback"
-      ),
+        await addDoc(
 
-      (snapshot) => {
+          collection(
+            db,
+            "feedback"
+          ),
 
-        feedbackList = [];
+          {
 
+            type:
+              feedbackType,
 
-        snapshot.forEach(
-          (documentSnapshot) => {
+            message:
+              feedbackMessage,
 
-            feedbackList.push({
+            userId:
+              currentUser.uid,
 
-              id:
-                documentSnapshot.id,
+            userEmail:
+              currentUser.email,
 
-              ...documentSnapshot.data()
+            userName:
+              currentUser.displayName ||
+              currentUser.email.split("@")[0],
 
-            });
+            createdAt:
+              serverTimestamp()
 
           }
+
         );
 
 
-        feedbackList.sort(
-          (a, b) => {
-
-            const timeA =
-              a.createdAt?.seconds || 0;
-
-            const timeB =
-              b.createdAt?.seconds || 0;
-
-            return timeB - timeA;
-
-          }
+        alert(
+          "Thank you for your feedback! ❤️"
         );
 
 
-        renderFeedback();
-
-      },
+        feedbackForm.reset();
 
 
-      (error) => {
+      } catch (error) {
 
-        console.error(
-          "Feedback loading error:",
-          error
+        console.error(error);
+
+        alert(
+          "Unable to submit feedback."
         );
 
       }
-
-    );
-
-}
-
-
-// ==========================================
-// RENDER FEEDBACK
-// ADMIN ONLY
-// ==========================================
-
-function renderFeedback() {
-
-  const feedbackContainer =
-    document.getElementById(
-      "feedbackContainer"
-    );
-
-
-  if (!feedbackContainer) return;
-
-
-  if (!isAdmin) {
-
-    feedbackContainer.innerHTML = "";
-
-    return;
-
-  }
-
-
-  if (
-    feedbackList.length === 0
-  ) {
-
-    feedbackContainer.innerHTML = `
-      <p class="no-report">
-        No feedback received yet.
-      </p>
-    `;
-
-    return;
-
-  }
-
-
-  feedbackContainer.innerHTML = "";
-
-
-  feedbackList.forEach(
-    (feedback) => {
-
-      let dateText =
-        "Just now";
-
-
-      if (feedback.createdAt) {
-
-        dateText =
-          feedback.createdAt
-            .toDate()
-            .toLocaleString();
-
-      }
-
-
-      const card =
-        document.createElement(
-          "div"
-        );
-
-
-      card.className =
-        "report-card";
-
-
-      card.innerHTML = `
-
-        <div class="report-top">
-
-          <h3>
-            💬 User Feedback
-          </h3>
-
-          <button
-            class="delete-btn"
-            onclick="deleteFeedback(
-              '${feedback.id}'
-            )"
-          >
-            🗑 Delete
-          </button>
-
-        </div>
-
-
-        <p>
-          <strong>Name:</strong>
-          ${escapeHTML(
-            feedback.userName ||
-            "Unknown"
-          )}
-        </p>
-
-
-        <p>
-          <strong>Email:</strong>
-          ${escapeHTML(
-            feedback.userEmail ||
-            "Unknown"
-          )}
-        </p>
-
-
-        <p>
-          <strong>Feedback:</strong>
-          ${escapeHTML(
-            feedback.message
-          )}
-        </p>
-
-
-        <p>
-          <strong>Submitted:</strong>
-          ${dateText}
-        </p>
-
-      `;
-
-
-      feedbackContainer.appendChild(
-        card
-      );
 
     }
 
   );
 
 }
-
-
-// ==========================================
-// DELETE FEEDBACK
-// ADMIN ONLY
-// ==========================================
-
-window.deleteFeedback =
-async function (
-  feedbackId
-) {
-
-  if (!isAdmin) {
-
-    alert(
-      "Admin access required."
-    );
-
-    return;
-
-  }
-
-
-  const confirmDelete =
-    confirm(
-      "Delete this feedback?"
-    );
-
-
-  if (!confirmDelete) return;
-
-
-  try {
-
-    await deleteDoc(
-
-      doc(
-        db,
-        "feedback",
-        feedbackId
-      )
-
-    );
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Unable to delete feedback."
-    );
-
-  }
-
-};
 
 
 // ==========================================
