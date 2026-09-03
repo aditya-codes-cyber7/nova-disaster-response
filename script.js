@@ -3,7 +3,6 @@
 // FINAL SCRIPT.JS
 // ==========================================
 
-
 // ==========================================
 // FIREBASE IMPORTS
 // ==========================================
@@ -58,9 +57,7 @@ const firebaseConfig = {
 // ==========================================
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getFirestore(app);
 
 
@@ -76,13 +73,9 @@ const ADMIN_EMAIL = "adi56tya65raj00@gmail.com";
 // ==========================================
 
 let currentUser = null;
-
 let isAdmin = false;
-
 let userReports = [];
-
 let currentLocation = null;
-
 let unsubscribeReports = null;
 
 
@@ -90,32 +83,15 @@ let unsubscribeReports = null;
 // DOM ELEMENTS
 // ==========================================
 
-const authButtons =
-  document.getElementById("authButtons");
-
-const userProfile =
-  document.getElementById("userProfile");
-
-const userName =
-  document.getElementById("userName");
-
-const reportsContainer =
-  document.getElementById("reportsContainer");
-
-const reportCount =
-  document.getElementById("reportCount");
-
-const totalReports =
-  document.getElementById("totalReports");
-
-const activeReports =
-  document.getElementById("activeReports");
-
-const resolvedReports =
-  document.getElementById("resolvedReports");
-
-const clearButton =
-  document.querySelector(".clear-btn");
+const authButtons = document.getElementById("authButtons");
+const userProfile = document.getElementById("userProfile");
+const userName = document.getElementById("userName");
+const reportsContainer = document.getElementById("reportsContainer");
+const reportCount = document.getElementById("reportCount");
+const totalReports = document.getElementById("totalReports");
+const activeReports = document.getElementById("activeReports");
+const resolvedReports = document.getElementById("resolvedReports");
+const clearButton = document.querySelector(".clear-btn");
 
 
 // ==========================================
@@ -134,21 +110,9 @@ onAuthStateChanged(auth, (user) => {
       ADMIN_EMAIL.toLowerCase();
 
 
-    // Hide Login / Signup
+    if (authButtons) authButtons.style.display = "none";
+    if (userProfile) userProfile.style.display = "flex";
 
-    if (authButtons) {
-      authButtons.style.display = "none";
-    }
-
-
-    // Show User Profile
-
-    if (userProfile) {
-      userProfile.style.display = "flex";
-    }
-
-
-    // User Name
 
     const displayName =
       user.displayName ||
@@ -158,71 +122,39 @@ onAuthStateChanged(auth, (user) => {
     if (userName) {
 
       if (isAdmin) {
-
-        userName.textContent =
-          `${displayName} 🛡️ ADMIN`;
-
+        userName.textContent = `${displayName} 🛡️ ADMIN`;
       } else {
-
-        userName.textContent =
-          `${displayName} 👤`;
-
+        userName.textContent = `${displayName} 👤`;
       }
 
     }
 
 
-    // Admin Clear Button
-
     if (clearButton) {
-
       clearButton.style.display =
         isAdmin ? "block" : "none";
-
     }
 
 
-    // Load Reports
-
     loadReports();
-
 
   } else {
 
     currentUser = null;
-
     isAdmin = false;
-
     userReports = [];
 
 
-    if (authButtons) {
-      authButtons.style.display = "flex";
-    }
+    if (authButtons) authButtons.style.display = "flex";
+    if (userProfile) userProfile.style.display = "none";
+    if (clearButton) clearButton.style.display = "none";
 
-
-    if (userProfile) {
-      userProfile.style.display = "none";
-    }
-
-
-    if (clearButton) {
-      clearButton.style.display = "none";
-    }
-
-
-    // Stop Firestore Listener
 
     if (unsubscribeReports) {
-
       unsubscribeReports();
-
       unsubscribeReports = null;
-
     }
 
-
-    // Reset Reports
 
     if (reportsContainer) {
 
@@ -249,42 +181,24 @@ onAuthStateChanged(auth, (user) => {
 window.signupUser = async function () {
 
   const name =
-    document
-      .getElementById("signupName")
-      .value
-      .trim();
+    document.getElementById("signupName").value.trim();
 
   const email =
-    document
-      .getElementById("signupEmail")
-      .value
-      .trim();
+    document.getElementById("signupEmail").value.trim();
 
   const password =
-    document
-      .getElementById("signupPassword")
-      .value;
+    document.getElementById("signupPassword").value;
 
 
   if (!email || !password) {
-
-    alert(
-      "Please enter email and password."
-    );
-
+    alert("Please enter email and password.");
     return;
-
   }
 
 
   if (password.length < 6) {
-
-    alert(
-      "Password must be at least 6 characters."
-    );
-
+    alert("Password must be at least 6 characters.");
     return;
-
   }
 
 
@@ -310,20 +224,13 @@ window.signupUser = async function () {
     }
 
 
-    alert(
-      "Account created successfully! 🎉"
-    );
-
+    alert("Account created successfully! 🎉");
 
     closeSignupModal();
 
-
   } catch (error) {
 
-    alert(
-      "Signup failed: " +
-      error.message
-    );
+    alert(error.message);
 
   }
 
@@ -337,25 +244,15 @@ window.signupUser = async function () {
 window.loginUser = async function () {
 
   const email =
-    document
-      .getElementById("loginEmail")
-      .value
-      .trim();
+    document.getElementById("loginEmail").value.trim();
 
   const password =
-    document
-      .getElementById("loginPassword")
-      .value;
+    document.getElementById("loginPassword").value;
 
 
   if (!email || !password) {
-
-    alert(
-      "Please enter email and password."
-    );
-
+    alert("Please enter email and password.");
     return;
-
   }
 
 
@@ -368,20 +265,13 @@ window.loginUser = async function () {
     );
 
 
-    alert(
-      "Login successful! 🚀"
-    );
-
+    alert("Login successful! 🚀");
 
     closeLoginModal();
 
-
   } catch (error) {
 
-    alert(
-      "Login failed: " +
-      error.message
-    );
+    alert("Login failed: " + error.message);
 
   }
 
@@ -396,20 +286,12 @@ window.googleLogin = async function () {
 
   try {
 
-    const provider =
-      new GoogleAuthProvider();
+    const provider = new GoogleAuthProvider();
 
-
-    await signInWithPopup(
-      auth,
-      provider
-    );
-
+    await signInWithPopup(auth, provider);
 
     closeLoginModal();
-
     closeSignupModal();
-
 
   } catch (error) {
 
@@ -433,15 +315,11 @@ window.logoutUser = async function () {
 
     await signOut(auth);
 
-    alert(
-      "Logged out successfully."
-    );
+    alert("Logged out successfully.");
 
   } catch (error) {
 
-    alert(
-      error.message
-    );
+    alert(error.message);
 
   }
 
@@ -457,42 +335,30 @@ function loadReports() {
   if (!currentUser) return;
 
 
-  // Remove old listener
-
   if (unsubscribeReports) {
-
     unsubscribeReports();
-
   }
 
 
   let reportsQuery;
 
 
-  // ADMIN CAN SEE ALL REPORTS
-
+  // ADMIN SEES ALL REPORTS
   if (isAdmin) {
 
     reportsQuery =
-      collection(
-        db,
-        "reports"
+      query(
+        collection(db, "reports")
       );
 
   }
 
-
-  // NORMAL USER ONLY OWN REPORTS
-
+  // NORMAL USER SEES OWN REPORTS
   else {
 
     reportsQuery =
       query(
-        collection(
-          db,
-          "reports"
-        ),
-
+        collection(db, "reports"),
         where(
           "userId",
           "==",
@@ -502,8 +368,6 @@ function loadReports() {
 
   }
 
-
-  // REALTIME LISTENER
 
   unsubscribeReports =
     onSnapshot(
@@ -515,47 +379,34 @@ function loadReports() {
         userReports = [];
 
 
-        snapshot.forEach(
-          (documentSnapshot) => {
+        snapshot.forEach((documentSnapshot) => {
 
-            userReports.push({
+          userReports.push({
+            id: documentSnapshot.id,
+            ...documentSnapshot.data()
+          });
 
-              id:
-                documentSnapshot.id,
-
-              ...documentSnapshot.data()
-
-            });
-
-          }
-        );
+        });
 
 
-        // Sort Latest First
+        // SORT NEWEST FIRST
+        userReports.sort((a, b) => {
 
-        userReports.sort(
-          (a, b) => {
+          const timeA =
+            a.createdAt?.seconds || 0;
 
-            const timeA =
-              a.createdAt?.seconds || 0;
+          const timeB =
+            b.createdAt?.seconds || 0;
 
-            const timeB =
-              b.createdAt?.seconds || 0;
+          return timeB - timeA;
 
-            return timeB - timeA;
-
-          }
-        );
+        });
 
 
         renderReports();
-
-        updateDashboard(
-          userReports
-        );
+        updateDashboard(userReports);
 
       },
-
 
       (error) => {
 
@@ -592,37 +443,28 @@ function renderReports() {
 
 
   const filterElement =
-    document.getElementById(
-      "reportFilter"
-    );
+    document.getElementById("reportFilter");
 
 
   const filter =
-    filterElement ?
-    filterElement.value :
-    "All";
+    filterElement ? filterElement.value : "All";
 
 
-  let filteredReports =
-    userReports;
+  let filteredReports = userReports;
 
 
   if (filter !== "All") {
 
     filteredReports =
       userReports.filter(
-        (report) =>
+        report =>
           report.emergencyType === filter
       );
 
   }
 
 
-  // NO REPORTS
-
-  if (
-    filteredReports.length === 0
-  ) {
+  if (filteredReports.length === 0) {
 
     reportsContainer.innerHTML = `
       <p class="no-report">
@@ -638,25 +480,21 @@ function renderReports() {
   reportsContainer.innerHTML = "";
 
 
-  filteredReports.forEach(
-    (report) => {
+  filteredReports.forEach((report) => {
+
+    const card =
+      document.createElement("div");
 
 
-      const card =
-        document.createElement("div");
+    card.className = "report-card";
 
 
-      card.className =
-        "report-card";
+    // DATE
+    let dateText = "Just now";
 
+    if (report.createdAt) {
 
-      // DATE
-
-      let dateText =
-        "Just now";
-
-
-      if (report.createdAt) {
+      try {
 
         const date =
           report.createdAt.toDate();
@@ -664,230 +502,190 @@ function renderReports() {
         dateText =
           date.toLocaleString();
 
+      } catch (error) {
+        dateText = "Recently";
       }
 
-
-      // LOCATION
-
-      let locationText =
-        "Not shared";
+    }
 
 
-      if (
-        report.location &&
-        report.location.latitude !== undefined
-      ) {
+    // LOCATION
+    let locationText = "Not shared";
 
-        locationText =
-          `${report.location.latitude.toFixed(4)},
-           ${report.location.longitude.toFixed(4)}`;
+    if (
+      report.location &&
+      typeof report.location.latitude === "number"
+    ) {
 
-      }
+      locationText =
+        `${report.location.latitude.toFixed(4)},
+         ${report.location.longitude.toFixed(4)}`;
 
-
-      // STATUS
-
-      const status =
-        report.status || "Pending";
+    }
 
 
-      const statusClass =
+    const status =
+      report.status || "Pending";
+
+
+    const statusClass =
+      status === "Resolved"
+        ? "resolved-status"
+        : "pending-status";
+
+
+    // =====================================
+    // ADMIN VIEW
+    // =====================================
+
+    if (isAdmin) {
+
+      card.innerHTML = `
+
+        <div class="report-top">
+
+          <h3>
+            ${escapeHTML(report.emergencyType)}
+          </h3>
+
+          <span class="status-badge ${statusClass}">
+            ${escapeHTML(status)}
+          </span>
+
+        </div>
+
+
+        <p>
+          <strong>Name:</strong>
+          ${escapeHTML(report.name)}
+        </p>
+
+
+        <p>
+          <strong>User Email:</strong>
+          ${escapeHTML(report.userEmail || "Unknown")}
+        </p>
+
+
+        <p>
+          <strong>Description:</strong>
+          ${escapeHTML(report.description)}
+        </p>
+
+
+        <p>
+          <strong>Location:</strong>
+          ${locationText}
+        </p>
+
+
+        <p>
+          <strong>Submitted:</strong>
+          ${dateText}
+        </p>
+
+
+        <div class="report-actions">
+
+          <button
+            class="resolve-btn"
+            onclick="changeReportStatus('${report.id}', 'Resolved')"
+          >
+            ✅ Resolve
+          </button>
+
+
+          <button
+            class="active-btn"
+            onclick="changeReportStatus('${report.id}', 'Pending')"
+          >
+            ⏳ Pending
+          </button>
+
+
+          <button
+            class="delete-btn"
+            onclick="deleteReport('${report.id}')"
+          >
+            🗑 Delete
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+
+    // =====================================
+    // NORMAL USER VIEW
+    // =====================================
+
+    else {
+
+      const userStatusText =
+        status === "Resolved"
+          ? "✅ Your case has been resolved."
+          : "⏳ Your case is pending and under review.";
+
+
+      const userStatusClass =
         status === "Resolved"
           ? "resolved"
           : "pending";
 
 
-      // =====================================
-      // ADMIN VIEW
-      // =====================================
+      card.innerHTML = `
 
-      if (isAdmin) {
+        <div class="report-top">
 
-        card.innerHTML = `
+          <h3>
+            ${escapeHTML(report.emergencyType)}
+          </h3>
 
-          <div class="report-top">
+          <span class="status-badge ${statusClass}">
+            ${escapeHTML(status)}
+          </span>
 
-            <h3>
-              ${escapeHTML(
-                report.emergencyType
-              )}
-            </h3>
+        </div>
 
 
-            <span class="
-              status-badge
-              ${status === "Resolved"
-                ? "resolved-status"
-                : "pending-status"}
-            ">
-
-              ${status}
-
-            </span>
-
-          </div>
+        <p>
+          <strong>Name:</strong>
+          ${escapeHTML(report.name)}
+        </p>
 
 
-          <p>
-            <strong>Name:</strong>
-            ${escapeHTML(
-              report.name
-            )}
-          </p>
+        <p>
+          <strong>Description:</strong>
+          ${escapeHTML(report.description)}
+        </p>
 
 
-          <p>
-            <strong>User Email:</strong>
-            ${escapeHTML(
-              report.userEmail || "Unknown"
-            )}
-          </p>
+        <p>
+          <strong>Location:</strong>
+          ${locationText}
+        </p>
 
 
-          <p>
-            <strong>Description:</strong>
-            ${escapeHTML(
-              report.description
-            )}
-          </p>
+        <p>
+          <strong>Submitted:</strong>
+          ${dateText}
+        </p>
 
 
-          <p>
-            <strong>Location:</strong>
-            ${locationText}
-          </p>
+        <div class="case-status ${userStatusClass}">
+          ${userStatusText}
+        </div>
 
-
-          <p>
-            <strong>Submitted:</strong>
-            ${dateText}
-          </p>
-
-
-          <div class="report-actions">
-
-            <button
-              class="resolve-btn"
-              onclick="changeReportStatus(
-                '${report.id}',
-                'Resolved'
-              )"
-            >
-              ✅ Mark Resolved
-            </button>
-
-
-            <button
-              class="active-btn"
-              onclick="changeReportStatus(
-                '${report.id}',
-                'Pending'
-              )"
-            >
-              ⏳ Mark Pending
-            </button>
-
-
-            <button
-              class="delete-btn"
-              onclick="deleteReport(
-                '${report.id}'
-              )"
-            >
-              🗑 Delete
-            </button>
-
-          </div>
-
-        `;
-
-      }
-
-
-      // =====================================
-      // NORMAL USER VIEW
-      // =====================================
-
-      else {
-
-        const statusMessage =
-          status === "Resolved"
-            ? "✅ Your emergency case has been resolved."
-            : "⏳ Your emergency case is pending and under review.";
-
-
-        card.innerHTML = `
-
-          <div class="report-top">
-
-            <h3>
-              ${escapeHTML(
-                report.emergencyType
-              )}
-            </h3>
-
-
-            <span class="
-              status-badge
-              ${status === "Resolved"
-                ? "resolved-status"
-                : "pending-status"}
-            ">
-              ${status}
-            </span>
-
-          </div>
-
-
-          <p>
-            <strong>Name:</strong>
-            ${escapeHTML(
-              report.name
-            )}
-          </p>
-
-
-          <p>
-            <strong>Description:</strong>
-            ${escapeHTML(
-              report.description
-            )}
-          </p>
-
-
-          <p>
-            <strong>Location:</strong>
-            ${locationText}
-          </p>
-
-
-          <p>
-            <strong>Submitted:</strong>
-            ${dateText}
-          </p>
-
-
-          <div class="
-            case-status
-            ${statusClass}
-          ">
-
-            ${statusMessage}
-
-          </div>
-
-        `;
-
-      }
-
-
-      reportsContainer.appendChild(
-        card
-      );
+      `;
 
     }
 
-  );
+
+    reportsContainer.appendChild(card);
+
+  });
 
 }
 
@@ -897,114 +695,75 @@ function renderReports() {
 // ==========================================
 
 window.filterReports = function () {
-
   renderReports();
-
 };
 
 
 // ==========================================
-// UPDATE DASHBOARD
+// DASHBOARD
 // ==========================================
 
 function updateDashboard(reports) {
 
-  const total =
-    reports.length;
+  const total = reports.length;
 
-
-  let pending = 0;
-
+  let active = 0;
   let resolved = 0;
 
 
-  reports.forEach(
-    (report) => {
+  reports.forEach((report) => {
 
-      if (
-        report.status === "Resolved"
-      ) {
-
-        resolved++;
-
-      } else {
-
-        pending++;
-
-      }
-
+    if (report.status === "Resolved") {
+      resolved++;
+    } else {
+      active++;
     }
-  );
+
+  });
 
 
-  if (reportCount) {
+  if (reportCount)
     reportCount.textContent = total;
-  }
 
-
-  if (totalReports) {
+  if (totalReports)
     totalReports.textContent = total;
-  }
 
 
-  // User can also see their own status
+  if (activeReports)
+    activeReports.textContent = active;
 
-  if (activeReports) {
-    activeReports.textContent = pending;
-  }
-
-
-  if (resolvedReports) {
+  if (resolvedReports)
     resolvedReports.textContent = resolved;
-  }
 
 }
 
 
 // ==========================================
 // CHANGE REPORT STATUS
-// ADMIN ONLY
 // ==========================================
 
 window.changeReportStatus =
-async function (
-  reportId,
-  newStatus
-) {
+async function (reportId, newStatus) {
 
   if (!isAdmin) {
-
-    alert(
-      "Admin access required."
-    );
-
+    alert("Admin access required.");
     return;
-
   }
 
 
   try {
 
     await updateDoc(
-
-      doc(
-        db,
-        "reports",
-        reportId
-      ),
-
+      doc(db, "reports", reportId),
       {
-        status:
-          newStatus
+        status: newStatus
       }
-
     );
 
 
     alert(
       `Report marked as ${newStatus}.`
     );
-
 
   } catch (error) {
 
@@ -1021,22 +780,14 @@ async function (
 
 // ==========================================
 // DELETE REPORT
-// ADMIN ONLY
 // ==========================================
 
 window.deleteReport =
-async function (
-  reportId
-) {
+async function (reportId) {
 
   if (!isAdmin) {
-
-    alert(
-      "Admin access required."
-    );
-
+    alert("Admin access required.");
     return;
-
   }
 
 
@@ -1052,28 +803,17 @@ async function (
   try {
 
     await deleteDoc(
-
-      doc(
-        db,
-        "reports",
-        reportId
-      )
-
+      doc(db, "reports", reportId)
     );
 
 
-    alert(
-      "Report deleted successfully."
-    );
-
+    alert("Report deleted.");
 
   } catch (error) {
 
     console.error(error);
 
-    alert(
-      "Unable to delete report."
-    );
+    alert("Unable to delete report.");
 
   }
 
@@ -1082,20 +822,14 @@ async function (
 
 // ==========================================
 // CLEAR ALL REPORTS
-// ADMIN ONLY
 // ==========================================
 
 window.clearAllReports =
 async function () {
 
   if (!isAdmin) {
-
-    alert(
-      "Admin access required."
-    );
-
+    alert("Admin access required.");
     return;
-
   }
 
 
@@ -1112,52 +846,40 @@ async function () {
 
     const snapshot =
       await getDocs(
-        collection(
-          db,
-          "reports"
-        )
+        collection(db, "reports")
       );
 
 
     const deletePromises = [];
 
 
-    snapshot.forEach(
-      (documentSnapshot) => {
+    snapshot.forEach((documentSnapshot) => {
 
-        deletePromises.push(
+      deletePromises.push(
 
-          deleteDoc(
-            doc(
-              db,
-              "reports",
-              documentSnapshot.id
-            )
+        deleteDoc(
+          doc(
+            db,
+            "reports",
+            documentSnapshot.id
           )
+        )
 
-        );
+      );
 
-      }
-    );
-
-
-    await Promise.all(
-      deletePromises
-    );
+    });
 
 
-    alert(
-      "All reports deleted."
-    );
+    await Promise.all(deletePromises);
 
+
+    alert("All reports deleted.");
 
   } catch (error) {
 
     console.error(error);
 
-    alert(
-      "Unable to clear reports."
-    );
+    alert("Unable to clear reports.");
 
   }
 
@@ -1168,8 +890,7 @@ async function () {
 // OPEN REPORT FORM
 // ==========================================
 
-window.openReportForm =
-function () {
+window.openReportForm = function () {
 
   if (!currentUser) {
 
@@ -1184,22 +905,21 @@ function () {
   }
 
 
-  document.getElementById(
-    "reportModal"
-  ).style.display =
-    "block";
+  const modal =
+    document.getElementById("reportModal");
 
 
-  // AUTO FILL NAME
+  if (modal)
+    modal.style.display = "block";
+
 
   const nameInput =
-    document.getElementById(
-      "name"
-    );
+    document.getElementById("name");
 
 
   if (
     currentUser.displayName &&
+    nameInput &&
     !nameInput.value
   ) {
 
@@ -1211,15 +931,9 @@ function () {
 };
 
 
-// ==========================================
-// SOS FORM
-// ==========================================
-
-window.openSOSForm =
-function () {
-
+// SOS
+window.openSOSForm = function () {
   openReportForm();
-
 };
 
 
@@ -1227,42 +941,41 @@ function () {
 // CLOSE REPORT FORM
 // ==========================================
 
-window.closeReportForm =
-function () {
+window.closeReportForm = function () {
 
-  document.getElementById(
-    "reportModal"
-  ).style.display =
-    "none";
+  const modal =
+    document.getElementById("reportModal");
+
+  if (modal)
+    modal.style.display = "none";
 
 };
 
 
 // ==========================================
-// GET LOCATION
+// LOCATION
 // ==========================================
 
-window.getLocation =
-function () {
+window.getLocation = function () {
 
   const status =
-    document.getElementById(
-      "locationStatus"
-    );
+    document.getElementById("locationStatus");
 
 
   if (!navigator.geolocation) {
 
-    status.textContent =
-      "Geolocation is not supported.";
+    if (status)
+      status.textContent =
+        "Geolocation is not supported.";
 
     return;
 
   }
 
 
-  status.textContent =
-    "Getting your location...";
+  if (status)
+    status.textContent =
+      "Getting location...";
 
 
   navigator.geolocation.getCurrentPosition(
@@ -1280,8 +993,9 @@ function () {
       };
 
 
-      status.textContent =
-        "📍 Location added successfully.";
+      if (status)
+        status.textContent =
+          "📍 Location added successfully.";
 
     },
 
@@ -1290,9 +1004,9 @@ function () {
 
       console.error(error);
 
-
-      status.textContent =
-        "Unable to get location.";
+      if (status)
+        status.textContent =
+          "Unable to get location.";
 
     }
 
@@ -1306,15 +1020,12 @@ function () {
 // ==========================================
 
 const emergencyForm =
-  document.getElementById(
-    "emergencyForm"
-  );
+  document.getElementById("emergencyForm");
 
 
 if (emergencyForm) {
 
   emergencyForm.addEventListener(
-
     "submit",
 
     async function (event) {
@@ -1324,9 +1035,7 @@ if (emergencyForm) {
 
       if (!currentUser) {
 
-        alert(
-          "Please login first."
-        );
+        alert("Please login first.");
 
         return;
 
@@ -1334,23 +1043,13 @@ if (emergencyForm) {
 
 
       const name =
-        document
-          .getElementById("name")
-          .value
-          .trim();
-
+        document.getElementById("name").value.trim();
 
       const emergencyType =
-        document
-          .getElementById("emergencyType")
-          .value;
-
+        document.getElementById("emergencyType").value;
 
       const description =
-        document
-          .getElementById("description")
-          .value
-          .trim();
+        document.getElementById("description").value.trim();
 
 
       if (
@@ -1371,37 +1070,25 @@ if (emergencyForm) {
       try {
 
         await addDoc(
-
-          collection(
-            db,
-            "reports"
-          ),
+          collection(db, "reports"),
 
           {
 
-            name:
-              name,
+            name: name,
 
-            emergencyType:
-              emergencyType,
+            emergencyType: emergencyType,
 
-            description:
-              description,
+            description: description,
 
-            location:
-              currentLocation,
+            location: currentLocation,
 
-            userId:
-              currentUser.uid,
+            userId: currentUser.uid,
 
-            userEmail:
-              currentUser.email,
+            userEmail: currentUser.email,
 
-            status:
-              "Pending",
+            status: "Pending",
 
-            createdAt:
-              serverTimestamp()
+            createdAt: serverTimestamp()
 
           }
 
@@ -1419,14 +1106,17 @@ if (emergencyForm) {
         currentLocation = null;
 
 
-        document.getElementById(
-          "locationStatus"
-        ).textContent =
-          "";
+        const locationStatus =
+          document.getElementById(
+            "locationStatus"
+          );
+
+
+        if (locationStatus)
+          locationStatus.textContent = "";
 
 
         closeReportForm();
-
 
       } catch (error) {
 
@@ -1450,153 +1140,124 @@ if (emergencyForm) {
 // FEEDBACK SYSTEM
 // ==========================================
 
-const feedbackForm =
-  document.getElementById(
-    "feedbackForm"
-  );
+window.submitFeedback =
+async function () {
+
+  if (!currentUser) {
+
+    alert(
+      "Please login first to submit feedback."
+    );
+
+    openLoginModal();
+
+    return;
+
+  }
 
 
-if (feedbackForm) {
+  const feedbackType =
+    document.getElementById("feedbackType");
 
-  feedbackForm.addEventListener(
-
-    "submit",
-
-    async function (event) {
-
-      event.preventDefault();
+  const feedbackMessage =
+    document.getElementById("feedbackMessage");
 
 
-      if (!currentUser) {
-
-        alert(
-          "Please login first to submit feedback."
-        );
-
-        openLoginModal();
-
-        return;
-
-      }
+  if (!feedbackType || !feedbackMessage) {
+    return;
+  }
 
 
-      const feedbackTypeElement =
-        document.getElementById(
-          "feedbackType"
-        );
+  const type =
+    feedbackType.value;
+
+  const message =
+    feedbackMessage.value.trim();
 
 
-      const feedbackMessageElement =
-        document.getElementById(
-          "feedbackMessage"
-        );
+  if (!message) {
+
+    alert(
+      "Please write your feedback."
+    );
+
+    return;
+
+  }
 
 
-      const feedbackType =
-        feedbackTypeElement ?
-        feedbackTypeElement.value :
-        "General";
+  try {
 
+    await addDoc(
+      collection(db, "feedback"),
 
-      const feedbackMessage =
-        feedbackMessageElement ?
-        feedbackMessageElement.value.trim() :
-        "";
+      {
 
+        userId: currentUser.uid,
 
-      if (!feedbackMessage) {
+        userEmail: currentUser.email,
 
-        alert(
-          "Please enter your feedback."
-        );
+        userName:
+          currentUser.displayName ||
+          "Anonymous",
 
-        return;
+        feedbackType: type,
 
-      }
+        message: message,
 
-
-      try {
-
-        await addDoc(
-
-          collection(
-            db,
-            "feedback"
-          ),
-
-          {
-
-            type:
-              feedbackType,
-
-            message:
-              feedbackMessage,
-
-            userId:
-              currentUser.uid,
-
-            userEmail:
-              currentUser.email,
-
-            userName:
-              currentUser.displayName ||
-              currentUser.email.split("@")[0],
-
-            createdAt:
-              serverTimestamp()
-
-          }
-
-        );
-
-
-        alert(
-          "Thank you for your feedback! ❤️"
-        );
-
-
-        feedbackForm.reset();
-
-
-      } catch (error) {
-
-        console.error(error);
-
-        alert(
-          "Unable to submit feedback."
-        );
+        createdAt: serverTimestamp()
 
       }
 
-    }
+    );
 
-  );
 
-}
+    alert(
+      "Thank you for your feedback! 💙"
+    );
+
+
+    feedbackMessage.value = "";
+
+
+    if (feedbackType)
+      feedbackType.value = "General";
+
+  } catch (error) {
+
+    console.error(error);
+
+    alert(
+      "Unable to submit feedback."
+    );
+
+  }
+
+};
 
 
 // ==========================================
 // LOGIN MODAL
 // ==========================================
 
-window.openLoginModal =
-function () {
+window.openLoginModal = function () {
 
-  document.getElementById(
-    "loginModal"
-  ).style.display =
-    "block";
+  const modal =
+    document.getElementById("loginModal");
+
+  if (modal)
+    modal.style.display = "block";
 
 };
 
 
-window.closeLoginModal =
-function () {
+window.closeLoginModal = function () {
 
-  document.getElementById(
-    "loginModal"
-  ).style.display =
-    "none";
+  const modal =
+    document.getElementById("loginModal");
+
+  if (modal)
+    modal.style.display = "none";
 
 };
 
@@ -1605,78 +1266,59 @@ function () {
 // SIGNUP MODAL
 // ==========================================
 
-window.openSignupModal =
-function () {
+window.openSignupModal = function () {
 
-  document.getElementById(
-    "signupModal"
-  ).style.display =
-    "block";
+  const modal =
+    document.getElementById("signupModal");
+
+  if (modal)
+    modal.style.display = "block";
 
 };
 
 
-window.closeSignupModal =
-function () {
+window.closeSignupModal = function () {
 
-  document.getElementById(
-    "signupModal"
-  ).style.display =
-    "none";
+  const modal =
+    document.getElementById("signupModal");
+
+  if (modal)
+    modal.style.display = "none";
 
 };
 
 
 // ==========================================
-// CLOSE MODAL WHEN CLICK OUTSIDE
+// CLOSE MODALS OUTSIDE CLICK
 // ==========================================
 
 window.addEventListener(
-
   "click",
 
   function (event) {
 
     const reportModal =
-      document.getElementById(
-        "reportModal"
-      );
+      document.getElementById("reportModal");
 
     const loginModal =
-      document.getElementById(
-        "loginModal"
-      );
+      document.getElementById("loginModal");
 
     const signupModal =
-      document.getElementById(
-        "signupModal"
-      );
+      document.getElementById("signupModal");
 
 
-    if (
-      event.target === reportModal
-    ) {
-
+    if (event.target === reportModal) {
       closeReportForm();
-
     }
 
 
-    if (
-      event.target === loginModal
-    ) {
-
+    if (event.target === loginModal) {
       closeLoginModal();
-
     }
 
 
-    if (
-      event.target === signupModal
-    ) {
-
+    if (event.target === signupModal) {
       closeSignupModal();
-
     }
 
   }
@@ -1686,7 +1328,6 @@ window.addEventListener(
 
 // ==========================================
 // ESCAPE HTML
-// SECURITY
 // ==========================================
 
 function escapeHTML(value) {
@@ -1696,30 +1337,15 @@ function escapeHTML(value) {
 
   return String(value)
 
-    .replace(
-      /&/g,
-      "&amp;"
-    )
+    .replace(/&/g, "&amp;")
 
-    .replace(
-      /</g,
-      "&lt;"
-    )
+    .replace(/</g, "&lt;")
 
-    .replace(
-      />/g,
-      "&gt;"
-    )
+    .replace(/>/g, "&gt;")
 
-    .replace(
-      /"/g,
-      "&quot;"
-    )
+    .replace(/"/g, "&quot;")
 
-    .replace(
-      /'/g,
-      "&#039;"
-    );
+    .replace(/'/g, "&#039;");
 
 }
 
