@@ -1,12 +1,12 @@
-// ==========================================
-// NOVA DISASTER RESPONSE
-// PHASE 5 - FINAL SCRIPT.JS
-// ==========================================
+/* ==========================================
+   NOVA DISASTER RESPONSE
+   FINAL SCRIPT.JS - PHASE 6
+========================================== */
 
 
-// ==========================================
-// FIREBASE IMPORTS
-// ==========================================
+/* ==========================================
+   FIREBASE IMPORTS
+========================================== */
 
 import { initializeApp } from
   "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -15,9 +15,9 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  signOut,
-  GoogleAuthProvider,
   signInWithPopup,
+  GoogleAuthProvider,
+  signOut,
   onAuthStateChanged,
   updateProfile
 } from
@@ -28,210 +28,214 @@ import {
   collection,
   addDoc,
   getDocs,
-  deleteDoc,
+  getDoc,
   doc,
   updateDoc,
+  deleteDoc,
   query,
-  where,
+  orderBy,
   serverTimestamp,
-  onSnapshot
+  where
 } from
   "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-// ==========================================
-// FIREBASE CONFIG
-// ==========================================
+/* ==========================================
+   FIREBASE CONFIG
+========================================== */
 
 const firebaseConfig = {
   apiKey: "AIzaSyBcEkoZMt1KZdQ-ch6J1-7KKyQRO542ZRY",
   authDomain: "nova-disaster-response.firebaseapp.com",
   projectId: "nova-disaster-response",
   storageBucket: "nova-disaster-response.firebasestorage.app",
-  messagingSenderId: "275029136991",
-  appId: "1:275029136991:web:382543b5ef90263b8364a"
+  messagingSenderId: "275029316991",
+  appId: "1:275029316991:web:382543b5ef90263b8364a"
 };
 
 
-// ==========================================
-// INITIALIZE FIREBASE
-// ==========================================
+/* ==========================================
+   INITIALIZE FIREBASE
+========================================== */
 
 const app = initializeApp(firebaseConfig);
+
 const auth = getAuth(app);
+
 const db = getFirestore(app);
 
+const provider = new GoogleAuthProvider();
 
-// ==========================================
-// ADMIN CONFIGURATION
-// ==========================================
+
+/* ==========================================
+   GLOBAL VARIABLES
+========================================== */
+
+let currentUser = null;
+
+let currentLocation = null;
+
+let allReports = [];
+
+let selectedImageBase64 = null;
+
+
+/* ==========================================
+   ADMIN EMAIL
+========================================== */
+
+/*
+  CHANGE THIS TO YOUR EMAIL
+
+  Example:
+  const ADMIN_EMAIL = "your@email.com";
+*/
 
 const ADMIN_EMAIL = "adi56tya65raj00@gmail.com";
 
 
-// ==========================================
-// GLOBAL VARIABLES
-// ==========================================
+/* ==========================================
+   LANGUAGE SUPPORT
+========================================== */
 
-let currentUser = null;
-let isAdmin = false;
-let userReports = [];
-let currentLocation = null;
-let unsubscribeReports = null;
+const translations = {
 
+  en: {
+    home: "Home",
+    features: "Features",
+    emergency: "Emergency",
+    dashboard: "Dashboard",
+    reports: "Reports",
+    feedback: "Feedback"
+  },
 
-// ==========================================
-// DOM ELEMENTS
-// ==========================================
+  hi: {
+    home: "होम",
+    features: "फीचर्स",
+    emergency: "आपातकाल",
+    dashboard: "डैशबोर्ड",
+    reports: "रिपोर्ट्स",
+    feedback: "फीडबैक"
+  }
 
-const authButtons = document.getElementById("authButtons");
-const userProfile = document.getElementById("userProfile");
-const userName = document.getElementById("userName");
-
-const reportsContainer =
-  document.getElementById("reportsContainer");
-
-const reportCount =
-  document.getElementById("reportCount");
-
-const totalReports =
-  document.getElementById("totalReports");
-
-const activeReports =
-  document.getElementById("activeReports");
-
-const resolvedReports =
-  document.getElementById("resolvedReports");
-
-const clearButton =
-  document.querySelector(".clear-btn");
+};
 
 
-// ==========================================
-// AUTH STATE
-// ==========================================
+/* ==========================================
+   AUTH STATE
+========================================== */
 
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
 
   currentUser = user;
 
+  const authButtons =
+    document.getElementById("authButtons");
+
+  const userProfile =
+    document.getElementById("userProfile");
+
+  const userName =
+    document.getElementById("userName");
+
+
   if (user) {
 
-    isAdmin =
-      user.email &&
-      user.email.toLowerCase() ===
-      ADMIN_EMAIL.toLowerCase();
+    authButtons.style.display = "none";
+
+    userProfile.style.display = "flex";
+
+    userName.textContent =
+      `👋 ${user.displayName || user.email.split("@")[0]}`;
 
 
-    // SHOW USER PROFILE
+    await loadReports();
 
-    if (authButtons) {
-      authButtons.style.display = "none";
-    }
+    checkAdmin(user);
 
-    if (userProfile) {
-      userProfile.style.display = "flex";
-    }
+  }
 
+  else {
 
-    const displayName =
-      user.displayName ||
-      user.email.split("@")[0];
+    authButtons.style.display = "flex";
 
+    userProfile.style.display = "none";
 
-    if (userName) {
+    document.getElementById(
+      "reportsContainer"
+    ).innerHTML = `
+      <p class="no-report">
+        🔐 Login to view emergency reports.
+      </p>
+    `;
 
-      userName.textContent =
-        isAdmin
-          ? `${displayName} 🛡️ ADMIN`
-          : `${displayName} 👤`;
-
-    }
-
-
-    // ADMIN CLEAR BUTTON
-
-    if (clearButton) {
-
-      clearButton.style.display =
-        isAdmin ? "block" : "none";
-
-    }
-
-
-    loadReports();
-
-
-  } else {
-
-    currentUser = null;
-    isAdmin = false;
-    userReports = [];
-
-
-    if (authButtons) {
-      authButtons.style.display = "flex";
-    }
-
-    if (userProfile) {
-      userProfile.style.display = "none";
-    }
-
-    if (clearButton) {
-      clearButton.style.display = "none";
-    }
-
-
-    if (unsubscribeReports) {
-
-      unsubscribeReports();
-      unsubscribeReports = null;
-
-    }
-
-
-    if (reportsContainer) {
-
-      reportsContainer.innerHTML = `
-        <p class="no-report">
-          🔐 Login to view your emergency reports.
-        </p>
-      `;
-
-    }
-
-
-    updateDashboard([]);
+    resetAnalytics();
 
   }
 
 });
 
 
-// ==========================================
-// SIGNUP
-// ==========================================
+/* ==========================================
+   CHECK ADMIN
+========================================== */
+
+function checkAdmin(user) {
+
+  const adminSection =
+    document.getElementById(
+      "adminFeedbackSection"
+    );
+
+
+  if (
+    ADMIN_EMAIL !== "YOUR_ADMIN_EMAIL_HERE" &&
+    user.email === ADMIN_EMAIL
+  ) {
+
+    adminSection.style.display = "block";
+
+    loadFeedback();
+
+  }
+
+  else {
+
+    adminSection.style.display = "none";
+
+  }
+
+}
+
+
+/* ==========================================
+   SIGNUP
+========================================== */
 
 window.signupUser = async function () {
 
   const name =
-    document.getElementById("signupName")
-      ?.value
-      .trim();
+    document.getElementById(
+      "signupName"
+    ).value.trim();
 
   const email =
-    document.getElementById("signupEmail")
-      ?.value
-      .trim();
+    document.getElementById(
+      "signupEmail"
+    ).value.trim();
 
   const password =
-    document.getElementById("signupPassword")
-      ?.value;
+    document.getElementById(
+      "signupPassword"
+    ).value;
 
 
-  if (!email || !password) {
+  if (!name || !email || !password) {
 
-    alert("Please enter email and password.");
+    alert(
+      "Please fill all fields."
+    );
+
     return;
 
   }
@@ -239,7 +243,10 @@ window.signupUser = async function () {
 
   if (password.length < 6) {
 
-    alert("Password must be at least 6 characters.");
+    alert(
+      "Password must be at least 6 characters."
+    );
+
     return;
 
   }
@@ -255,51 +262,60 @@ window.signupUser = async function () {
       );
 
 
-    if (name) {
-
-      await updateProfile(
-        userCredential.user,
-        {
-          displayName: name
-        }
-      );
-
-    }
+    await updateProfile(
+      userCredential.user,
+      {
+        displayName: name
+      }
+    );
 
 
-    alert("Account created successfully! 🎉");
+    alert(
+      "🎉 Account created successfully!"
+    );
+
 
     closeSignupModal();
 
 
-  } catch (error) {
+  }
 
-    alert(error.message);
+  catch (error) {
+
+    console.error(error);
+
+    alert(
+      error.message
+    );
 
   }
 
 };
 
 
-// ==========================================
-// LOGIN
-// ==========================================
+/* ==========================================
+   LOGIN
+========================================== */
 
 window.loginUser = async function () {
 
   const email =
-    document.getElementById("loginEmail")
-      ?.value
-      .trim();
+    document.getElementById(
+      "loginEmail"
+    ).value.trim();
 
   const password =
-    document.getElementById("loginPassword")
-      ?.value;
+    document.getElementById(
+      "loginPassword"
+    ).value;
 
 
   if (!email || !password) {
 
-    alert("Please enter email and password.");
+    alert(
+      "Please enter email and password."
+    );
+
     return;
 
   }
@@ -314,45 +330,22 @@ window.loginUser = async function () {
     );
 
 
-    alert("Login successful! 🚀");
-
-    closeLoginModal();
-
-
-  } catch (error) {
-
-    alert("Login failed: " + error.message);
-
-  }
-
-};
-
-
-// ==========================================
-// GOOGLE LOGIN
-// ==========================================
-
-window.googleLogin = async function () {
-
-  try {
-
-    const provider =
-      new GoogleAuthProvider();
-
-    await signInWithPopup(
-      auth,
-      provider
+    alert(
+      "Welcome back! 👋"
     );
 
 
     closeLoginModal();
-    closeSignupModal();
 
 
-  } catch (error) {
+  }
+
+  catch (error) {
+
+    console.error(error);
 
     alert(
-      "Google login failed: " +
+      "Login failed: " +
       error.message
     );
 
@@ -361,9 +354,47 @@ window.googleLogin = async function () {
 };
 
 
-// ==========================================
-// LOGOUT
-// ==========================================
+/* ==========================================
+   GOOGLE LOGIN
+========================================== */
+
+window.googleLogin = async function () {
+
+  try {
+
+    await signInWithPopup(
+      auth,
+      provider
+    );
+
+
+    closeLoginModal();
+
+    closeSignupModal();
+
+
+    alert(
+      "Google login successful! 🎉"
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+    alert(
+      error.message
+    );
+
+  }
+
+};
+
+
+/* ==========================================
+   LOGOUT
+========================================== */
 
 window.logoutUser = async function () {
 
@@ -371,693 +402,67 @@ window.logoutUser = async function () {
 
     await signOut(auth);
 
-    alert("Logged out successfully.");
-
-  } catch (error) {
-
-    alert(error.message);
-
-  }
-
-};
-
-
-// ==========================================
-// LOAD REPORTS
-// ==========================================
-
-function loadReports() {
-
-  if (!currentUser) return;
-
-
-  if (unsubscribeReports) {
-
-    unsubscribeReports();
-
-  }
-
-
-  let reportsQuery;
-
-
-  // ADMIN CAN SEE ALL REPORTS
-
-  if (isAdmin) {
-
-    reportsQuery =
-      query(
-        collection(db, "reports")
-      );
-
-  }
-
-
-  // NORMAL USER ONLY OWN REPORTS
-
-  else {
-
-    reportsQuery =
-      query(
-        collection(db, "reports"),
-        where(
-          "userId",
-          "==",
-          currentUser.uid
-        )
-      );
-
-  }
-
-
-  unsubscribeReports =
-    onSnapshot(
-
-      reportsQuery,
-
-      (snapshot) => {
-
-        userReports = [];
-
-
-        snapshot.forEach(
-          (documentSnapshot) => {
-
-            userReports.push({
-
-              id:
-                documentSnapshot.id,
-
-              ...documentSnapshot.data()
-
-            });
-
-          }
-        );
-
-
-        // SORT NEWEST FIRST
-
-        userReports.sort(
-          (a, b) => {
-
-            const timeA =
-              a.createdAt?.seconds || 0;
-
-            const timeB =
-              b.createdAt?.seconds || 0;
-
-            return timeB - timeA;
-
-          }
-        );
-
-
-        renderReports();
-
-        updateDashboard(
-          userReports
-        );
-
-      },
-
-
-      (error) => {
-
-        console.error(
-          "Error loading reports:",
-          error
-        );
-
-
-        if (reportsContainer) {
-
-          reportsContainer.innerHTML = `
-            <p class="no-report">
-              Unable to load reports.
-            </p>
-          `;
-
-        }
-
-      }
-
-    );
-
-}
-
-
-// ==========================================
-// RENDER REPORTS
-// ==========================================
-
-function renderReports() {
-
-  if (!currentUser || !reportsContainer) return;
-
-
-  const filterElement =
-    document.getElementById(
-      "reportFilter"
-    );
-
-
-  const filter =
-    filterElement
-      ? filterElement.value
-      : "All";
-
-
-  let filteredReports =
-    [...userReports];
-
-
-  if (filter !== "All") {
-
-    filteredReports =
-      filteredReports.filter(
-        (report) =>
-          report.emergencyType === filter
-      );
-
-  }
-
-
-  if (filteredReports.length === 0) {
-
-    reportsContainer.innerHTML = `
-      <p class="no-report">
-        No emergency reports found.
-      </p>
-    `;
-
-    return;
-
-  }
-
-
-  reportsContainer.innerHTML = "";
-
-
-  filteredReports.forEach(
-    (report) => {
-
-      const card =
-        document.createElement("div");
-
-      card.className =
-        "report-card";
-
-
-      // DATE
-
-      let dateText = "Just now";
-
-      if (report.createdAt) {
-
-        try {
-
-          dateText =
-            report.createdAt
-              .toDate()
-              .toLocaleString();
-
-        } catch {
-
-          dateText = "Recently";
-
-        }
-
-      }
-
-
-      // LOCATION
-
-      let locationText =
-        "Not shared";
-
-
-      if (
-        report.location &&
-        typeof report.location.latitude === "number"
-      ) {
-
-        locationText =
-          `${report.location.latitude.toFixed(4)},
-           ${report.location.longitude.toFixed(4)}`;
-
-      }
-
-
-      // STATUS
-
-      const status =
-        report.status || "Pending";
-
-
-      const isResolved =
-        status === "Resolved";
-
-
-      // =====================================
-      // ADMIN VIEW
-      // =====================================
-
-      if (isAdmin) {
-
-        card.innerHTML = `
-
-          <div class="report-top">
-
-            <h3>
-              ${escapeHTML(report.emergencyType)}
-            </h3>
-
-            <span class="
-              status-badge
-              ${isResolved
-                ? "resolved-status"
-                : "pending-status"}
-            ">
-              ${escapeHTML(status)}
-            </span>
-
-          </div>
-
-
-          <p>
-            <strong>👤 Name:</strong>
-            ${escapeHTML(report.name)}
-          </p>
-
-
-          <p>
-            <strong>📧 User Email:</strong>
-            ${escapeHTML(
-              report.userEmail || "Unknown"
-            )}
-          </p>
-
-
-          <p>
-            <strong>📝 Description:</strong>
-            ${escapeHTML(report.description)}
-          </p>
-
-
-          <p>
-            <strong>📍 Location:</strong>
-            ${locationText}
-          </p>
-
-
-          <p>
-            <strong>🕒 Submitted:</strong>
-            ${dateText}
-          </p>
-
-
-          <div class="report-actions">
-
-            <button
-              class="resolve-btn"
-              onclick="changeReportStatus(
-                '${report.id}',
-                'Resolved'
-              )"
-            >
-              ✅ Resolve
-            </button>
-
-
-            <button
-              class="active-btn"
-              onclick="changeReportStatus(
-                '${report.id}',
-                'Pending'
-              )"
-            >
-              🟡 Pending
-            </button>
-
-
-            <button
-              class="delete-btn"
-              onclick="deleteReport(
-                '${report.id}'
-              )"
-            >
-              🗑 Delete
-            </button>
-
-          </div>
-
-        `;
-
-      }
-
-
-      // =====================================
-      // USER VIEW
-      // =====================================
-
-      else {
-
-        card.innerHTML = `
-
-          <div class="report-top">
-
-            <h3>
-              ${escapeHTML(report.emergencyType)}
-            </h3>
-
-          </div>
-
-
-          <p>
-            <strong>👤 Name:</strong>
-            ${escapeHTML(report.name)}
-          </p>
-
-
-          <p>
-            <strong>📝 Description:</strong>
-            ${escapeHTML(report.description)}
-          </p>
-
-
-          <p>
-            <strong>📍 Location:</strong>
-            ${locationText}
-          </p>
-
-
-          <p>
-            <strong>🕒 Submitted:</strong>
-            ${dateText}
-          </p>
-
-
-          <div class="
-            case-status
-            ${isResolved
-              ? "resolved"
-              : "pending"}
-          ">
-
-            ${isResolved
-              ? "✅ Case Resolved"
-              : "⏳ Case Pending"}
-
-          </div>
-
-        `;
-
-      }
-
-
-      reportsContainer.appendChild(card);
-
-    }
-
-  );
-
-}
-
-
-// ==========================================
-// FILTER REPORTS
-// ==========================================
-
-window.filterReports = function () {
-
-  renderReports();
-
-};
-
-
-// ==========================================
-// DASHBOARD
-// ==========================================
-
-function updateDashboard(reports) {
-
-  const total =
-    reports.length;
-
-  let pending = 0;
-  let resolved = 0;
-
-
-  reports.forEach(
-    (report) => {
-
-      if (
-        report.status === "Resolved"
-      ) {
-
-        resolved++;
-
-      } else {
-
-        pending++;
-
-      }
-
-    }
-  );
-
-
-  if (reportCount) {
-
-    reportCount.textContent =
-      total;
-
-  }
-
-
-  if (totalReports) {
-
-    totalReports.textContent =
-      total;
-
-  }
-
-
-  if (activeReports) {
-
-    activeReports.textContent =
-      isAdmin ? pending : "-";
-
-  }
-
-
-  if (resolvedReports) {
-
-    resolvedReports.textContent =
-      isAdmin ? resolved : "-";
-
-  }
-
-}
-
-
-// ==========================================
-// CHANGE REPORT STATUS
-// ADMIN ONLY
-// ==========================================
-
-window.changeReportStatus =
-async function (
-  reportId,
-  newStatus
-) {
-
-  if (!isAdmin) {
-
-    alert("Admin access required.");
-    return;
-
-  }
-
-
-  try {
-
-    await updateDoc(
-
-      doc(
-        db,
-        "reports",
-        reportId
-      ),
-
-      {
-        status: newStatus,
-        updatedAt: serverTimestamp()
-      }
-
-    );
-
-
     alert(
-      `Case marked as ${newStatus}.`
+      "Logged out successfully."
     );
 
+  }
 
-  } catch (error) {
+  catch (error) {
 
     console.error(error);
 
-    alert(
-      "Unable to update status."
-    );
-
   }
 
 };
 
 
-// ==========================================
-// DELETE REPORT
-// ADMIN ONLY
-// ==========================================
+/* ==========================================
+   MODAL FUNCTIONS
+========================================== */
 
-window.deleteReport =
-async function (reportId) {
+window.openLoginModal = function () {
 
-  if (!isAdmin) {
-
-    alert("Admin access required.");
-    return;
-
-  }
-
-
-  const confirmDelete =
-    confirm(
-      "Delete this report permanently?"
-    );
-
-
-  if (!confirmDelete) return;
-
-
-  try {
-
-    await deleteDoc(
-
-      doc(
-        db,
-        "reports",
-        reportId
-      )
-
-    );
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert("Unable to delete report.");
-
-  }
+  document.getElementById(
+    "loginModal"
+  ).style.display = "block";
 
 };
 
 
-// ==========================================
-// CLEAR ALL REPORTS
-// ADMIN ONLY
-// ==========================================
+window.closeLoginModal = function () {
 
-window.clearAllReports =
-async function () {
-
-  if (!isAdmin) {
-
-    alert("Admin access required.");
-    return;
-
-  }
-
-
-  const confirmClear =
-    confirm(
-      "Are you sure you want to delete ALL reports?"
-    );
-
-
-  if (!confirmClear) return;
-
-
-  try {
-
-    const snapshot =
-      await getDocs(
-        collection(
-          db,
-          "reports"
-        )
-      );
-
-
-    const deletePromises = [];
-
-
-    snapshot.forEach(
-      (documentSnapshot) => {
-
-        deletePromises.push(
-
-          deleteDoc(
-
-            doc(
-              db,
-              "reports",
-              documentSnapshot.id
-            )
-
-          )
-
-        );
-
-      }
-    );
-
-
-    await Promise.all(
-      deletePromises
-    );
-
-
-    alert("All reports deleted.");
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    alert(
-      "Unable to clear reports."
-    );
-
-  }
+  document.getElementById(
+    "loginModal"
+  ).style.display = "none";
 
 };
 
 
-// ==========================================
-// OPEN REPORT FORM
-// ==========================================
+window.openSignupModal = function () {
 
-window.openReportForm =
-function () {
+  document.getElementById(
+    "signupModal"
+  ).style.display = "block";
+
+};
+
+
+window.closeSignupModal = function () {
+
+  document.getElementById(
+    "signupModal"
+  ).style.display = "none";
+
+};
+
+
+window.openReportForm = function () {
 
   if (!currentUser) {
 
     alert(
-      "Please login first to submit an emergency report."
+      "🔐 Please login first to report an emergency."
     );
 
     openLoginModal();
@@ -1067,80 +472,57 @@ function () {
   }
 
 
-  const modal =
-    document.getElementById(
-      "reportModal"
-    );
-
-
-  if (modal) {
-
-    modal.style.display =
-      "block";
-
-  }
-
-
-  const nameInput =
-    document.getElementById(
-      "name"
-    );
-
-
-  if (
-    currentUser.displayName &&
-    nameInput &&
-    !nameInput.value
-  ) {
-
-    nameInput.value =
-      currentUser.displayName;
-
-  }
+  document.getElementById(
+    "reportModal"
+  ).style.display = "block";
 
 };
 
 
-// ==========================================
-// SOS FORM
-// ==========================================
-
-window.openSOSForm =
-function () {
+window.openSOSForm = function () {
 
   openReportForm();
 
 };
 
 
-// ==========================================
-// CLOSE REPORT FORM
-// ==========================================
+window.closeReportForm = function () {
 
-window.closeReportForm =
-function () {
-
-  const modal =
-    document.getElementById(
-      "reportModal"
-    );
-
-  if (modal) {
-
-    modal.style.display =
-      "none";
-
-  }
+  document.getElementById(
+    "reportModal"
+  ).style.display = "none";
 
 };
 
 
-// ==========================================
-// GET LOCATION
-// ==========================================
+/* ==========================================
+   CLOSE MODAL OUTSIDE
+========================================== */
 
-window.getLocation =
-function () {
+window.onclick = function (event) {
+
+  const modals =
+    document.querySelectorAll(".modal");
+
+
+  modals.forEach((modal) => {
+
+    if (event.target === modal) {
+
+      modal.style.display = "none";
+
+    }
+
+  });
+
+};
+
+
+/* ==========================================
+   LOCATION
+========================================== */
+
+window.getLocation = function () {
 
   const status =
     document.getElementById(
@@ -1150,24 +532,16 @@ function () {
 
   if (!navigator.geolocation) {
 
-    if (status) {
-
-      status.textContent =
-        "Geolocation is not supported.";
-
-    }
+    status.textContent =
+      "❌ Location is not supported.";
 
     return;
 
   }
 
 
-  if (status) {
-
-    status.textContent =
-      "Getting location...";
-
-  }
+  status.textContent =
+    "📍 Getting your location...";
 
 
   navigator.geolocation.getCurrentPosition(
@@ -1185,12 +559,13 @@ function () {
       };
 
 
-      if (status) {
-
-        status.textContent =
-          "📍 Location added successfully.";
-
-      }
+      status.innerHTML = `
+        ✅ Location captured successfully
+        <br>
+        Lat: ${currentLocation.latitude.toFixed(5)}
+        |
+        Long: ${currentLocation.longitude.toFixed(5)}
+      `;
 
     },
 
@@ -1199,21 +574,14 @@ function () {
 
       console.error(error);
 
-
-      if (status) {
-
-        status.textContent =
-          "Unable to get location.";
-
-      }
+      status.textContent =
+        "❌ Unable to get location. Please allow location permission.";
 
     },
 
-
     {
       enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0
+      timeout: 10000
     }
 
   );
@@ -1221,9 +589,93 @@ function () {
 };
 
 
-// ==========================================
-// SUBMIT EMERGENCY REPORT
-// ==========================================
+/* ==========================================
+   IMAGE UPLOAD
+========================================== */
+
+const reportImageInput =
+  document.getElementById("reportImage");
+
+
+if (reportImageInput) {
+
+  reportImageInput.addEventListener(
+    "change",
+    function () {
+
+      const file =
+        this.files[0];
+
+
+      if (!file) return;
+
+
+      if (
+        !file.type.startsWith("image/")
+      ) {
+
+        alert(
+          "Please select an image file."
+        );
+
+        return;
+
+      }
+
+
+      if (
+        file.size > 2 * 1024 * 1024
+      ) {
+
+        alert(
+          "Image size must be less than 2MB."
+        );
+
+        return;
+
+      }
+
+
+      const reader =
+        new FileReader();
+
+
+      reader.onload = function (event) {
+
+        selectedImageBase64 =
+          event.target.result;
+
+
+        const preview =
+          document.getElementById(
+            "imagePreview"
+          );
+
+
+        if (preview) {
+
+          preview.src =
+            selectedImageBase64;
+
+          preview.style.display =
+            "block";
+
+        }
+
+      };
+
+
+      reader.readAsDataURL(file);
+
+    }
+  );
+
+}
+
+
+/* ==========================================
+   SUBMIT EMERGENCY REPORT
+========================================== */
 
 const emergencyForm =
   document.getElementById(
@@ -1234,9 +686,7 @@ const emergencyForm =
 if (emergencyForm) {
 
   emergencyForm.addEventListener(
-
     "submit",
-
     async function (event) {
 
       event.preventDefault();
@@ -1258,12 +708,15 @@ if (emergencyForm) {
           "name"
         ).value.trim();
 
-
       const emergencyType =
         document.getElementById(
           "emergencyType"
         ).value;
 
+      const priority =
+        document.getElementById(
+          "priority"
+        ).value;
 
       const description =
         document.getElementById(
@@ -1274,6 +727,7 @@ if (emergencyForm) {
       if (
         !name ||
         !emergencyType ||
+        !priority ||
         !description
       ) {
 
@@ -1288,38 +742,47 @@ if (emergencyForm) {
 
       try {
 
-        await addDoc(
+        const reportData = {
 
+          userId:
+            currentUser.uid,
+
+          userEmail:
+            currentUser.email,
+
+          name:
+            name,
+
+          emergencyType:
+            emergencyType,
+
+          priority:
+            priority,
+
+          description:
+            description,
+
+          status:
+            "Pending",
+
+          location:
+            currentLocation || null,
+
+          image:
+            selectedImageBase64 || null,
+
+          createdAt:
+            serverTimestamp()
+
+        };
+
+
+        await addDoc(
           collection(
             db,
             "reports"
           ),
-
-          {
-
-            name,
-
-            emergencyType,
-
-            description,
-
-            location:
-              currentLocation || null,
-
-            userId:
-              currentUser.uid,
-
-            userEmail:
-              currentUser.email,
-
-            status:
-              "Pending",
-
-            createdAt:
-              serverTimestamp()
-
-          }
-
+          reportData
         );
 
 
@@ -1332,45 +795,957 @@ if (emergencyForm) {
 
         currentLocation = null;
 
+        selectedImageBase64 = null;
 
-        const locationStatus =
+
+        const status =
           document.getElementById(
             "locationStatus"
           );
 
+        if (status) {
 
-        if (locationStatus) {
+          status.textContent = "";
 
-          locationStatus.textContent =
-            "";
+        }
+
+
+        const preview =
+          document.getElementById(
+            "imagePreview"
+          );
+
+        if (preview) {
+
+          preview.style.display =
+            "none";
 
         }
 
 
         closeReportForm();
 
+        await loadReports();
 
-      } catch (error) {
+      }
+
+      catch (error) {
 
         console.error(error);
 
         alert(
-          "Unable to submit report: " +
+          "Error submitting report: " +
           error.message
         );
 
       }
 
     }
-
   );
 
 }
 
 
-// ==========================================
-// FEEDBACK SYSTEM
-// ==========================================
+/* ==========================================
+   LOAD REPORTS
+========================================== */
+
+async function loadReports() {
+
+  if (!currentUser) return;
+
+
+  try {
+
+    const reportsRef =
+      collection(
+        db,
+        "reports"
+      );
+
+
+    const snapshot =
+      await getDocs(
+        reportsRef
+      );
+
+
+    allReports = [];
+
+
+    snapshot.forEach((docItem) => {
+
+      const data =
+        docItem.data();
+
+
+      /*
+        Admin can see all reports.
+        Normal user sees only own reports.
+      */
+
+      const isAdmin =
+        currentUser.email ===
+        ADMIN_EMAIL;
+
+
+      if (
+        isAdmin ||
+        data.userId === currentUser.uid
+      ) {
+
+        allReports.push({
+
+          id:
+            docItem.id,
+
+          ...data
+
+        });
+
+      }
+
+    });
+
+
+    allReports.sort(
+      (a, b) => {
+
+        const timeA =
+          a.createdAt?.seconds || 0;
+
+        const timeB =
+          b.createdAt?.seconds || 0;
+
+        return timeB - timeA;
+
+      }
+    );
+
+
+    displayReports(
+      allReports
+    );
+
+
+    updateAnalytics(
+      allReports
+    );
+
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Error loading reports:",
+      error
+    );
+
+  }
+
+}
+
+
+/* ==========================================
+   DISPLAY REPORTS
+========================================== */
+
+function displayReports(reports) {
+
+  const container =
+    document.getElementById(
+      "reportsContainer"
+    );
+
+
+  const reportCount =
+    document.getElementById(
+      "reportCount"
+    );
+
+
+  reportCount.textContent =
+    reports.length;
+
+
+  if (reports.length === 0) {
+
+    container.innerHTML = `
+      <p class="no-report">
+        📭 No emergency reports found.
+      </p>
+    `;
+
+    return;
+
+  }
+
+
+  container.innerHTML = "";
+
+
+  reports.forEach((report) => {
+
+    let date = "Recently";
+
+
+    if (report.createdAt?.seconds) {
+
+      date =
+        new Date(
+          report.createdAt.seconds * 1000
+        ).toLocaleString();
+
+    }
+
+
+    const statusClass =
+      getStatusClass(
+        report.status
+      );
+
+
+    const priorityClass =
+      getPriorityClass(
+        report.priority
+      );
+
+
+    const isAdmin =
+      currentUser.email ===
+      ADMIN_EMAIL;
+
+
+    const imageHTML =
+      report.image
+        ? `
+          <img
+            src="${report.image}"
+            class="report-image"
+            alt="Emergency Evidence"
+          >
+        `
+        : "";
+
+
+    const locationHTML =
+      report.location
+        ? `
+          <p>
+            📍 Location:
+            <a
+              href="https://www.google.com/maps?q=${report.location.latitude},${report.location.longitude}"
+              target="_blank"
+              style="color:#7fa8ff;"
+            >
+              View on Map
+            </a>
+          </p>
+        `
+        : `
+          <p>
+            📍 Location:
+            Not shared
+          </p>
+        `;
+
+
+    let adminButtons = "";
+
+
+    if (isAdmin) {
+
+      adminButtons = `
+
+        <div class="report-actions">
+
+          <button
+            class="active-btn"
+            onclick="updateReportStatus('${report.id}', 'In Progress')"
+          >
+            🔵 In Progress
+          </button>
+
+
+          <button
+            class="resolve-btn"
+            onclick="updateReportStatus('${report.id}', 'Resolved')"
+          >
+            ✅ Resolve
+          </button>
+
+
+          <button
+            class="delete-btn"
+            onclick="deleteReport('${report.id}')"
+          >
+            🗑 Delete
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+
+    container.innerHTML += `
+
+      <div class="report-card">
+
+        <div class="report-top">
+
+          <h3>
+            🚨 ${escapeHTML(report.emergencyType)}
+          </h3>
+
+          <span class="status-badge ${statusClass}">
+            ${escapeHTML(report.status)}
+          </span>
+
+        </div>
+
+
+        <p>
+          👤 <strong>Name:</strong>
+          ${escapeHTML(report.name)}
+        </p>
+
+
+        <p>
+          ⚡ <strong>Priority:</strong>
+          <span class="${priorityClass}">
+            ${escapeHTML(report.priority)}
+          </span>
+        </p>
+
+
+        <p>
+          📝 <strong>Description:</strong>
+          ${escapeHTML(report.description)}
+        </p>
+
+
+        ${locationHTML}
+
+
+        ${imageHTML}
+
+
+        <p>
+          🕒 <strong>Reported:</strong>
+          ${date}
+        </p>
+
+
+        ${adminButtons}
+
+      </div>
+
+    `;
+
+  });
+
+}
+
+
+/* ==========================================
+   ESCAPE HTML
+========================================== */
+
+function escapeHTML(text) {
+
+  if (!text) return "";
+
+  const div =
+    document.createElement("div");
+
+  div.textContent =
+    text;
+
+  return div.innerHTML;
+
+}
+
+
+/* ==========================================
+   STATUS CLASS
+========================================== */
+
+function getStatusClass(status) {
+
+  if (status === "Resolved") {
+
+    return "resolved-status";
+
+  }
+
+
+  if (status === "In Progress") {
+
+    return "active-status";
+
+  }
+
+
+  return "pending-status";
+
+}
+
+
+/* ==========================================
+   PRIORITY CLASS
+========================================== */
+
+function getPriorityClass(priority) {
+
+  const priorityMap = {
+
+    Critical:
+      "priority-critical",
+
+    High:
+      "priority-high",
+
+    Medium:
+      "priority-medium",
+
+    Low:
+      "priority-low"
+
+  };
+
+
+  return priorityMap[priority] || "";
+
+}
+
+
+/* ==========================================
+   UPDATE REPORT STATUS
+========================================== */
+
+window.updateReportStatus =
+  async function (
+    reportId,
+    newStatus
+  ) {
+
+    try {
+
+      await updateDoc(
+
+        doc(
+          db,
+          "reports",
+          reportId
+        ),
+
+        {
+          status:
+            newStatus
+        }
+
+      );
+
+
+      alert(
+        `Report marked as ${newStatus}`
+      );
+
+
+      await loadReports();
+
+    }
+
+    catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Unable to update report."
+      );
+
+    }
+
+  };
+
+
+/* ==========================================
+   DELETE REPORT
+========================================== */
+
+window.deleteReport =
+  async function (
+    reportId
+  ) {
+
+    const confirmDelete =
+      confirm(
+        "Are you sure you want to delete this report?"
+      );
+
+
+    if (!confirmDelete) return;
+
+
+    try {
+
+      await deleteDoc(
+
+        doc(
+          db,
+          "reports",
+          reportId
+        )
+
+      );
+
+
+      alert(
+        "Report deleted successfully."
+      );
+
+
+      await loadReports();
+
+    }
+
+    catch (error) {
+
+      console.error(error);
+
+      alert(
+        "Unable to delete report."
+      );
+
+    }
+
+  };
+
+
+/* ==========================================
+   CLEAR ALL REPORTS
+========================================== */
+
+window.clearAllReports =
+  async function () {
+
+    if (
+      currentUser.email !==
+      ADMIN_EMAIL
+    ) {
+
+      return;
+
+    }
+
+
+    const confirmation =
+      confirm(
+        "Delete ALL emergency reports?"
+      );
+
+
+    if (!confirmation) return;
+
+
+    try {
+
+      const snapshot =
+        await getDocs(
+          collection(
+            db,
+            "reports"
+          )
+        );
+
+
+      for (
+        const documentItem
+        of snapshot.docs
+      ) {
+
+        await deleteDoc(
+          doc(
+            db,
+            "reports",
+            documentItem.id
+          )
+        );
+
+      }
+
+
+      await loadReports();
+
+
+      alert(
+        "All reports cleared."
+      );
+
+    }
+
+    catch (error) {
+
+      console.error(error);
+
+    }
+
+  };
+
+
+/* ==========================================
+   FILTER REPORTS
+========================================== */
+
+window.filterReports =
+  function () {
+
+    const type =
+      document.getElementById(
+        "reportFilter"
+      ).value;
+
+    const status =
+      document.getElementById(
+        "statusFilter"
+      ).value;
+
+    const priority =
+      document.getElementById(
+        "priorityFilter"
+      ).value;
+
+    const search =
+      document.getElementById(
+        "reportSearch"
+      ).value
+        .toLowerCase()
+        .trim();
+
+
+    const filtered =
+      allReports.filter(
+        (report) => {
+
+
+          const matchType =
+            type === "All" ||
+            report.emergencyType === type;
+
+
+          const matchStatus =
+            status === "All" ||
+            report.status === status;
+
+
+          const matchPriority =
+            priority === "All" ||
+            report.priority === priority;
+
+
+          const searchText =
+            `
+              ${report.name || ""}
+              ${report.userEmail || ""}
+              ${report.emergencyType || ""}
+              ${report.description || ""}
+            `
+              .toLowerCase();
+
+
+          const matchSearch =
+            searchText.includes(
+              search
+            );
+
+
+          return (
+            matchType &&
+            matchStatus &&
+            matchPriority &&
+            matchSearch
+          );
+
+        }
+      );
+
+
+    displayReports(
+      filtered
+    );
+
+  };
+
+
+/* ==========================================
+   ANALYTICS
+========================================== */
+
+function updateAnalytics(reports) {
+
+  const total =
+    reports.length;
+
+
+  const pending =
+    reports.filter(
+      report =>
+        report.status === "Pending"
+    ).length;
+
+
+  const progress =
+    reports.filter(
+      report =>
+        report.status === "In Progress"
+    ).length;
+
+
+  const resolved =
+    reports.filter(
+      report =>
+        report.status === "Resolved"
+    ).length;
+
+
+  /* HERO */
+
+  setText(
+    "totalReports",
+    total
+  );
+
+  setText(
+    "activeReports",
+    pending + progress
+  );
+
+  setText(
+    "resolvedReports",
+    resolved
+  );
+
+
+  /* ANALYTICS */
+
+  setText(
+    "analyticsTotal",
+    total
+  );
+
+  setText(
+    "pendingReports",
+    pending
+  );
+
+  setText(
+    "progressReports",
+    progress
+  );
+
+  setText(
+    "analyticsResolved",
+    resolved
+  );
+
+
+  /* PRIORITY */
+
+  const critical =
+    reports.filter(
+      r => r.priority === "Critical"
+    ).length;
+
+  const high =
+    reports.filter(
+      r => r.priority === "High"
+    ).length;
+
+  const medium =
+    reports.filter(
+      r => r.priority === "Medium"
+    ).length;
+
+  const low =
+    reports.filter(
+      r => r.priority === "Low"
+    ).length;
+
+
+  setText(
+    "criticalCount",
+    critical
+  );
+
+  setText(
+    "highCount",
+    high
+  );
+
+  setText(
+    "mediumCount",
+    medium
+  );
+
+  setText(
+    "lowCount",
+    low
+  );
+
+
+  updateEmergencyTypes(
+    reports
+  );
+
+}
+
+
+/* ==========================================
+   EMERGENCY TYPE ANALYTICS
+========================================== */
+
+function updateEmergencyTypes(reports) {
+
+  const container =
+    document.getElementById(
+      "emergencyTypeStats"
+    );
+
+
+  if (!container) return;
+
+
+  if (reports.length === 0) {
+
+    container.innerHTML =
+      "No report data available.";
+
+    return;
+
+  }
+
+
+  const types = {};
+
+
+  reports.forEach(
+    (report) => {
+
+      const type =
+        report.emergencyType ||
+        "Other";
+
+
+      types[type] =
+        (types[type] || 0) + 1;
+
+    }
+  );
+
+
+  container.innerHTML = "";
+
+
+  Object.keys(types).forEach(
+    (type) => {
+
+      container.innerHTML += `
+
+        <div class="type-stat-item">
+
+          <span>
+            ${escapeHTML(type)}
+          </span>
+
+          <strong>
+            ${types[type]}
+          </strong>
+
+        </div>
+
+      `;
+
+    }
+  );
+
+}
+
+
+/* ==========================================
+   SET TEXT SAFELY
+========================================== */
+
+function setText(
+  id,
+  value
+) {
+
+  const element =
+    document.getElementById(id);
+
+
+  if (element) {
+
+    element.textContent =
+      value;
+
+  }
+
+}
+
+
+/* ==========================================
+   RESET ANALYTICS
+========================================== */
+
+function resetAnalytics() {
+
+  const ids = [
+
+    "totalReports",
+    "activeReports",
+    "resolvedReports",
+
+    "analyticsTotal",
+    "pendingReports",
+    "progressReports",
+    "analyticsResolved",
+
+    "criticalCount",
+    "highCount",
+    "mediumCount",
+    "lowCount"
+
+  ];
+
+
+  ids.forEach(
+    id => setText(id, 0)
+  );
+
+
+  const typeStats =
+    document.getElementById(
+      "emergencyTypeStats"
+    );
+
+
+  if (typeStats) {
+
+    typeStats.textContent =
+      "No report data available.";
+
+  }
+
+}
+
+
+/* ==========================================
+   FEEDBACK
+========================================== */
 
 const feedbackForm =
   document.getElementById(
@@ -1381,43 +1756,36 @@ const feedbackForm =
 if (feedbackForm) {
 
   feedbackForm.addEventListener(
-
     "submit",
-
     async function (event) {
 
       event.preventDefault();
 
 
-      if (!currentUser) {
-
-        alert(
-          "Please login first to submit feedback."
-        );
-
-        openLoginModal();
-
-        return;
-
-      }
-
-
-      const feedbackType =
+      const name =
         document.getElementById(
-          "feedbackType"
-        )?.value || "General";
+          "feedbackName"
+        ).value.trim();
 
+      const rating =
+        document.getElementById(
+          "feedbackRating"
+        ).value;
 
-      const feedbackMessage =
+      const message =
         document.getElementById(
           "feedbackMessage"
-        )?.value.trim();
+        ).value.trim();
 
 
-      if (!feedbackMessage) {
+      if (
+        !name ||
+        !rating ||
+        !message
+      ) {
 
         alert(
-          "Please enter your feedback."
+          "Please fill all fields."
         );
 
         return;
@@ -1436,21 +1804,16 @@ if (feedbackForm) {
 
           {
 
-            userId:
-              currentUser.uid,
+            name,
+
+            rating,
+
+            message,
 
             userEmail:
-              currentUser.email,
-
-            userName:
-              currentUser.displayName ||
-              currentUser.email.split("@")[0],
-
-            type:
-              feedbackType,
-
-            message:
-              feedbackMessage,
+              currentUser
+                ? currentUser.email
+                : "Anonymous",
 
             createdAt:
               serverTimestamp()
@@ -1461,14 +1824,26 @@ if (feedbackForm) {
 
 
         alert(
-          "Thank you! Your feedback has been submitted. 💙"
+          "Thank you for your feedback! 💙"
         );
 
 
         feedbackForm.reset();
 
 
-      } catch (error) {
+        if (
+          currentUser &&
+          currentUser.email ===
+          ADMIN_EMAIL
+        ) {
+
+          loadFeedback();
+
+        }
+
+      }
+
+      catch (error) {
 
         console.error(error);
 
@@ -1479,199 +1854,153 @@ if (feedbackForm) {
       }
 
     }
-
   );
 
 }
 
 
-// ==========================================
-// LOGIN MODAL
-// ==========================================
+/* ==========================================
+   LOAD FEEDBACK (ADMIN)
+========================================== */
 
-window.openLoginModal =
-function () {
-
-  const modal =
-    document.getElementById(
-      "loginModal"
-    );
-
-  if (modal) {
-
-    modal.style.display =
-      "block";
-
-  }
-
-};
-
-
-window.closeLoginModal =
-function () {
-
-  const modal =
-    document.getElementById(
-      "loginModal"
-    );
-
-  if (modal) {
-
-    modal.style.display =
-      "none";
-
-  }
-
-};
-
-
-// ==========================================
-// SIGNUP MODAL
-// ==========================================
-
-window.openSignupModal =
-function () {
-
-  const modal =
-    document.getElementById(
-      "signupModal"
-    );
-
-  if (modal) {
-
-    modal.style.display =
-      "block";
-
-  }
-
-};
-
-
-window.closeSignupModal =
-function () {
-
-  const modal =
-    document.getElementById(
-      "signupModal"
-    );
-
-  if (modal) {
-
-    modal.style.display =
-      "none";
-
-  }
-
-};
-
-
-// ==========================================
-// CLOSE MODALS ON OUTSIDE CLICK
-// ==========================================
-
-window.addEventListener(
-
-  "click",
-
-  function (event) {
-
-    const reportModal =
-      document.getElementById(
-        "reportModal"
-      );
-
-    const loginModal =
-      document.getElementById(
-        "loginModal"
-      );
-
-    const signupModal =
-      document.getElementById(
-        "signupModal"
-      );
-
-
-    if (
-      event.target === reportModal
-    ) {
-
-      closeReportForm();
-
-    }
-
-
-    if (
-      event.target === loginModal
-    ) {
-
-      closeLoginModal();
-
-    }
-
-
-    if (
-      event.target === signupModal
-    ) {
-
-      closeSignupModal();
-
-    }
-
-  }
-
-);
-
-
-// ==========================================
-// ESCAPE HTML
-// ==========================================
-
-function escapeHTML(value) {
+async function loadFeedback() {
 
   if (
-    value === null ||
-    value === undefined
+    !currentUser ||
+    currentUser.email !==
+    ADMIN_EMAIL
   ) {
 
-    return "";
+    return;
 
   }
 
 
-  return String(value)
-
-    .replace(
-      /&/g,
-      "&amp;"
-    )
-
-    .replace(
-      /</g,
-      "&lt;"
-    )
-
-    .replace(
-      />/g,
-      "&gt;"
-    )
-
-    .replace(
-      /"/g,
-      "&quot;"
-    )
-
-    .replace(
-      /'/g,
-      "&#039;"
+  const list =
+    document.getElementById(
+      "feedbackList"
     );
+
+
+  try {
+
+    const snapshot =
+      await getDocs(
+        collection(
+          db,
+          "feedback"
+        )
+      );
+
+
+    const feedbackData = [];
+
+
+    snapshot.forEach(
+      item => {
+
+        feedbackData.push({
+
+          id:
+            item.id,
+
+          ...item.data()
+
+        });
+
+      }
+    );
+
+
+    feedbackData.sort(
+      (a, b) => {
+
+        const aTime =
+          a.createdAt?.seconds || 0;
+
+        const bTime =
+          b.createdAt?.seconds || 0;
+
+        return bTime - aTime;
+
+      }
+    );
+
+
+    if (
+      feedbackData.length === 0
+    ) {
+
+      list.innerHTML = `
+        <p class="no-report">
+          No feedback available.
+        </p>
+      `;
+
+      return;
+
+    }
+
+
+    list.innerHTML = "";
+
+
+    feedbackData.forEach(
+      feedback => {
+
+        const stars =
+          "⭐".repeat(
+            Number(
+              feedback.rating
+            )
+          );
+
+
+        list.innerHTML += `
+
+          <div class="feedback-item">
+
+            <h4>
+              👤 ${escapeHTML(feedback.name)}
+            </h4>
+
+            <div class="feedback-rating">
+              ${stars}
+            </div>
+
+            <p>
+              ${escapeHTML(feedback.message)}
+            </p>
+
+          </div>
+
+        `;
+
+      }
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(error);
+
+  }
 
 }
 
 
-// ==========================================
-// FINAL CONSOLE MESSAGE
-// ==========================================
+/* ==========================================
+   PAGE LOADED
+========================================== */
 
-console.log(
-  "🚨 NOVA Disaster Response - Phase 5 Loaded Successfully"
+document.addEventListener(
+  "DOMContentLoaded",
+  () => {
+
+    console.log(
+      "🚨 NOVA Disaster Response System Ready"
+    );
+
+  }
 );
