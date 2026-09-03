@@ -1,261 +1,1268 @@
-<!-- ================= EMERGENCY CONTACTS ================= -->
+<!DOCTYPE html>
+<html lang="en">
 
-<section class="emergency-contacts" id="contacts">
+<head>
 
-  <div class="contact-heading">
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    NOVA | Disaster Response
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
+
+</head>
+
+
+<body>
+
+
+  <!-- =========================================
+       NAVBAR
+  ========================================== -->
+
+  <nav>
+
+    <div class="logo">
+      NOVA
+    </div>
+
+
+    <div class="nav-links">
+
+      <a href="#home">
+        Home
+      </a>
+
+      <a href="#features">
+        Features
+      </a>
+
+      <a href="#contacts">
+        Contacts
+      </a>
+
+      <a href="#reports">
+        Reports
+      </a>
+
+      <a href="#feedback">
+        Feedback
+      </a>
+
+    </div>
+
+
+    <!-- AUTH BUTTONS -->
+
+    <div
+      class="auth-buttons"
+      id="authButtons"
+    >
+
+      <button
+        class="login-nav-btn"
+        onclick="openLoginModal()"
+      >
+        Login
+      </button>
+
+
+      <button
+        class="signup-nav-btn"
+        onclick="openSignupModal()"
+      >
+        Sign Up
+      </button>
+
+    </div>
+
+
+    <!-- USER PROFILE -->
+
+    <div
+      class="user-profile"
+      id="userProfile"
+      style="display:none"
+    >
+
+      <span id="userName">
+        User
+      </span>
+
+
+      <button
+        class="logout-btn"
+        onclick="logoutUser()"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </nav>
+
+
+
+  <!-- =========================================
+       HERO SECTION
+  ========================================== -->
+
+  <section
+    class="hero"
+    id="home"
+  >
+
+    <div class="hero-content">
+
+      <p class="tag">
+        SMART • FAST • RELIABLE
+      </p>
+
+
+      <h1>
+        Disaster Response
+        <br>
+        Made Smarter.
+      </h1>
+
+
+      <p class="hero-text">
+
+        NOVA helps citizens report emergencies quickly,
+        share their location and track the status of
+        their emergency cases in real time.
+
+      </p>
+
+
+      <div class="buttons">
+
+        <button
+          class="sos-btn"
+          onclick="openSOSForm()"
+        >
+          🚨 Emergency SOS
+        </button>
+
+
+        <button
+          class="report-btn"
+          onclick="openReportForm()"
+        >
+          Report Emergency
+        </button>
+
+      </div>
+
+    </div>
+
+
+
+    <!-- HERO CARD -->
+
+    <div class="hero-card">
+
+      <div class="status">
+
+        <span class="pulse"></span>
+
+        System Active
+
+      </div>
+
+
+      <h3>
+        Emergency Response Network
+      </h3>
+
+
+      <p>
+
+        Submit emergency reports instantly and
+        allow administrators to monitor and
+        manage cases efficiently.
+
+      </p>
+
+
+      <div class="stats">
+
+        <div>
+
+          <strong id="reportCount">
+            0
+          </strong>
+
+          <span>
+            Reports
+          </span>
+
+        </div>
+
+
+        <div>
+
+          <strong>
+            24/7
+          </strong>
+
+          <span>
+            Support
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================
+       FEATURES
+  ========================================== -->
+
+  <section
+    class="features"
+    id="features"
+  >
 
     <p class="tag">
-      QUICK HELP
+      HOW NOVA WORKS
     </p>
+
 
     <h2>
-      Emergency Contact Numbers
+      Smart Emergency Response
     </h2>
 
-    <p>
-      In case of an emergency, contact the appropriate emergency service immediately.
+
+    <p class="subtitle">
+
+      A simple platform designed to help citizens
+      report and track emergency situations.
+
     </p>
 
-  </div>
+
+    <div class="feature-grid">
 
 
-  <div class="contact-grid">
+      <div class="feature-card">
 
+        <div class="icon">
+          🚨
+        </div>
 
-    <!-- NATIONAL EMERGENCY -->
+        <h3>
+          Instant Reporting
+        </h3>
 
-    <div class="contact-card">
+        <p>
+          Submit emergency reports quickly.
+        </p>
 
-      <div class="contact-icon">
-        🚨
       </div>
 
-      <h3>
-        National Emergency
-      </h3>
 
-      <div class="contact-number">
-        112
+
+      <div class="feature-card">
+
+        <div class="icon">
+          📍
+        </div>
+
+        <h3>
+          Location Sharing
+        </h3>
+
+        <p>
+          Share your location for faster response.
+        </p>
+
       </div>
 
-      <p>
-        All Emergency Services
-      </p>
 
-      <a href="tel:112" class="call-btn">
-        📞 Call Now
-      </a>
+
+      <div class="feature-card">
+
+        <div class="icon">
+          📊
+        </div>
+
+        <h3>
+          Live Tracking
+        </h3>
+
+        <p>
+          Track your emergency case status.
+        </p>
+
+      </div>
+
+
+
+      <div class="feature-card">
+
+        <div class="icon">
+          🛡️
+        </div>
+
+        <h3>
+          Admin Management
+        </h3>
+
+        <p>
+          Emergency cases can be monitored and managed.
+        </p>
+
+      </div>
+
 
     </div>
 
+  </section>
 
-    <!-- FIRE -->
 
-    <div class="contact-card">
 
-      <div class="contact-icon">
-        🚒
-      </div>
+  <!-- =========================================
+       EMERGENCY SOS
+  ========================================== -->
 
-      <h3>
-        Fire Brigade
-      </h3>
+  <section class="emergency-section">
 
-      <div class="contact-number">
-        101
-      </div>
-
-      <p>
-        Fire Emergency
-      </p>
-
-      <a href="tel:101" class="call-btn">
-        📞 Call Now
-      </a>
-
-    </div>
-
-
-    <!-- AMBULANCE -->
-
-    <div class="contact-card">
-
-      <div class="contact-icon">
-        🚑
-      </div>
-
-      <h3>
-        Ambulance
-      </h3>
-
-      <div class="contact-number">
-        108
-      </div>
-
-      <p>
-        Medical Emergency
-      </p>
-
-      <a href="tel:108" class="call-btn">
-        📞 Call Now
-      </a>
-
-    </div>
-
-
-    <!-- POLICE -->
-
-    <div class="contact-card">
-
-      <div class="contact-icon">
-        👮
-      </div>
-
-      <h3>
-        Police
-      </h3>
-
-      <div class="contact-number">
-        100
-      </div>
-
-      <p>
-        Police Emergency
-      </p>
-
-      <a href="tel:100" class="call-btn">
-        📞 Call Now
-      </a>
-
-    </div>
-
-
-    <!-- DISASTER MANAGEMENT -->
-
-    <div class="contact-card">
-
-      <div class="contact-icon">
-        👩‍🚒
-      </div>
-
-      <h3>
-        Disaster Management
-      </h3>
-
-      <div class="contact-number">
-        1078
-      </div>
-
-      <p>
-        Disaster Assistance
-      </p>
-
-      <a href="tel:1078" class="call-btn">
-        📞 Call Now
-      </a>
-
-    </div>
-
-
-    <!-- WOMEN HELPLINE -->
-
-    <div class="contact-card">
-
-      <div class="contact-icon">
-        🆘
-      </div>
-
-      <h3>
-        Women Helpline
-      </h3>
-
-      <div class="contact-number">
-        181
-      </div>
-
-      <p>
-        Emergency Support
-      </p>
-
-      <a href="tel:181" class="call-btn">
-        📞 Call Now
-      </a>
-
-    </div>
-
-
-    <!-- CHILD HELPLINE -->
-
-    <div class="contact-card">
-
-      <div class="contact-icon">
-        🧒
-      </div>
-
-      <h3>
-        Child Helpline
-      </h3>
-
-      <div class="contact-number">
-        1098
-      </div>
-
-      <p>
-        Child Safety Support
-      </p>
-
-      <a href="tel:1098" class="call-btn">
-        📞 Call Now
-      </a>
-
-    </div>
-
-
-    <!-- HIGHWAY HELPLINE -->
-
-    <div class="contact-card">
-
-      <div class="contact-icon">
-        🛣️
-      </div>
-
-      <h3>
-        Highway Helpline
-      </h3>
-
-      <div class="contact-number">
-        1033
-      </div>
-
-      <p>
-        Highway Assistance
-      </p>
-
-      <a href="tel:1033" class="call-btn">
-        📞 Call Now
-      </a>
-
-    </div>
-
-
-  </div>
-
-
-  <!-- IMPORTANT NOTE -->
-
-  <div class="emergency-note">
-
-    <div class="note-icon">
-      📞
-    </div>
-
-    <p>
-      <strong>Important:</strong>
-      These emergency numbers are for India.
-      In case of any life-threatening emergency,
-      dial <strong>112</strong> immediately.
+    <p class="tag">
+      NEED HELP?
     </p>
 
+
+    <h2>
+      Emergency Situation?
+    </h2>
+
+
+    <p>
+      Report your emergency immediately and share
+      important details with the response team.
+    </p>
+
+
+    <button
+      class="big-sos"
+      onclick="openSOSForm()"
+    >
+      🚨 SEND EMERGENCY SOS
+    </button>
+
+  </section>
+
+
+
+  <!-- =========================================
+       EMERGENCY CONTACTS
+  ========================================== -->
+
+  <section
+    class="emergency-contacts"
+    id="contacts"
+  >
+
+    <div class="contact-heading">
+
+      <p class="tag">
+        QUICK HELP
+      </p>
+
+
+      <h2>
+        Emergency Contact Numbers
+      </h2>
+
+
+      <p class="contacts-subtitle">
+
+        In case of an emergency, contact the appropriate
+        emergency service immediately.
+
+      </p>
+
+    </div>
+
+
+
+    <div class="contact-grid">
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🚨
+        </div>
+
+        <h3>
+          National Emergency
+        </h3>
+
+        <div class="contact-number">
+          112
+        </div>
+
+        <p>
+          All Emergency Services
+        </p>
+
+        <a
+          href="tel:112"
+          class="call-btn"
+        >
+          📞 Call Now
+        </a>
+
+      </div>
+
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🚒
+        </div>
+
+        <h3>
+          Fire Brigade
+        </h3>
+
+        <div class="contact-number">
+          101
+        </div>
+
+        <p>
+          Fire Emergency
+        </p>
+
+        <a
+          href="tel:101"
+          class="call-btn"
+        >
+          📞 Call Now
+        </a>
+
+      </div>
+
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🚑
+        </div>
+
+        <h3>
+          Ambulance
+        </h3>
+
+        <div class="contact-number">
+          108
+        </div>
+
+        <p>
+          Medical Emergency
+        </p>
+
+        <a
+          href="tel:108"
+          class="call-btn"
+        >
+          📞 Call Now
+        </a>
+
+      </div>
+
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          👮
+        </div>
+
+        <h3>
+          Police
+        </h3>
+
+        <div class="contact-number">
+          100
+        </div>
+
+        <p>
+          Police Emergency
+        </p>
+
+        <a
+          href="tel:100"
+          class="call-btn"
+        >
+          📞 Call Now
+        </a>
+
+      </div>
+
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🌪️
+        </div>
+
+        <h3>
+          Disaster Management
+        </h3>
+
+        <div class="contact-number">
+          1078
+        </div>
+
+        <p>
+          Disaster Assistance
+        </p>
+
+        <a
+          href="tel:1078"
+          class="call-btn"
+        >
+          📞 Call Now
+        </a>
+
+      </div>
+
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🆘
+        </div>
+
+        <h3>
+          Women Helpline
+        </h3>
+
+        <div class="contact-number">
+          181
+        </div>
+
+        <p>
+          Emergency Support
+        </p>
+
+        <a
+          href="tel:181"
+          class="call-btn"
+        >
+          📞 Call Now
+        </a>
+
+      </div>
+
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🧒
+        </div>
+
+        <h3>
+          Child Helpline
+        </h3>
+
+        <div class="contact-number">
+          1098
+        </div>
+
+        <p>
+          Child Safety Support
+        </p>
+
+        <a
+          href="tel:1098"
+          class="call-btn"
+        >
+          📞 Call Now
+        </a>
+
+      </div>
+
+
+
+      <div class="contact-card">
+
+        <div class="contact-icon">
+          🛣️
+        </div>
+
+        <h3>
+          Highway Helpline
+        </h3>
+
+        <div class="contact-number">
+          1033
+        </div>
+
+        <p>
+          Highway Assistance
+        </p>
+
+        <a
+          href="tel:1033"
+          class="call-btn"
+        >
+          📞 Call Now
+        </a>
+
+      </div>
+
+
+    </div>
+
+
+
+    <div class="emergency-note">
+
+      <div class="note-icon">
+        📞
+      </div>
+
+
+      <p>
+
+        <strong>
+          Important:
+        </strong>
+
+        These emergency numbers are for India.
+        In case of any life-threatening emergency,
+        dial <strong>112</strong> immediately.
+
+      </p>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================
+       DASHBOARD
+  ========================================== -->
+
+  <section class="dashboard-section">
+
+    <div class="dashboard-heading">
+
+      <p class="tag">
+        LIVE DASHBOARD
+      </p>
+
+      <h2>
+        Emergency Overview
+      </h2>
+
+      <p>
+        Monitor submitted emergency reports.
+      </p>
+
+    </div>
+
+
+
+    <div class="dashboard-cards">
+
+
+      <div class="dashboard-card">
+
+        <div class="dashboard-icon">
+          📋
+        </div>
+
+        <div>
+
+          <span>
+            Total Reports
+          </span>
+
+          <strong id="totalReports">
+            0
+          </strong>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="dashboard-card">
+
+        <div class="dashboard-icon">
+          ⏳
+        </div>
+
+        <div>
+
+          <span>
+            Pending Cases
+          </span>
+
+          <strong id="activeReports">
+            0
+          </strong>
+
+        </div>
+
+      </div>
+
+
+
+      <div class="dashboard-card">
+
+        <div class="dashboard-icon">
+          ✅
+        </div>
+
+        <div>
+
+          <span>
+            Resolved Cases
+          </span>
+
+          <strong id="resolvedReports">
+            0
+          </strong>
+
+        </div>
+
+      </div>
+
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================
+       REPORTS
+  ========================================== -->
+
+  <section
+    class="reports-section"
+    id="reports"
+  >
+
+    <div class="reports-header">
+
+      <div>
+
+        <p class="tag">
+          EMERGENCY RECORDS
+        </p>
+
+        <h2>
+          Emergency Reports
+        </h2>
+
+      </div>
+
+
+      <button
+        class="clear-btn"
+        onclick="clearAllReports()"
+        style="display:none"
+      >
+        🗑 Clear All Reports
+      </button>
+
+    </div>
+
+
+
+    <div class="filter-box">
+
+      <label>
+        Filter:
+      </label>
+
+
+      <select
+        id="reportFilter"
+        onchange="filterReports()"
+      >
+
+        <option value="All">
+          All Reports
+        </option>
+
+        <option value="Fire">
+          Fire
+        </option>
+
+        <option value="Medical">
+          Medical
+        </option>
+
+        <option value="Accident">
+          Accident
+        </option>
+
+        <option value="Flood">
+          Flood
+        </option>
+
+        <option value="Earthquake">
+          Earthquake
+        </option>
+
+        <option value="Other">
+          Other
+        </option>
+
+      </select>
+
+    </div>
+
+
+
+    <div
+      class="reports-container"
+      id="reportsContainer"
+    >
+
+      <p class="no-report">
+        🔐 Login to view your emergency reports.
+      </p>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================
+       FEEDBACK
+  ========================================== -->
+
+  <section
+    class="feedback-section"
+    id="feedback"
+  >
+
+    <div class="feedback-wrapper">
+
+      <p class="tag">
+        YOUR VOICE MATTERS
+      </p>
+
+
+      <h2>
+        Share Your Feedback
+      </h2>
+
+
+      <p>
+
+        Help us improve NOVA Disaster Response
+        by sharing your experience and suggestions.
+
+      </p>
+
+
+
+      <div class="feedback-card">
+
+
+        <label>
+          Feedback Type
+        </label>
+
+
+        <select id="feedbackType">
+
+          <option value="General">
+            General Feedback
+          </option>
+
+          <option value="Suggestion">
+            Suggestion
+          </option>
+
+          <option value="Problem">
+            Report a Problem
+          </option>
+
+          <option value="Appreciation">
+            Appreciation
+          </option>
+
+        </select>
+
+
+
+        <label>
+          Your Feedback
+        </label>
+
+
+        <textarea
+          id="feedbackMessage"
+          placeholder="Write your feedback here..."
+        ></textarea>
+
+
+
+        <button
+          class="feedback-submit-btn"
+          onclick="submitFeedback()"
+        >
+          Submit Feedback
+        </button>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+
+  <!-- =========================================
+       FOOTER
+  ========================================== -->
+
+  <footer>
+
+    <p>
+      © 2026 NOVA Disaster Response.
+      Built for smarter and faster emergency management.
+    </p>
+
+  </footer>
+
+
+
+  <!-- =========================================
+       REPORT MODAL
+  ========================================== -->
+
+  <div
+    class="modal"
+    id="reportModal"
+  >
+
+    <div class="modal-content">
+
+      <span
+        class="close"
+        onclick="closeReportForm()"
+      >
+        &times;
+      </span>
+
+
+      <h2>
+        🚨 Report Emergency
+      </h2>
+
+
+      <p class="form-text">
+        Provide accurate details for faster response.
+      </p>
+
+
+
+      <form id="emergencyForm">
+
+
+        <label>
+          Your Name
+        </label>
+
+        <input
+          type="text"
+          id="name"
+          placeholder="Enter your name"
+          required
+        >
+
+
+
+        <label>
+          Emergency Type
+        </label>
+
+        <select
+          id="emergencyType"
+          required
+        >
+
+          <option value="">
+            Select Emergency
+          </option>
+
+          <option value="Fire">
+            🔥 Fire
+          </option>
+
+          <option value="Medical">
+            🚑 Medical
+          </option>
+
+          <option value="Accident">
+            🚗 Accident
+          </option>
+
+          <option value="Flood">
+            🌊 Flood
+          </option>
+
+          <option value="Earthquake">
+            🌍 Earthquake
+          </option>
+
+          <option value="Other">
+            ⚠️ Other
+          </option>
+
+        </select>
+
+
+
+        <label>
+          Emergency Description
+        </label>
+
+        <textarea
+          id="description"
+          placeholder="Describe the emergency..."
+          required
+        ></textarea>
+
+
+
+        <button
+          type="button"
+          class="location-btn"
+          onclick="getLocation()"
+        >
+          📍 Share My Location
+        </button>
+
+
+        <p id="locationStatus"></p>
+
+
+
+        <button
+          type="submit"
+          class="submit-btn"
+        >
+          Submit Emergency Report
+        </button>
+
+
+      </form>
+
+    </div>
+
   </div>
 
-</section>
+
+
+  <!-- =========================================
+       LOGIN MODAL
+  ========================================== -->
+
+  <div
+    class="modal"
+    id="loginModal"
+  >
+
+    <div class="modal-content auth-content">
+
+      <span
+        class="close"
+        onclick="closeLoginModal()"
+      >
+        &times;
+      </span>
+
+
+      <h2>
+        Login to NOVA
+      </h2>
+
+
+      <p class="form-text">
+        Access your emergency reports.
+      </p>
+
+
+
+      <label>
+        Email
+      </label>
+
+      <input
+        type="email"
+        id="loginEmail"
+        placeholder="Enter email"
+      >
+
+
+
+      <label>
+        Password
+      </label>
+
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Enter password"
+      >
+
+
+
+      <button
+        class="submit-btn"
+        onclick="loginUser()"
+      >
+        Login
+      </button>
+
+
+      <button
+        class="google-btn"
+        onclick="googleLogin()"
+      >
+        Continue with Google
+      </button>
+
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =========================================
+       SIGNUP MODAL
+  ========================================== -->
+
+  <div
+    class="modal"
+    id="signupModal"
+  >
+
+    <div class="modal-content auth-content">
+
+      <span
+        class="close"
+        onclick="closeSignupModal()"
+      >
+        &times;
+      </span>
+
+
+      <h2>
+        Create Account
+      </h2>
+
+
+      <p class="form-text">
+        Join NOVA Disaster Response.
+      </p>
+
+
+
+      <label>
+        Full Name
+      </label>
+
+      <input
+        type="text"
+        id="signupName"
+        placeholder="Enter your name"
+      >
+
+
+
+      <label>
+        Email
+      </label>
+
+      <input
+        type="email"
+        id="signupEmail"
+        placeholder="Enter email"
+      >
+
+
+
+      <label>
+        Password
+      </label>
+
+      <input
+        type="password"
+        id="signupPassword"
+        placeholder="Minimum 6 characters"
+      >
+
+
+
+      <button
+        class="submit-btn"
+        onclick="signupUser()"
+      >
+        Create Account
+      </button>
+
+
+      <button
+        class="google-btn"
+        onclick="googleLogin()"
+      >
+        Sign up with Google
+      </button>
+
+
+    </div>
+
+  </div>
+
+
+
+  <!-- =========================================
+       SCRIPT
+  ========================================== -->
+
+  <script
+    type="module"
+    src="script.js"
+  ></script>
+
+
+</body>
+
+</html>
