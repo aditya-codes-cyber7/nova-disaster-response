@@ -1,6 +1,6 @@
 // ==========================================
 // NOVA DISASTER RESPONSE
-// FINAL PHASE 4 SCRIPT
+// PHASE 5 - FINAL SCRIPT.JS
 // ==========================================
 
 
@@ -8,10 +8,8 @@
 // FIREBASE IMPORTS
 // ==========================================
 
-import {
-  initializeApp
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-
+import { initializeApp } from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 
 import {
   getAuth,
@@ -22,8 +20,8 @@ import {
   signInWithPopup,
   onAuthStateChanged,
   updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-
+} from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 import {
   getFirestore,
@@ -37,7 +35,8 @@ import {
   where,
   serverTimestamp,
   onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from
+  "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
 // ==========================================
@@ -59,18 +58,15 @@ const firebaseConfig = {
 // ==========================================
 
 const app = initializeApp(firebaseConfig);
-
 const auth = getAuth(app);
-
 const db = getFirestore(app);
 
 
 // ==========================================
-// ADMIN CONFIG
+// ADMIN CONFIGURATION
 // ==========================================
 
-const ADMIN_EMAIL =
-  "adi56tya65raj00@gmail.com";
+const ADMIN_EMAIL = "adi56tya65raj00@gmail.com";
 
 
 // ==========================================
@@ -78,13 +74,9 @@ const ADMIN_EMAIL =
 // ==========================================
 
 let currentUser = null;
-
 let isAdmin = false;
-
 let userReports = [];
-
 let currentLocation = null;
-
 let unsubscribeReports = null;
 
 
@@ -92,14 +84,9 @@ let unsubscribeReports = null;
 // DOM ELEMENTS
 // ==========================================
 
-const authButtons =
-  document.getElementById("authButtons");
-
-const userProfile =
-  document.getElementById("userProfile");
-
-const userName =
-  document.getElementById("userName");
+const authButtons = document.getElementById("authButtons");
+const userProfile = document.getElementById("userProfile");
+const userName = document.getElementById("userName");
 
 const reportsContainer =
   document.getElementById("reportsContainer");
@@ -128,7 +115,6 @@ onAuthStateChanged(auth, (user) => {
 
   currentUser = user;
 
-
   if (user) {
 
     isAdmin =
@@ -137,10 +123,11 @@ onAuthStateChanged(auth, (user) => {
       ADMIN_EMAIL.toLowerCase();
 
 
+    // SHOW USER PROFILE
+
     if (authButtons) {
       authButtons.style.display = "none";
     }
-
 
     if (userProfile) {
       userProfile.style.display = "flex";
@@ -162,27 +149,23 @@ onAuthStateChanged(auth, (user) => {
     }
 
 
+    // ADMIN CLEAR BUTTON
+
     if (clearButton) {
 
       clearButton.style.display =
-        isAdmin
-          ? "block"
-          : "none";
+        isAdmin ? "block" : "none";
 
     }
 
 
     loadReports();
 
-  }
 
-
-  else {
+  } else {
 
     currentUser = null;
-
     isAdmin = false;
-
     userReports = [];
 
 
@@ -190,11 +173,9 @@ onAuthStateChanged(auth, (user) => {
       authButtons.style.display = "flex";
     }
 
-
     if (userProfile) {
       userProfile.style.display = "none";
     }
-
 
     if (clearButton) {
       clearButton.style.display = "none";
@@ -204,7 +185,6 @@ onAuthStateChanged(auth, (user) => {
     if (unsubscribeReports) {
 
       unsubscribeReports();
-
       unsubscribeReports = null;
 
     }
@@ -235,29 +215,23 @@ onAuthStateChanged(auth, (user) => {
 window.signupUser = async function () {
 
   const name =
-    document.getElementById(
-      "signupName"
-    ).value.trim();
-
+    document.getElementById("signupName")
+      ?.value
+      .trim();
 
   const email =
-    document.getElementById(
-      "signupEmail"
-    ).value.trim();
-
+    document.getElementById("signupEmail")
+      ?.value
+      .trim();
 
   const password =
-    document.getElementById(
-      "signupPassword"
-    ).value;
+    document.getElementById("signupPassword")
+      ?.value;
 
 
   if (!email || !password) {
 
-    alert(
-      "Please enter email and password."
-    );
-
+    alert("Please enter email and password.");
     return;
 
   }
@@ -265,10 +239,7 @@ window.signupUser = async function () {
 
   if (password.length < 6) {
 
-    alert(
-      "Password must be at least 6 characters."
-    );
-
+    alert("Password must be at least 6 characters.");
     return;
 
   }
@@ -296,22 +267,14 @@ window.signupUser = async function () {
     }
 
 
-    alert(
-      "Account created successfully! 🎉"
-    );
-
+    alert("Account created successfully! 🎉");
 
     closeSignupModal();
 
-  }
 
-  catch (error) {
+  } catch (error) {
 
-    console.error(error);
-
-    alert(
-      error.message
-    );
+    alert(error.message);
 
   }
 
@@ -325,23 +288,18 @@ window.signupUser = async function () {
 window.loginUser = async function () {
 
   const email =
-    document.getElementById(
-      "loginEmail"
-    ).value.trim();
-
+    document.getElementById("loginEmail")
+      ?.value
+      .trim();
 
   const password =
-    document.getElementById(
-      "loginPassword"
-    ).value;
+    document.getElementById("loginPassword")
+      ?.value;
 
 
   if (!email || !password) {
 
-    alert(
-      "Please enter email and password."
-    );
-
+    alert("Please enter email and password.");
     return;
 
   }
@@ -356,23 +314,14 @@ window.loginUser = async function () {
     );
 
 
-    alert(
-      "Login successful! 🚀"
-    );
-
+    alert("Login successful! 🚀");
 
     closeLoginModal();
 
-  }
 
-  catch (error) {
+  } catch (error) {
 
-    console.error(error);
-
-    alert(
-      "Login failed: " +
-      error.message
-    );
+    alert("Login failed: " + error.message);
 
   }
 
@@ -390,7 +339,6 @@ window.googleLogin = async function () {
     const provider =
       new GoogleAuthProvider();
 
-
     await signInWithPopup(
       auth,
       provider
@@ -398,14 +346,10 @@ window.googleLogin = async function () {
 
 
     closeLoginModal();
-
     closeSignupModal();
 
-  }
 
-  catch (error) {
-
-    console.error(error);
+  } catch (error) {
 
     alert(
       "Google login failed: " +
@@ -427,17 +371,11 @@ window.logoutUser = async function () {
 
     await signOut(auth);
 
-    alert(
-      "Logged out successfully."
-    );
+    alert("Logged out successfully.");
 
-  }
+  } catch (error) {
 
-  catch (error) {
-
-    alert(
-      error.message
-    );
+    alert(error.message);
 
   }
 
@@ -463,32 +401,25 @@ function loadReports() {
   let reportsQuery;
 
 
-  // ADMIN SEES ALL REPORTS
+  // ADMIN CAN SEE ALL REPORTS
 
   if (isAdmin) {
 
     reportsQuery =
       query(
-        collection(
-          db,
-          "reports"
-        )
+        collection(db, "reports")
       );
 
   }
 
 
-  // NORMAL USER SEES OWN REPORTS
+  // NORMAL USER ONLY OWN REPORTS
 
   else {
 
     reportsQuery =
       query(
-        collection(
-          db,
-          "reports"
-        ),
-
+        collection(db, "reports"),
         where(
           "userId",
           "==",
@@ -503,7 +434,6 @@ function loadReports() {
     onSnapshot(
 
       reportsQuery,
-
 
       (snapshot) => {
 
@@ -583,9 +513,7 @@ function loadReports() {
 
 function renderReports() {
 
-  if (!currentUser) return;
-
-  if (!reportsContainer) return;
+  if (!currentUser || !reportsContainer) return;
 
 
   const filterElement =
@@ -601,23 +529,21 @@ function renderReports() {
 
 
   let filteredReports =
-    userReports;
+    [...userReports];
 
 
   if (filter !== "All") {
 
     filteredReports =
-      userReports.filter(
-        report =>
+      filteredReports.filter(
+        (report) =>
           report.emergencyType === filter
       );
 
   }
 
 
-  if (
-    filteredReports.length === 0
-  ) {
+  if (filteredReports.length === 0) {
 
     reportsContainer.innerHTML = `
       <p class="no-report">
@@ -639,33 +565,26 @@ function renderReports() {
       const card =
         document.createElement("div");
 
-
       card.className =
         "report-card";
 
 
       // DATE
 
-      let dateText =
-        "Just now";
-
+      let dateText = "Just now";
 
       if (report.createdAt) {
 
         try {
 
-          const date =
-            report.createdAt.toDate();
-
           dateText =
-            date.toLocaleString();
+            report.createdAt
+              .toDate()
+              .toLocaleString();
 
-        }
+        } catch {
 
-        catch {
-
-          dateText =
-            "Recently";
+          dateText = "Recently";
 
         }
 
@@ -680,8 +599,7 @@ function renderReports() {
 
       if (
         report.location &&
-        typeof report.location.latitude ===
-        "number"
+        typeof report.location.latitude === "number"
       ) {
 
         locationText =
@@ -694,14 +612,11 @@ function renderReports() {
       // STATUS
 
       const status =
-        report.status ||
-        "Pending";
+        report.status || "Pending";
 
 
-      const statusClass =
-        status === "Resolved"
-          ? "resolved-status"
-          : "pending-status";
+      const isResolved =
+        status === "Resolved";
 
 
       // =====================================
@@ -715,15 +630,15 @@ function renderReports() {
           <div class="report-top">
 
             <h3>
-              ${escapeHTML(
-                report.emergencyType
-              )}
+              ${escapeHTML(report.emergencyType)}
             </h3>
 
-
-            <span
-              class="status-badge ${statusClass}"
-            >
+            <span class="
+              status-badge
+              ${isResolved
+                ? "resolved-status"
+                : "pending-status"}
+            ">
               ${escapeHTML(status)}
             </span>
 
@@ -731,69 +646,38 @@ function renderReports() {
 
 
           <p>
-
-            <strong>
-              Name:
-            </strong>
-
-            ${escapeHTML(
-              report.name
-            )}
-
+            <strong>👤 Name:</strong>
+            ${escapeHTML(report.name)}
           </p>
 
 
           <p>
-
-            <strong>
-              User Email:
-            </strong>
-
+            <strong>📧 User Email:</strong>
             ${escapeHTML(
-              report.userEmail ||
-              "Unknown"
+              report.userEmail || "Unknown"
             )}
-
           </p>
 
 
           <p>
-
-            <strong>
-              Description:
-            </strong>
-
-            ${escapeHTML(
-              report.description
-            )}
-
+            <strong>📝 Description:</strong>
+            ${escapeHTML(report.description)}
           </p>
 
 
           <p>
-
-            <strong>
-              Location:
-            </strong>
-
+            <strong>📍 Location:</strong>
             ${locationText}
-
           </p>
 
 
           <p>
-
-            <strong>
-              Submitted:
-            </strong>
-
+            <strong>🕒 Submitted:</strong>
             ${dateText}
-
           </p>
 
 
           <div class="report-actions">
-
 
             <button
               class="resolve-btn"
@@ -802,9 +686,7 @@ function renderReports() {
                 'Resolved'
               )"
             >
-
               ✅ Resolve
-
             </button>
 
 
@@ -815,9 +697,7 @@ function renderReports() {
                 'Pending'
               )"
             >
-
-              ⏳ Pending
-
+              🟡 Pending
             </button>
 
 
@@ -827,11 +707,8 @@ function renderReports() {
                 '${report.id}'
               )"
             >
-
               🗑 Delete
-
             </button>
-
 
           </div>
 
@@ -846,91 +723,51 @@ function renderReports() {
 
       else {
 
-        const userStatusText =
-          status === "Resolved"
-            ? "✅ Your case has been resolved."
-            : "⏳ Your case is pending and under review.";
-
-
-        const userStatusClass =
-          status === "Resolved"
-            ? "resolved"
-            : "pending";
-
-
         card.innerHTML = `
 
           <div class="report-top">
 
             <h3>
-              ${escapeHTML(
-                report.emergencyType
-              )}
+              ${escapeHTML(report.emergencyType)}
             </h3>
-
-
-            <span
-              class="status-badge ${statusClass}"
-            >
-              ${escapeHTML(status)}
-            </span>
 
           </div>
 
 
           <p>
-
-            <strong>
-              Name:
-            </strong>
-
-            ${escapeHTML(
-              report.name
-            )}
-
+            <strong>👤 Name:</strong>
+            ${escapeHTML(report.name)}
           </p>
 
 
           <p>
-
-            <strong>
-              Description:
-            </strong>
-
-            ${escapeHTML(
-              report.description
-            )}
-
+            <strong>📝 Description:</strong>
+            ${escapeHTML(report.description)}
           </p>
 
 
           <p>
-
-            <strong>
-              Location:
-            </strong>
-
+            <strong>📍 Location:</strong>
             ${locationText}
-
           </p>
 
 
           <p>
-
-            <strong>
-              Submitted:
-            </strong>
-
+            <strong>🕒 Submitted:</strong>
             ${dateText}
-
           </p>
 
 
-          <div
-            class="case-status ${userStatusClass}"
-          >
+          <div class="
+            case-status
+            ${isResolved
+              ? "resolved"
+              : "pending"}
+          ">
 
-            ${userStatusText}
+            ${isResolved
+              ? "✅ Case Resolved"
+              : "⏳ Case Pending"}
 
           </div>
 
@@ -939,9 +776,7 @@ function renderReports() {
       }
 
 
-      reportsContainer.appendChild(
-        card
-      );
+      reportsContainer.appendChild(card);
 
     }
 
@@ -951,11 +786,10 @@ function renderReports() {
 
 
 // ==========================================
-// FILTER
+// FILTER REPORTS
 // ==========================================
 
-window.filterReports =
-function () {
+window.filterReports = function () {
 
   renderReports();
 
@@ -971,9 +805,7 @@ function updateDashboard(reports) {
   const total =
     reports.length;
 
-
   let pending = 0;
-
   let resolved = 0;
 
 
@@ -986,9 +818,7 @@ function updateDashboard(reports) {
 
         resolved++;
 
-      }
-
-      else {
+      } else {
 
         pending++;
 
@@ -1017,7 +847,7 @@ function updateDashboard(reports) {
   if (activeReports) {
 
     activeReports.textContent =
-      pending;
+      isAdmin ? pending : "-";
 
   }
 
@@ -1025,7 +855,7 @@ function updateDashboard(reports) {
   if (resolvedReports) {
 
     resolvedReports.textContent =
-      resolved;
+      isAdmin ? resolved : "-";
 
   }
 
@@ -1045,10 +875,7 @@ async function (
 
   if (!isAdmin) {
 
-    alert(
-      "Admin access required."
-    );
-
+    alert("Admin access required.");
     return;
 
   }
@@ -1065,20 +892,19 @@ async function (
       ),
 
       {
-        status:
-          newStatus
+        status: newStatus,
+        updatedAt: serverTimestamp()
       }
 
     );
 
 
     alert(
-      `Report marked as ${newStatus}`
+      `Case marked as ${newStatus}.`
     );
 
-  }
 
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
 
@@ -1093,19 +919,15 @@ async function (
 
 // ==========================================
 // DELETE REPORT
+// ADMIN ONLY
 // ==========================================
 
 window.deleteReport =
-async function (
-  reportId
-) {
+async function (reportId) {
 
   if (!isAdmin) {
 
-    alert(
-      "Admin access required."
-    );
-
+    alert("Admin access required.");
     return;
 
   }
@@ -1133,19 +955,11 @@ async function (
     );
 
 
-    alert(
-      "Report deleted successfully."
-    );
-
-  }
-
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
 
-    alert(
-      "Unable to delete report."
-    );
+    alert("Unable to delete report.");
 
   }
 
@@ -1154,6 +968,7 @@ async function (
 
 // ==========================================
 // CLEAR ALL REPORTS
+// ADMIN ONLY
 // ==========================================
 
 window.clearAllReports =
@@ -1161,10 +976,7 @@ async function () {
 
   if (!isAdmin) {
 
-    alert(
-      "Admin access required."
-    );
-
+    alert("Admin access required.");
     return;
 
   }
@@ -1219,13 +1031,10 @@ async function () {
     );
 
 
-    alert(
-      "All reports deleted."
-    );
+    alert("All reports deleted.");
 
-  }
 
-  catch (error) {
+  } catch (error) {
 
     console.error(error);
 
@@ -1292,7 +1101,9 @@ function () {
 };
 
 
-// SOS
+// ==========================================
+// SOS FORM
+// ==========================================
 
 window.openSOSForm =
 function () {
@@ -1313,7 +1124,6 @@ function () {
     document.getElementById(
       "reportModal"
     );
-
 
   if (modal) {
 
@@ -1338,9 +1148,7 @@ function () {
     );
 
 
-  if (
-    !navigator.geolocation
-  ) {
+  if (!navigator.geolocation) {
 
     if (status) {
 
@@ -1399,6 +1207,13 @@ function () {
 
       }
 
+    },
+
+
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0
     }
 
   );
@@ -1482,17 +1297,14 @@ if (emergencyForm) {
 
           {
 
-            name:
-              name,
+            name,
 
-            emergencyType:
-              emergencyType,
+            emergencyType,
 
-            description:
-              description,
+            description,
 
             location:
-              currentLocation,
+              currentLocation || null,
 
             userId:
               currentUser.uid,
@@ -1512,15 +1324,13 @@ if (emergencyForm) {
 
 
         alert(
-          "Emergency report submitted successfully! 🚨"
+          "🚨 Emergency report submitted successfully!"
         );
 
 
         emergencyForm.reset();
 
-
-        currentLocation =
-          null;
+        currentLocation = null;
 
 
         const locationStatus =
@@ -1539,9 +1349,8 @@ if (emergencyForm) {
 
         closeReportForm();
 
-      }
 
-      catch (error) {
+      } catch (error) {
 
         console.error(error);
 
@@ -1563,123 +1372,117 @@ if (emergencyForm) {
 // FEEDBACK SYSTEM
 // ==========================================
 
-window.submitFeedback =
-async function () {
-
-  if (!currentUser) {
-
-    alert(
-      "Please login first to submit feedback."
-    );
-
-    openLoginModal();
-
-    return;
-
-  }
+const feedbackForm =
+  document.getElementById(
+    "feedbackForm"
+  );
 
 
-  const feedbackType =
-    document.getElementById(
-      "feedbackType"
-    );
+if (feedbackForm) {
+
+  feedbackForm.addEventListener(
+
+    "submit",
+
+    async function (event) {
+
+      event.preventDefault();
 
 
-  const feedbackMessage =
-    document.getElementById(
-      "feedbackMessage"
-    );
+      if (!currentUser) {
 
+        alert(
+          "Please login first to submit feedback."
+        );
 
-  if (
-    !feedbackType ||
-    !feedbackMessage
-  ) {
+        openLoginModal();
 
-    return;
-
-  }
-
-
-  const type =
-    feedbackType.value;
-
-
-  const message =
-    feedbackMessage.value.trim();
-
-
-  if (!message) {
-
-    alert(
-      "Please write your feedback."
-    );
-
-    return;
-
-  }
-
-
-  try {
-
-    await addDoc(
-
-      collection(
-        db,
-        "feedback"
-      ),
-
-      {
-
-        userId:
-          currentUser.uid,
-
-        userEmail:
-          currentUser.email,
-
-        userName:
-          currentUser.displayName ||
-          "Anonymous",
-
-        feedbackType:
-          type,
-
-        message:
-          message,
-
-        createdAt:
-          serverTimestamp()
+        return;
 
       }
 
-    );
+
+      const feedbackType =
+        document.getElementById(
+          "feedbackType"
+        )?.value || "General";
 
 
-    alert(
-      "Thank you for your feedback! 💙"
-    );
+      const feedbackMessage =
+        document.getElementById(
+          "feedbackMessage"
+        )?.value.trim();
 
 
-    feedbackMessage.value =
-      "";
+      if (!feedbackMessage) {
+
+        alert(
+          "Please enter your feedback."
+        );
+
+        return;
+
+      }
 
 
-    feedbackType.value =
-      "General";
+      try {
 
-  }
+        await addDoc(
 
-  catch (error) {
+          collection(
+            db,
+            "feedback"
+          ),
 
-    console.error(error);
+          {
 
-    alert(
-      "Unable to submit feedback."
-    );
+            userId:
+              currentUser.uid,
 
-  }
+            userEmail:
+              currentUser.email,
 
-};
+            userName:
+              currentUser.displayName ||
+              currentUser.email.split("@")[0],
+
+            type:
+              feedbackType,
+
+            message:
+              feedbackMessage,
+
+            createdAt:
+              serverTimestamp()
+
+          }
+
+        );
+
+
+        alert(
+          "Thank you! Your feedback has been submitted. 💙"
+        );
+
+
+        feedbackForm.reset();
+
+
+      } catch (error) {
+
+        console.error(error);
+
+        alert(
+          "Unable to submit feedback."
+        );
+
+      }
+
+    }
+
+  );
+
+}
 
 
 // ==========================================
@@ -1693,7 +1496,6 @@ function () {
     document.getElementById(
       "loginModal"
     );
-
 
   if (modal) {
 
@@ -1712,7 +1514,6 @@ function () {
     document.getElementById(
       "loginModal"
     );
-
 
   if (modal) {
 
@@ -1736,7 +1537,6 @@ function () {
       "signupModal"
     );
 
-
   if (modal) {
 
     modal.style.display =
@@ -1755,7 +1555,6 @@ function () {
       "signupModal"
     );
 
-
   if (modal) {
 
     modal.style.display =
@@ -1767,7 +1566,7 @@ function () {
 
 
 // ==========================================
-// CLOSE MODALS OUTSIDE
+// CLOSE MODALS ON OUTSIDE CLICK
 // ==========================================
 
 window.addEventListener(
@@ -1781,12 +1580,10 @@ window.addEventListener(
         "reportModal"
       );
 
-
     const loginModal =
       document.getElementById(
         "loginModal"
       );
-
 
     const signupModal =
       document.getElementById(
@@ -1831,7 +1628,14 @@ window.addEventListener(
 
 function escapeHTML(value) {
 
-  if (!value) return "";
+  if (
+    value === null ||
+    value === undefined
+  ) {
+
+    return "";
+
+  }
 
 
   return String(value)
@@ -1865,9 +1669,9 @@ function escapeHTML(value) {
 
 
 // ==========================================
-// FINAL
+// FINAL CONSOLE MESSAGE
 // ==========================================
 
 console.log(
-  "🚨 NOVA Disaster Response Phase 4 Loaded Successfully"
+  "🚨 NOVA Disaster Response - Phase 5 Loaded Successfully"
 );
